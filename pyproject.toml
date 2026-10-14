@@ -1,7 +1,7 @@
 [project]
-name = "frameseek"
+name = "ctrlf-video"
 version = "0.1.0"
-description = "Evidence-first video search and conversation"
+description = "CtrlF Video: Gemini-powered video investigation workspace"
 requires-python = ">=3.13,<3.14"
 dependencies = [
   "fastapi>=0.115,<1",
@@ -18,7 +18,7 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/frameseek"]
+packages = ["src/ctrlf_video"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

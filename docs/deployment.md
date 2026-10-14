@@ -35,14 +35,14 @@ equivalent CAS, ownership, generation and atomic budget behavior.
 
 - [Dockerfile](../Dockerfile): Python 3.13, frozen `uv.lock`, committed frontend,
   FFmpeg/ffprobe and bubblewrap, nonroot UID 10001; no Node or GPU requirement.
-  Workspace startup requires an explicit `FS_DATA_DIR` volume mount by default
-  (`FS_REQUIRE_DATA_MOUNT=1`); a mounted volume still needs durability validation.
+  Workspace startup requires an explicit `CTRLF_DATA_DIR` volume mount by default
+  (`CTRLF_REQUIRE_DATA_MOUNT=1`); a mounted volume still needs durability validation.
 - [.dockerignore](../.dockerignore): an allowlist excluding private media,
   databases, credentials, approval records, evaluation data and unrelated drafts.
-- `frameseek.server`: binds `0.0.0.0:$PORT`, defaults to workspace and fixture,
+- `ctrlf_video.server`: binds `0.0.0.0:$PORT`, defaults to workspace and fixture,
   always runs one Uvicorn process. Workspace startup refuses Cloud Run's
   `K_SERVICE` before opening storage, even when invoked directly via the factory.
-- `frameseek.gateway`: streams HTTP without copying storage or starting workers,
+- `ctrlf_video.gateway`: streams HTTP without copying storage or starting workers,
   follows no redirects and has no retry/model/cloud SDK path.
 - [gateway.service.example.yaml](../deploy/gcp/gateway.service.example.yaml):
   Cloud Run ingress template with placeholder image/origins/secret. Its replica,
@@ -56,8 +56,8 @@ The local Python/ASGI tests exercise the gateway and real workspace together.
 
 | Component | Required configuration |
 | --- | --- |
-| Gateway | `FS_COMPONENT=gateway`, `FS_PUBLIC_ORIGIN`, `FS_BACKEND_ORIGIN`, private `FS_GATEWAY_TOKEN`, `PORT` |
-| Workspace | `FS_COMPONENT=workspace`, same `FS_PUBLIC_ORIGIN` and private `FS_GATEWAY_TOKEN`, persistent `FS_DATA_DIR`, trusted `FS_RUNTIME_FILE`, backend-only `GEMINI_API_KEY`, `FRAMESEEK_MODE=real` only after prerequisites |
+| Gateway | `CTRLF_COMPONENT=gateway`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, `PORT` |
+| Workspace | `CTRLF_COMPONENT=workspace`, same `CTRLF_PUBLIC_ORIGIN` and private `CTRLF_GATEWAY_TOKEN`, persistent `CTRLF_DATA_DIR`, trusted `CTRLF_RUNTIME_FILE`, backend-only `GEMINI_API_KEY`, `CTRLF_VIDEO_MODE=real` only after prerequisites |
 
 Both origins must be exact HTTPS origins without credentials, path, query or
 fragment. They must differ. The shared token must be 32–256 printable ASCII
@@ -71,7 +71,7 @@ sets the canonical public Host and injects its private token. It preserves
 Range requests, status codes, cookie headers, cache headers, request bodies and
 streamed bytes. Backend cookies are Secure whenever a public HTTPS origin is
 configured. No public-origin rewriting can bypass the existing CSRF/ownership
-checks. With `FS_GATEWAY_TOKEN` configured, all direct backend requests require
+checks. With `CTRLF_GATEWAY_TOKEN` configured, all direct backend requests require
 the token; an unavailable backend produces an explicit 502.
 
 The gateway limits request bodies to **30 MiB** because its Uvicorn HTTP/1 server
@@ -104,7 +104,7 @@ limit without an independently tested larger-upload transport.
 7. Configure the public Cloud Run ingress and secret reference only after the
    backend passes. Test forwarding, spoofed headers, uploads, ranges, session
    persistence across gateway restarts and free authorized judge access.
-8. Run the authorized real-video smoke in [AI_BUILDER_CUP.md](AI_BUILDER_CUP.md),
+8. Run the authorized real-video smoke in [runtime guide](WORKSPACE_RUNTIME.md),
    retain billing/quality proof and verify the event's deployment requirements.
 
 Rollback keeps the same durable backend/ledger and stops the replacement before

@@ -153,7 +153,7 @@ async function harness(readyState = 1, width = 1440) {
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "../src/frameseek/static/app.js"),
+      path.join(__dirname, "../src/ctrlf_video/static/app.js"),
       "utf8",
     ),
     context,
@@ -223,13 +223,13 @@ test("removed evidence cannot receive focus; desktop seek preserves current focu
 
 test("unsupported follow-up on another topic gives a supported recovery question", async () => {
   const h = await conversation();
-  h.get("question").value = "那后来呢？";
-  h.run('lastQueryId = "forklift"; ask("那后来呢？")');
-  assert.equal(h.get("question").value, "那后来呢？");
+  h.get("question").value = "What happened next?";
+  h.run('lastQueryId = "forklift"; ask("What happened next?")');
+  assert.equal(h.get("question").value, "What happened next?");
   assert.equal(h.get("messages").children.length, 0);
-  assert.match(h.get("form-notice").textContent, /当前话题不支持这个追问/);
-  assert.match(h.get("form-notice").textContent, /包裹什么时候出现在中央/);
-  assert.doesNotMatch(h.get("form-notice").textContent, /演示支持「那后来呢/);
-  h.run('lastQueryId = "center"; ask("不支持的问题")');
-  assert.match(h.get("form-notice").textContent, /演示支持「那后来呢/);
+  assert.match(h.get("form-notice").textContent, /does not match the current context/);
+  assert.match(h.get("form-notice").textContent, /When is the package at the center/);
+  assert.doesNotMatch(h.get("form-notice").textContent, /demo supports“What happened next/);
+  h.run('lastQueryId = "center"; ask("不Support Question")');
+  assert.match(h.get("form-notice").textContent, /demo supports“What happened next/);
 });

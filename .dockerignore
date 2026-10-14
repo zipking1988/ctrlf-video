@@ -7,7 +7,7 @@
 !uv.lock
 !README.md
 !src/
-!src/frameseek/
-!src/frameseek/**
+!src/ctrlf_video/
+!src/ctrlf_video/**
 **/__pycache__/
 **/*.pyc

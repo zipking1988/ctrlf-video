@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def main() -> None:
-    directory = Path(__file__).resolve().parents[1] / "src" / "frameseek" / "static" / "demo"
+    directory = Path(__file__).resolve().parents[1] / "src" / "ctrlf_video" / "static" / "demo"
     frames = directory / "frames"
     frames.mkdir(parents=True, exist_ok=True)
     command = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y"]

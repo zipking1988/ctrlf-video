@@ -2,7 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   createModel,
-} = require("../src/frameseek/static/investigation-canvas.js");
+} = require("../src/ctrlf_video/static/investigation-canvas.js");
 test("a branch attaches to the explicitly selected turn, not the latest turn", () => {
   const m = createModel();
   m.add("center", null);
@@ -78,7 +78,7 @@ test("fit keeps a twelve-turn investigation chain within the viewport", () => {
   }
 });
 
-test("横向评审排列保留分支且在小桌面保有可读比例", () => {
+test("横Ask评审排列Keep分支且在小桌面保有可读比例", () => {
   const m = createModel();
   m.add("root", null);
   m.add("tape", "root");
@@ -97,7 +97,7 @@ test("横向评审排列保留分支且在小桌面保有可读比例", () => {
   assert.ok(m.items.get("tape").x < m.items.get("lighting").x);
 });
 
-test("工作台按对象排列分开问题和发现，保留证据来源", () => {
+test("工作台按对象排列分开QuestionandFindings, KeepEvidenceSource", () => {
   const m = createModel();
   m.add("q1", null);
   m.add("q2", "q1");
@@ -110,7 +110,7 @@ test("工作台按对象排列分开问题和发现，保留证据来源", () =>
   assert.equal(m.items.get("frame").parent, "q1");
   assert.equal(m.items.get("claim").parent, "q2");
 });
-test("工作台取景按输入区留白，发现卡片不被底部遮挡", () => {
+test("工作台取景按输入区留白, Findings卡片不被底部遮挡", () => {
   const m = createModel();
   for (let n = 0; n < 6; n++)
     m.add(String(n), n ? String(n - 1) : null, {
@@ -122,7 +122,7 @@ test("工作台取景按输入区留白，发现卡片不被底部遮挡", () =>
     assert.ok((item.y + item.height) * m.view.scale + m.view.y <= 988.001);
 });
 
-test("对齐吸附选最近轴线，超出容差保持自由移动且不改父关系", () => {
+test("Align吸附选最近轴线, 超出容差保持自由移动且不改父关系", () => {
   const m = createModel();
   m.add("a", null);
   m.add("b", "a");
@@ -138,7 +138,7 @@ test("对齐吸附选最近轴线，超出容差保持自由移动且不改父�
   assert.deepEqual(far.guides, []);
 });
 
-test("选中分支关联祖先和下游发现，其他分支不误标为来源", () => {
+test("Select分支关联祖先and下游Findings, 其他分支不误标为Source", () => {
   const m = createModel();
   m.add("root", null);
   m.add("left", "root");
@@ -151,7 +151,7 @@ test("选中分支关联祖先和下游发现，其他分支不误标为来源",
   assert.deepEqual([...m.related("frame")], ["frame"]);
 });
 
-test("小地图包含负坐标对象与远处视野，投影随缩放平移更新", () => {
+test("小地图包含负坐标对象with远处视野, 投影随缩放平移更新", () => {
   const m = createModel();
   m.add("a", null);
   m.add("b", "a");
@@ -172,7 +172,7 @@ test("小地图包含负坐标对象与远处视野，投影随缩放平移更�
   assert.equal(m.overview(1000, 700).nodes.length, 0);
 });
 
-test("折叠只隐藏实际后代，其他分支与坐标保持，展开恢复原对象", () => {
+test("Collapse只隐藏实际后代, 其他分支with坐标保持, Expand恢复原对象", () => {
   const m = createModel();
   m.add("root", null);
   m.add("a", "root");
@@ -192,7 +192,7 @@ test("折叠只隐藏实际后代，其他分支与坐标保持，展开恢复�
   assert.equal(m.items.get("frame").y, 900);
 });
 
-test("选择隐藏轮次展开祖先，保留独立子路径的折叠状态", () => {
+test("选择隐藏TurnExpand祖先, Keep独立子Path Collapse状态", () => {
   const m = createModel();
   m.add("root", null);
   m.add("a", "root");
@@ -208,7 +208,7 @@ test("选择隐藏轮次展开祖先，保留独立子路径的折叠状态", ()
   assert.ok(!m.visible().some((i) => i.id === "claim"));
 });
 
-test("隐藏对象不影响小地图与适应视图，展开后重新纳入取景", () => {
+test("隐藏对象不影响小地图withFit view, Expand后重新纳入取景", () => {
   const m = createModel();
   m.add("root", null);
   m.add("far", "root");
@@ -223,13 +223,13 @@ test("隐藏对象不影响小地图与适应视图，展开后重新纳入取�
   assert.equal(m.overview(1000, 800).nodes.length, 2);
 });
 
-test("路径命名不覆盖原始问题，移除父节点释放隐藏子项，重置清除折叠", () => {
+test("Path命名不覆盖原始Question, Remove父节点释放隐藏子项, 重置清除Collapse", () => {
   const m = createModel();
-  m.add("root", null, { question: "原始问题" });
+  m.add("root", null, { question: "原始Question" });
   m.add("child", "root");
   m.renameBranch("root", "  位置变化  ");
   m.fold("root", true);
-  assert.equal(m.items.get("root").question, "原始问题");
+  assert.equal(m.items.get("root").question, "原始Question");
   assert.equal(m.items.get("root").branchName, "位置变化");
   m.remove("root");
   assert.equal(m.visible()[0].id, "child");
@@ -238,10 +238,10 @@ test("路径命名不覆盖原始问题，移除父节点释放隐藏子项，�
   assert.equal(m.visible().length, 0);
 });
 
-test("摘要阈值带缓冲区，边界缩放不会反复切换内容", () => {
+test("摘要阈值带缓冲区, 边界缩放不会反复切换内容", () => {
   const {
     densityFor,
-  } = require("../src/frameseek/static/investigation-canvas.js");
+  } = require("../src/ctrlf_video/static/investigation-canvas.js");
   assert.equal(densityFor(0.7, "detail"), "overview");
   assert.equal(densityFor(0.76, "overview"), "overview");
   assert.equal(densityFor(0.81, "overview"), "overview");
@@ -249,17 +249,17 @@ test("摘要阈值带缓冲区，边界缩放不会反复切换内容", () => {
   assert.equal(densityFor(0.76, "detail"), "detail");
 });
 
-test("极小取景使用图谱，返回摘要时保留阈值缓冲", () => {
+test("极小取景Use图谱, 返回摘要时Keep阈值缓冲", () => {
   const {
     densityFor,
-  } = require("../src/frameseek/static/investigation-canvas.js");
+  } = require("../src/ctrlf_video/static/investigation-canvas.js");
   assert.equal(densityFor(0.3, "detail"), "map");
   assert.equal(densityFor(0.41, "map"), "map");
   assert.equal(densityFor(0.45, "map"), "overview");
   assert.equal(densityFor(0.9, "map"), "detail");
 });
 
-test("折叠路径作为整体移动，其他路径不受影响", () => {
+test("CollapsePath作为整体移动, 其他Path不受影响", () => {
   const m = createModel();
   const root = m.add("root", null);
   const child = m.add("child", "root");
@@ -281,7 +281,7 @@ test("折叠路径作为整体移动，其他路径不受影响", () => {
   assert.equal(frame.parent, "child");
 });
 
-test("折叠时整理压缩空位，展开后重排避免重叠且保留关系", () => {
+test("Collapse时Arrange压缩空位, Expand后重排避免重叠且Keep关系", () => {
   const m = createModel();
   m.add("root", null);
   m.add("child", "root");
@@ -307,7 +307,7 @@ test("折叠时整理压缩空位，展开后重排避免重叠且保留关系",
   assert.equal(m.items.get("frame").parent, "child");
 });
 
-test("空间快照恢复位置、视角、路径名称与折叠，丢失对象不复活", () => {
+test("空间快照恢复位置、视角、Path namewithCollapse, 丢失对象不复活", () => {
   const original = createModel();
   original.add("root", null); original.add("child", "root");
   original.renameBranch("root", "物体位置"); original.move("root", 620, 400); original.fold("root", true);
@@ -329,10 +329,10 @@ test('one batch translation moves a folded subtree once even if a child is also 
 });
 test('undo/redo restores groups, names and positions without reverting view, new answers or parents',()=>{
  const m=createModel();m.add('a',null);m.add('b','a');const x=m.items.get('a').x;
- m.perform('分组',()=>{m.group(['a','b'],'调查线索','g1');m.renameBranch('a','位置');m.moveMany(['a','b'],100,30);});
+ m.perform('分组',()=>{m.group(['a','b'],'Investigation线索','g1');m.renameBranch('a','位置');m.moveMany(['a','b'],100,30);});
  m.add('new','b');m.pan(18,25);const view=m.view;
  assert.equal(m.undo(),'分组');assert.equal(m.groups.size,0);assert.equal(m.items.get('a').branchName,'');assert.equal(m.items.get('a').x,x);assert.equal(m.items.get('new').parent,'b');assert.deepEqual(m.view,view);
- assert.equal(m.redo(),'分组');assert.equal(m.groups.get('g1').name,'调查线索');assert.equal(m.items.get('a').x,x+100);
+ assert.equal(m.redo(),'分组');assert.equal(m.groups.get('g1').name,'Investigation线索');assert.equal(m.items.get('a').x,x+100);
  m.undo();m.perform('另一次移动',()=>m.moveMany(['a'],10,0));assert.equal(m.canRedo,false);
 });
 test('group hydration filters missing nodes; deletion and clear cannot resurrect evidence objects',()=>{
@@ -343,7 +343,7 @@ test('group hydration filters missing nodes; deletion and clear cannot resurrect
 });
 test('alignment and spacing preserve evidence parents; history is bounded and no-op does not add entries',()=>{
  const m=createModel();m.add('a',null);m.add('b','a');m.add('c','a');
- m.perform('对齐',()=>m.align(['a','b','c'],'left'));assert.equal(m.items.get('a').x,m.items.get('b').x);assert.equal(m.items.get('c').parent,'a');
+ m.perform('Align',()=>m.align(['a','b','c'],'left'));assert.equal(m.items.get('a').x,m.items.get('b').x);assert.equal(m.items.get('c').parent,'a');
  assert.equal(m.perform('不移动',()=>m.moveMany(['a'],0,0)),false);
  for(let i=0;i<70;i++)m.perform('移动',()=>m.moveMany(['a'],1,0));let count=0;while(m.undo())count++;assert.equal(count,60);
 });
@@ -351,14 +351,14 @@ test('alignment and spacing preserve evidence parents; history is bounded and no
 
 test('Shift removing a nonprimary selection keeps follow-up anchored to the remaining checked card',()=>{
  const fs=require('node:fs'),vm=require('node:vm');
- const source=fs.readFileSync(require.resolve('../src/frameseek/static/investigation-canvas.js'),'utf8');
+ const source=fs.readFileSync(require.resolve('../src/ctrlf_video/static/investigation-canvas.js'),'utf8');
  const chooser=source.slice(source.indexOf('    function choose('),source.indexOf('    function clearScope('));
  const selectedIds=new Set(),elements=new Map();
  const $=id=>{if(!elements.has(id))elements.set(id,{});return elements.get(id);};
  const records=new Map(['A','B'].map(id=>[id,{query:{id,question:id,response:{id}},select:{setAttribute(){}}}]));
  const ctx=vm.createContext({records,selectedIds,$,model:{expandPath(){}},detailFocus:null,selected:null,callbacks:{select(){}},draw(){},clearScope(){}});
  vm.runInContext(chooser,ctx);vm.runInContext("choose('A');choose('B',false,true);choose('A',false,true)",ctx);
- assert.equal(ctx.selected,'B');assert.equal(elements.get('composer-label').textContent,'继续追问：B');assert.deepEqual([...selectedIds],['B']);
+ assert.equal(ctx.selected,'B');assert.equal(elements.get('composer-label').textContent,'Follow up: B');assert.deepEqual([...selectedIds],['B']);
 });
 
 
@@ -371,7 +371,7 @@ test('aligning a folded parent ignores selected hidden children and preserves th
 
 test('holding Shift before title drag preserves selection and still begins a free-placement gesture',()=>{
  const fs=require('node:fs'),vm=require('node:vm');
- const source=fs.readFileSync(require.resolve('../src/frameseek/static/investigation-canvas.js'),'utf8');
+ const source=fs.readFileSync(require.resolve('../src/ctrlf_video/static/investigation-canvas.js'),'utf8');
  const chooser=source.slice(source.indexOf('    function choose('),source.indexOf('    function clearScope('));
  const begin=source.indexOf('      drag.addEventListener("pointerdown", (e) => {');
  const end=source.indexOf('      const end = () => {',begin);

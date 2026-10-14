@@ -3,22 +3,22 @@ const assert = require("node:assert/strict");
 const {
   createStore,
   visiblePins,
-} = require("../src/frameseek/static/workbench-model.js");
+} = require("../src/ctrlf_video/static/workbench-model.js");
 const frames = [
-  { uri: "/media/demo_parcel/frames/0.jpg", t: 0, caption: "包裹位于左侧" },
-  { uri: "/media/demo_parcel/frames/13.jpg", t: 13, caption: "包裹位于右侧" },
+  { uri: "/media/demo_parcel/frames/0.jpg", t: 0, caption: "Package on the left" },
+  { uri: "/media/demo_parcel/frames/13.jpg", t: 13, caption: "Package on the right" },
 ];
 const query = {
   id: "compare",
   question: "对比前后位置",
   response: {
     status: "partial",
-    answer: "可确认位置，不能确认连续移动。",
-    unresolved: ["搬运者未知"],
+    answer: "可确认位置, 不能确认连续移动.",
+    unresolved: ["搬运者Unknown"],
     events: [{ evidence: frames }],
   },
 };
-test("订阅使用稳定快照，可退订；独立切换旧轮次而非最新问题", () => {
+test("subscriptions return stable snapshots and selection can revisit earlier questions", () => {
   const s = createStore();
   const snapshot = s.getSnapshot();
   assert.equal(s.getSnapshot(), snapshot);
@@ -30,10 +30,10 @@ test("订阅使用稳定快照，可退订；独立切换旧轮次而非最新�
   assert.equal(s.getSnapshot().selectedId, "one");
   assert.equal(calls, 3);
   off();
-  s.rename("调查");
+  s.rename("Investigation");
   assert.equal(calls, 3);
 });
-test("证据去重保留真实引用，拒绝伪造时间或其他文件", () => {
+test("evidence deduplication preserves references and rejects forged timestamps or sources", () => {
   const s = createStore();
   const first = s.pinFrame("one", query, frames[0]);
   assert.ok(first);
@@ -45,20 +45,20 @@ test("证据去重保留真实引用，拒绝伪造时间或其他文件", () =>
     null,
   );
 });
-test("partial结论与未确认项一并导出，不保存失败或无结果为事实", () => {
+test("partial findings export unresolved details; failures and no results cannot become facts", () => {
   const s = createStore();
-  s.rename("位置调查");
+  s.rename("位置Investigation");
   s.group("前后核对");
   s.annotate("下一步核实搬运者");
   s.record("one", query);
   s.pinFrame("one", query, frames[1]);
   s.pinConclusion("one", query);
   const md = s.markdown();
-  assert.match(md, /位置调查/);
+  assert.match(md, /位置Investigation/);
   assert.match(md, /前后核对/);
   assert.match(md, /00:13/);
-  assert.match(md, /未确认：搬运者未知/);
-  assert.match(md, /预设结果/);
+  assert.match(md, /Unresolved: 搬运者Unknown/);
+  assert.match(md, /preset results/);
   assert.match(md, /下一步核实搬运者/);
   assert.equal(
     s.pinConclusion("one", {
@@ -68,7 +68,7 @@ test("partial结论与未确认项一并导出，不保存失败或无结果为�
     null,
   );
 });
-test("集合限制、移除与重置不遗留引用，本地文件禁止套用演示事实", () => {
+test("finding limits and reset retain no stale references; local playback cannot use demo evidence", () => {
   const s = createStore();
   for (let i = 0; i < 8; i++)
     assert.ok(s.pinConclusion("one", { ...query, id: String(i) }));
@@ -81,10 +81,10 @@ test("集合限制、移除与重置不遗留引用，本地文件禁止套用�
   assert.deepEqual(s.getSnapshot().pins, []);
   assert.equal(s.pinFrame("one", query, frames[0]), null);
   assert.equal(s.pinConclusion("one", query), null);
-  assert.match(s.markdown(), /本地文件/);
-  assert.doesNotMatch(s.markdown(), /合成演示/);
+  assert.match(s.markdown(), /Local file/);
+  assert.doesNotMatch(s.markdown(), /Synthetic demo/);
 });
-test("最近12轮受限，但保存的发现保留来源快照", () => {
+test("only twelve recent questions are retained while findings preserve their source snapshots", () => {
   const s = createStore();
   s.record("old", query);
   s.pinConclusion("old", query);
@@ -97,11 +97,11 @@ test("最近12轮受限，但保存的发现保留来源快照", () => {
   assert.equal(s.getSnapshot().pins[0].turnId, "old");
   assert.equal(
     s.getSnapshot().pins[0].query.response.unresolved[0],
-    "搬运者未知",
+    "搬运者Unknown",
   );
 });
 
-test("菜单与检查器共享面板选择，切换不改写调查或草稿数据", () => {
+test("panel navigation preserves investigation data and resets to the findings editor", () => {
   const s = createStore();
   s.record("one", query);
   s.pinFrame("one", query, frames[0]);
@@ -117,10 +117,10 @@ test("菜单与检查器共享面板选择，切换不改写调查或草稿数�
   s.showPanel("unknown");
   assert.equal(s.getSnapshot(), valid);
   s.clear();
-  assert.equal(s.getSnapshot().inspectorTab, "context");
+  assert.equal(s.getSnapshot().inspectorTab, "findings");
 });
 
-test("发现筛选与时间排序保持来源及保存顺序，不修改原集合", () => {
+test("filtering and time sorting preserve sources without mutating the collection", () => {
   const s = createStore();
   const later = s.pinFrame("one", query, frames[1]);
   const conclusion = s.pinConclusion("one", query);
@@ -141,4 +141,39 @@ test("发现筛选与时间排序保持来源及保存顺序，不修改原集�
   assert.deepEqual(original, [later, conclusion, earlier]);
   assert.equal(visiblePins(original, "evidence", "time")[0].query, query);
   assert.deepEqual(visiblePins([], "evidence", "time"), []);
+});
+
+test("research context and structured findings survive restore without changing evidence", () => {
+  const s = createStore();
+  s.setTaskBrief("Invite a teammate"); s.setStudyType("technical_sample");
+  const pin = s.pinConclusion("task-1", query);
+  const evidence = JSON.stringify(pin.query);
+  s.editFinding(pin.id, "observation", "An error message is visible.");
+  s.editFinding(pin.id, "interpretation", "The message may be unclear.");
+  s.editFinding(pin.id, "openQuestions", "Does the next attempt succeed?");
+  s.editFinding(pin.id, "query", "tampered");
+  const restored = createStore(); restored.hydrate(JSON.parse(JSON.stringify(s.getSnapshot())));
+  assert.equal(restored.getSnapshot().taskBrief, "Invite a teammate");
+  assert.equal(restored.getSnapshot().studyType, "technical_sample");
+  assert.equal(restored.getSnapshot().pins[0].research.interpretation, "The message may be unclear.");
+  assert.equal(JSON.stringify(restored.getSnapshot().pins[0].query), evidence);
+  restored.clear(); assert.equal(restored.getSnapshot().taskBrief, "");
+  assert.equal(restored.getSnapshot().studyType, "ux_research");
+});
+
+test("finding title edits preserve source evidence and persist across hydration", () => {
+  const s = createStore();
+  s.record("task-1", query);
+  const pin = s.pinConclusion("task-1", query);
+  const originalQuery = pin.query;
+  s.renameFinding(pin.id, "Package visible at center");
+  s.editFinding(pin.id, "observation", "Visible in two sampled frames.");
+  assert.equal(s.getSnapshot().pins[0].title, "Package visible at center");
+  assert.equal(s.getSnapshot().pins[0].query, originalQuery);
+  const restored = createStore();
+  restored.hydrate(JSON.parse(JSON.stringify(s.getSnapshot())));
+  assert.equal(restored.getSnapshot().pins[0].title, "Package visible at center");
+  assert.equal(restored.getSnapshot().pins[0].research.observation, "Visible in two sampled frames.");
+  s.renameFinding(pin.id, "x".repeat(250));
+  assert.equal(s.getSnapshot().pins[0].title.length, 200);
 });

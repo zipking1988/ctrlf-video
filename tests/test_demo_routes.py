@@ -1,4 +1,4 @@
-from frameseek.demo import catalog
+from ctrlf_video.demo import catalog
 
 
 def test_review_routes_have_valid_evidence_and_scoped_continuations():

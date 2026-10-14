@@ -2,7 +2,7 @@ from itertools import pairwise
 
 import pytest
 
-from frameseek.windows import plan_windows
+from ctrlf_video.windows import plan_windows
 
 
 @pytest.mark.parametrize("duration", [0.1, 5, 120, 121, 235, 3599, 3600])

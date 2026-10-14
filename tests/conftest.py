@@ -5,5 +5,5 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def isolated_runtime_storage(tmp_path, monkeypatch):
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path / "isolated_workspace"))
-    monkeypatch.delenv("FS_RUNTIME_FILE", raising=False)
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path / "isolated_workspace"))
+    monkeypatch.delenv("CTRLF_RUNTIME_FILE", raising=False)

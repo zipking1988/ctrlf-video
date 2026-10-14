@@ -1,9 +1,9 @@
-# 配置
+# CtrlF Video — Configuration
 
-优先级：环境变量 > `[frameseek]` TOML > 默认值。`FRAMESEEK_CONFIG`为本地配置文件路径；不从HTTP请求获取它。密钥不能写入配置；未知字段/变量、非法值拒绝，错误不会回显输入值或秘密。程序不会自动加载`.env`。
+Updated: 2026-10-14. Environment variables override `[ctrlf_video]` TOML, then defaults. `CTRLF_VIDEO_CONFIG` selects the file; `.env` is not loaded. Unknown fields/variables, booleans masquerading as numeric limits and nonfinite/out-of-range values are rejected without echoing secrets.
 
 ```toml
-[frameseek]
+[ctrlf_video]
 mode = "fixture"
 scene_threshold = 0.3
 coarse_frames = 12
@@ -12,30 +12,40 @@ rerank_k = 5
 ttl_hours = 24
 ```
 
-例如`FRAMESEEK_COARSE_FRAMES=8 make preflight`覆盖文件与默认。`FRAMESEEK_CONFIG=/path/to/config.toml make preflight`显式载入文件。
+Use `CTRLF_VIDEO_COARSE_FRAMES=8 make preflight` or `CTRLF_VIDEO_CONFIG=/absolute/path/config.toml make preflight`.
 
-| 字段 / 对应FRAMESEEK大写变量 | 默认 | 当前范围/单位 |
-|---|---|---|
-| mode | fixture | fixture / real；真实启动需要有效 runtime，模型调用还需预算批准 |
-| scene_threshold | 0.3 | 0–1；上传媒体镜头切分阈值 |
-| coarse_frames | 12 | 每窗口8–16帧 |
-| candidate_k / rerank_k | 10 / 5 | 1–100，rerank≤candidate；真实检索候选数 |
-| ttl_hours | 24 | 1–168小时；到期禁读，服务启动及后台周期清理 |
-| max_window_seconds / overlap_seconds | 120 / 5 | 固定秒 |
-| max_fps / max_frames | 1 / 128 | 固定实际采样保护 |
-| primary_cap / coarse_retry_cap | 30 / 0 | 未确认预算的临时保护，普通配置不可升额 |
-| zoom_cap / text_repair_cap | 3 / 1 | 固定查询尝试/文本repair上限 |
+| Setting (`CTRLF_VIDEO_` + uppercase name) | Default | Bounds |
+| --- | --- | --- |
+| mode | fixture | fixture/real |
+| scene_threshold | 0.3 | 0–1 |
+| coarse_frames | 12 | 8–16 per window |
+| candidate_k / rerank_k | 10 / 5 | 1–100; rerank <= candidate |
+| ttl_hours | 24 | 1–168 hours |
+| max_window_seconds / overlap_seconds | 120 / 5 | Fixed seconds |
+| max_fps / max_frames | 1 / 128 | Fixed sampling bounds |
+| primary_cap / coarse_retry_cap | 30 / 0 | Fixed unapproved-budget protection |
+| zoom_cap / text_repair_cap | 3 / 1 | Fixed attempt limits |
 
-所有数值必须有限且范围合法；整数限额不接受布尔值。真实上传/存储/解码限额已实现；实际模型ID、权限、价格、硬件和资源停费校准尚未完成，部署预检报告保持 `real_ready=false`。CLI在real模式下仍固定退出2，不能作为已配置部署的动态准入结果；实际运行还由runtime、预算和会话操作校验。这些要求不能由 `mode=real`、普通env/file或客户端cap绕过。
+## Runtime and deployment variables
 
-账本的预算单位必须是明确币种的整数微单位（如`USD_MICRO`）；金额示例只用于合成测试，不是价格或批准额度。owner和部署总量同事务预留；unknown不释放。可信本机批准版本工具已实现；真实数值批准和费用上界验证仍待完成。
+| Variable | Purpose |
+| --- | --- |
+| `CTRLF_DATA_DIR` | Private storage; default `.ctrlf-video-data/` |
+| `CTRLF_RUNTIME_FILE` | Trusted private Gemini runtime JSON |
+| `CTRLF_PUBLIC_ORIGIN` | Reviewed public HTTPS origin |
+| `CTRLF_COMPONENT` | `workspace` default or stateless `gateway` |
+| `CTRLF_BACKEND_ORIGIN` | Separate HTTPS durable workspace origin for gateway |
+| `CTRLF_GATEWAY_TOKEN` | Private 32–256 printable-ASCII token shared by gateway/backend |
+| `CTRLF_REQUIRE_DATA_MOUNT` | `1` requires explicit workspace volume mount; container default |
+| `PORT` | Container port, integer 1–65535; default 8080 |
+| `GEMINI_API_KEY` | Backend-only credential referenced by model endpoint `key_env` |
 
-运行配置：`FS_DATA_DIR` 指向私有存储（默认 `.frameseek-data/`），`FS_RUNTIME_FILE` 指向可信模型runtime文件，`FS_PUBLIC_ORIGIN` 是经评审的部署HTTPS origin。密钥通过runtime端点的 `key_env` 引用环境变量，不写入配置或Git。runtime模板不是批准记录。详见 [当前运行工作流与预算安装要求](WORKSPACE_RUNTIME.md)。
+No previous package/environment/session aliases remain. Restart and reload after renaming; storage defaults and session cookie are separate from any earlier workspace. Private data is not automatically migrated or re-owned.
 
-`make agent-check`（`python -m frameseek.readiness`）是独立的动态本机前提检查；可加 `--owner EXISTING_OWNER_ID` 仅读已有两级审批。不创建私有存储、不读取/展示密钥值、不安装审批、不调用模型。API和UI的检查用当前会话主体。所有前提通过时CLI退出0，否则2；`live_verified` 始终false，原 `preflight` 的部署验收限制不受影响。
+## Gemini runtime
 
-## AI Builder Cup runtime 与入口
+[runtime.example.json](runtime.example.json) is blocked preparation, not approval. Only `provider=gemini` is accepted (also the default). Four roles are required: vision, embed, rerank/relevance selection and text. Each endpoint needs the fixed Google API base URL, a verified model/revision/key environment name and conservative cost bound. No ASR or self-hosted-provider configuration is accepted.
 
-runtime 新增 `provider`（`nvidia_nebius` 默认 / `gemini`）及 `allow_google_media`（默认false）。Gemini只允许 `https://generativelanguage.googleapis.com/v1beta`，四个必需角色需有模型/revision、环境密钥和经校准的保守费用上界；asr必须为空。配置使用 [runtime.gemini.example.json](runtime.gemini.example.json)，仍需独立两级数字预算，不会自动调用模型或创建Google项目。详见 [Gemini准备流程](AI_BUILDER_CUP.md)。
+`allow_google_media` defaults false. Locally decoded JPEG transmission requires deliberate trusted consent. `valid_until`, calibration/cutoff references, currency and active two-level budgets independently gate dispatch. Never turn placeholder costs or extended expiry into permission to spend.
 
-容器入口使用 `FS_COMPONENT=workspace`（默认）或 `gateway`，`PORT` 默认为8080、有限整数1–65535，始终一个Uvicorn进程。gateway需 `FS_PUBLIC_ORIGIN`、不同的HTTPS `FS_BACKEND_ORIGIN` 和32–256可打印ASCII字符的私有 `FS_GATEWAY_TOKEN`。workspace配置同一token后所有直接访问需该token，原session/CSRF/拥有权仍必需。Cloud Run 的 `K_SERVICE` 环境禁止直接启动workspace；使用持久单后端与无状态gateway。模板不是部署或开支授权，见 [deployment.md](deployment.md)。
+`make preflight` remains a deployment-acceptance report, exits 2 in real mode and never claims readiness. `make agent-check` dynamically reads local prerequisites, can inspect an existing owner's approvals, creates no storage and calls no model; passing does not prove live acceptance. See [runtime](WORKSPACE_RUNTIME.md) and [deployment](deployment.md).

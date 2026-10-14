@@ -3,7 +3,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const { createStore } = require("../src/frameseek/static/workbench-model.js");
+const { createStore } = require("../src/ctrlf_video/static/workbench-model.js");
+const findingActions = import("../frontend/finding-editor-actions.mjs");
+const report = require("../src/ctrlf_video/static/investigation-report.js");
 const tick = () => new Promise(setImmediate);
 const deferred = () => {
   let resolve, reject;
@@ -92,14 +94,14 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
     if (url === "/api/chat/prepare") return response({ kind: "ready" });
     throw new Error(`Unexpected request: ${call.method} ${url}`);
   };
-  const window = { FrameSeekSessionUI: ui, FrameSeekWorkbench: store, addEventListener() {} };
+  const window = { CtrlFVideoSessionUI: ui, CtrlFVideoWorkbench: store, addEventListener() {} };
   const sandbox = vm.createContext({ window, document: { getElementById: get, createElement: () => new Element(), addEventListener() {} }, fetch,
     localStorage: { getItem: () => "desk-A", setItem() {} }, crypto: { randomUUID: () => `request-${++seq}` },
     setTimeout: (fn, delay) => { const id = ++timerSeq; timers.set(id, { fn, delay }); return id; }, clearTimeout: id => timers.delete(id),
   });
   // Expose closure entry points in the VM only; production source is unchanged.
-  const source = fs.readFileSync(require.resolve("../src/frameseek/static/workspace.js"), "utf8")
-    .replace("window.FrameSeekPersistence={flush,", "window.testWorkspace={start,openDesk,openSource,recover,confirmDelete,get:()=>({current,currentVideo,activeRequest,requestEpoch})}; window.FrameSeekPersistence={flush,");
+  const source = fs.readFileSync(require.resolve("../src/ctrlf_video/static/workspace.js"), "utf8")
+    .replace("window.CtrlFVideoPersistence={flush,", "window.testWorkspace={start,openDesk,openSource,recover,confirmDelete,get:()=>({current,currentVideo,activeRequest,requestEpoch})}; window.CtrlFVideoPersistence={flush,");
   vm.runInContext(source, sandbox);
   ready = true; await window.testWorkspace.start();
   return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers,
@@ -108,13 +110,31 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
   };
 }
 
+for (const { name, resultContext, inputContext, expected } of [
+  { name: "completed-result context", resultContext: { task_brief: "", study_type: "ux_research" }, inputContext: {}, expected: { task_brief: "", study_type: "ux_research" } },
+  { name: "legacy input-only context", resultContext: {}, inputContext: { task_brief: "Inspect the menu", study_type: "technical_sample" }, expected: { task_brief: "Inspect the menu", study_type: "technical_sample" } },
+  { name: "missing legacy context", resultContext: {}, inputContext: {}, expected: { task_brief: "", study_type: null } },
+  { name: "result precedence including an empty brief", resultContext: { task_brief: "", study_type: "ux_research" }, inputContext: { task_brief: "Older context", study_type: "technical_sample" }, expected: { task_brief: "", study_type: "ux_research" } },
+]) {
+  test(`recovery preserves ${name} in saved state and reports`, async () => {
+    const request = { id: "recovered-context", state: "done", result: { ...answer("recovered-context"), ...resultContext }, input: { question: "Find the menu", ...inputContext } };
+    const h = await harness({ state: { taskBrief: "Current desk context must not replace submission", studyType: "technical_sample" }, requests: [request] });
+    const saved = h.desks.get("desk-A").state.records[0].query;
+    const exported = report.create(h.store.getSnapshot()).questions[0];
+    for (const field of ["task_brief", "study_type"]) {
+      assert.equal(saved[field], expected[field]);
+      assert.equal(exported[field], expected[field]);
+    }
+  });
+}
+
 test("failed deletion retains the active investigation and subsequent autosave", async () => {
   const h = await harness();
   h.setOverride(c => c.method === "DELETE" ? response({ detail: "delete_failed" }, 500) : undefined);
   h.window.testWorkspace.confirmDelete(h.desks.get("desk-A"), "investigations");
   await h.get("delete-confirm").onclick();
   assert.equal(h.window.testWorkspace.get().current.id, "desk-A");
-  h.store.annotate("saved after failed deletion"); await h.window.FrameSeekPersistence.flush();
+  h.store.annotate("saved after failed deletion"); await h.window.CtrlFVideoPersistence.flush();
   assert.equal(h.desks.get("desk-A").state.note, "saved after failed deletion");
   assert.equal(h.busy, false);
 });
@@ -176,7 +196,7 @@ test("target video GET remains within the old desk's saving boundary", async () 
 test("new-desk POST saves last edits to the old desk before clearing its canvas", async () => {
   const h = await harness(), created = deferred();
   h.setOverride(c => c.url === "/api/investigations" && c.method === "POST" ? created.promise : undefined);
-  const navigation = h.window.FrameSeekPersistence.newInvestigation(); await tick();
+  const navigation = h.window.CtrlFVideoPersistence.newInvestigation(); await tick();
   h.store.annotate("Edited during creation"); h.get("question").value = "Creation draft";
   const desk = { id: "created", video: "video-A", title: "New", state: {}, revision: 1 };
   h.desks.set(desk.id, desk); created.resolve(response(desk, 201)); await navigation;
@@ -222,7 +242,7 @@ test("advancing playback time alone does not cause another draining save", async
   h.ui.snapshot = () => { const state = original(); return { ...state, ui: { ...state.ui, playerTime: time++ } }; };
   h.store.annotate("Durable edit");
   h.setOverride(c => c.url === "/api/investigations/desk-A" && c.method === "PUT" ? first.promise : undefined);
-  const saving = h.window.FrameSeekPersistence.flush(); await tick();
+  const saving = h.window.CtrlFVideoPersistence.flush(); await tick();
   first.resolve(response({ revision: 2 })); await saving;
   const writes = h.calls.filter(c => c.url === "/api/investigations/desk-A" && c.method === "PUT");
   assert.equal(writes.length, 1); assert.ok(writes[0].body.state.ui.playerTime > 0);
@@ -231,7 +251,7 @@ test("advancing playback time alone does not cause another draining save", async
 test("deletion cancels the request before deleting and can create the fallback desk", async () => {
   const h = await harness(), query = deferred();
   h.setOverride(c => c.url === "/api/chat" ? query.promise : c.url.endsWith("/cancel") ? response(answer("cancelled")) : undefined);
-  const ask = h.window.FrameSeekPersistence.ask("query"); await tick();
+  const ask = h.window.CtrlFVideoPersistence.ask("query"); await tick();
   h.window.testWorkspace.confirmDelete(h.desks.get("desk-A"), "investigations");
   await h.get("delete-confirm").onclick();
   const cancelIndex = h.calls.findIndex(c => c.url.endsWith("/cancel"));
@@ -280,7 +300,7 @@ test("selection changes while asking do not rewrite the actual parent or next dr
   h.store.record("task-1", answer("first")); h.setContext(answer("first"));
   h.get("question").value = "submitted";
   h.setOverride(c => c.url === "/api/chat" ? query.promise : undefined);
-  const pending = h.window.FrameSeekPersistence.ask("submitted"); await tick();
+  const pending = h.window.CtrlFVideoPersistence.ask("submitted"); await tick();
   h.store.record("task-2", answer("other")); h.get("question").value = "next question draft";
   query.resolve(response(answer("completed"))); await pending;
   assert.equal(h.calls.find(c => c.url === "/api/chat").body.parent_request_id, "first");
@@ -290,19 +310,19 @@ test("selection changes while asking do not rewrite the actual parent or next dr
 test("a fresh root question does not gain a parent from the old selected record", async () => {
   const h = await harness(); h.store.record("task-1", answer("first"));
   h.setOverride(c => c.url === "/api/chat" ? response(answer("root")) : undefined);
-  await h.window.FrameSeekPersistence.ask("root question");
+  await h.window.CtrlFVideoPersistence.ask("root question");
   assert.equal(h.answers[0].parentTurn, null);
 });
 
 test("a pending request survives the polling limit and is available for recovery and cancellation", async () => {
   const h = await harness();
   h.setOverride(c => c.url === "/api/chat" ? response({ kind: "query_control", state: "pending" }) : undefined);
-  const ask = h.window.FrameSeekPersistence.ask("long query"); await tick();
+  const ask = h.window.CtrlFVideoPersistence.ask("long query"); await tick();
   for (let i = 0; i < 15; i++) await h.timer(Math.min(10000, 3000 + i * 500));
   await ask;
   assert.ok(h.window.testWorkspace.get().activeRequest); assert.equal(h.get("resume-query").hidden, false);
   const dispatched = h.calls.filter(c => c.url === "/api/chat").length;
-  await h.window.FrameSeekPersistence.ask("duplicate");
+  await h.window.CtrlFVideoPersistence.ask("duplicate");
   assert.equal(h.calls.filter(c => c.url === "/api/chat").length, dispatched);
   h.setOverride(c => c.url.endsWith("/cancel") ? response(answer("cancelled")) : undefined);
   await h.window.testWorkspace.openDesk("desk-B");
@@ -312,9 +332,9 @@ test("a pending request survives the polling limit and is available for recovery
 test("a delayed A response cannot stop B's busy indicator or add an A result", async () => {
   const h = await harness(), a = deferred(), b = deferred(); let dispatches = 0;
   h.setOverride(c => c.url === "/api/chat" ? (++dispatches === 1 ? a.promise : b.promise) : c.url.endsWith("/cancel") ? response(answer("cancelled")) : undefined);
-  const askA = h.window.FrameSeekPersistence.ask("A"); await tick();
+  const askA = h.window.CtrlFVideoPersistence.ask("A"); await tick();
   await h.window.testWorkspace.openDesk("desk-B");
-  const askB = h.window.FrameSeekPersistence.ask("B"); await tick(); assert.equal(h.busy, true);
+  const askB = h.window.CtrlFVideoPersistence.ask("B"); await tick(); assert.equal(h.busy, true);
   a.resolve(response(answer("late-A"))); await askA;
   assert.equal(h.busy, true); assert.equal(h.answers.length, 0);
   b.resolve(response(answer("B-result", "video-B"))); await askB; assert.equal(h.busy, false);
@@ -361,13 +381,13 @@ test("failed or cancelled preflight can be retried in fixture mode; indexed canc
   const h = await harness({ realReady: false });
   h.videos.set("video-C", { id: "video-C", name: "C.mp4", bytes: 1, metadata: {}, job: { state: "cancelled" } });
   h.videos.get("video-B").job.state = "cancelled";
-  await h.window.FrameSeekPersistence.library("videos");
+  await h.window.CtrlFVideoPersistence.library("videos");
   const rows = h.get("library-items").children;
-  const retry = rows.find(r => r.children[0].children[0].textContent === "C.mp4").children.find(b => b.textContent === "重新预检");
+  const retry = rows.find(r => r.children[0].children[0].textContent === "C.mp4").children.find(b => b.textContent === "Run preflight again");
   assert.ok(retry); assert.notEqual(retry.disabled, true);
   h.setOverride(c => c.url === "/api/videos/video-C/retry" ? response({}, 202) : undefined);
   await retry.onclick(); assert.ok(h.calls.some(c => c.url === "/api/videos/video-C/retry" && c.method === "POST"));
-  const analyze = rows.find(r => r.children[0].children[0].textContent === "B.mp4").children.find(b => b.textContent === "开始分析");
+  const analyze = rows.find(r => r.children[0].children[0].textContent === "B.mp4").children.find(b => b.textContent === "Start analysis");
   assert.equal(analyze.disabled, true);
 });
 
@@ -383,14 +403,86 @@ test("app answers keep edits made while busy and recovery preserves an existing 
   const sandbox = vm.createContext({ document: doc, window: { innerWidth: 1440, addEventListener() {}, dispatchEvent() {}, matchMedia: () => ({ matches: true }) },
     fetch: async () => response({ queries: [] }), Event: class {}, URL: {}, navigator: {},
   });
-  vm.runInContext(fs.readFileSync(require.resolve("../src/frameseek/static/app.js"), "utf8"), sandbox); await tick();
-  vm.runInContext('activeVideo={id:"video-A"}; window.FrameSeekSessionUI.busy(true)', sandbox);
+  vm.runInContext(fs.readFileSync(require.resolve("../src/ctrlf_video/static/app.js"), "utf8"), sandbox); await tick();
+  vm.runInContext('activeVideo={id:"video-A"}; window.CtrlFVideoSessionUI.busy(true)', sandbox);
   get("question").value = "next draft";
-  vm.runInContext(`window.FrameSeekSessionUI.answer(${JSON.stringify(answer("done"))},"submitted")`, sandbox);
+  vm.runInContext(`window.CtrlFVideoSessionUI.answer(${JSON.stringify(answer("done"))},"submitted")`, sandbox);
   assert.equal(get("question").value, "next draft"); assert.notEqual(get("question").disabled, true);
-  vm.runInContext(`window.FrameSeekSessionUI.answer(${JSON.stringify(answer("recovered"))})`, sandbox);
+  vm.runInContext(`window.CtrlFVideoSessionUI.answer(${JSON.stringify(answer("recovered"))})`, sandbox);
   assert.equal(get("question").value, "next draft");
   get("question").value = "submitted";
-  vm.runInContext(`window.FrameSeekSessionUI.answer(${JSON.stringify(answer("clear"))},"submitted")`, sandbox);
+  vm.runInContext(`window.CtrlFVideoSessionUI.answer(${JSON.stringify(answer("clear"))},"submitted")`, sandbox);
   assert.equal(get("question").value, "");
+});
+
+test("task context is captured before awaits and later edits persist independently", async () => {
+  const h = await harness(), prepare = deferred();
+  h.store.setTaskBrief("Original participant task"); h.store.setStudyType("technical_sample");
+  h.setOverride(c => {
+    if (c.url === "/api/chat/prepare") return prepare.promise;
+    if (c.url === "/api/chat") return response({...answer(c.body.request_id), task_brief:c.body.task_brief,study_type:c.body.study_type});
+  });
+  const ask = h.window.CtrlFVideoPersistence.ask("What changed?"); await tick();
+  h.store.setTaskBrief("Edited while waiting"); h.store.setStudyType("ux_research");
+  prepare.resolve(response({kind:"ready"})); await ask;
+  const submitted = h.calls.find(c=>c.url==="/api/chat").body;
+  assert.equal(submitted.task_brief,"Original participant task");
+  assert.equal(submitted.study_type,"technical_sample");
+  assert.equal(h.answers[0].task_brief,"Original participant task");
+  assert.equal(h.desks.get("desk-A").state.taskBrief,"Edited while waiting");
+  await h.window.testWorkspace.openDesk("desk-B");
+  assert.equal(h.store.getSnapshot().taskBrief,"");
+});
+
+test("explicit finding save confirms only durable writes and preserves conflict recovery", async () => {
+  const h = await harness(), { saveFinding } = await findingActions, messages = [];
+  h.store.annotate("Durable finding edit");
+  await saveFinding(h.window.CtrlFVideoPersistence, message => messages.push(message));
+  assert.equal(messages.at(-1), "Finding saved locally.");
+  assert.equal(h.desks.get("desk-A").state.note, "Durable finding edit");
+  assert.equal(await h.window.CtrlFVideoPersistence.flush(), true);
+
+  h.store.annotate("Conflicting edit");
+  h.setOverride(c => c.method === "PUT" ? response({ detail: "revision_conflict" }, 409) : undefined);
+  await assert.rejects(h.window.CtrlFVideoPersistence.flush(), /revision_conflict/);
+  const writes = h.calls.filter(c => c.method === "PUT").length;
+  h.store.annotate("Further unsaved edit");
+  await saveFinding(h.window.CtrlFVideoPersistence, message => messages.push(message));
+  assert.match(messages.at(-1), /^Not saved\./);
+  assert.match(h.get("save-state").textContent, /Changed in another window/);
+  assert.equal(h.calls.filter(c => c.method === "PUT").length, writes);
+  assert.equal(h.desks.get("desk-A").state.note, "Durable finding edit");
+});
+
+test("finding save feedback is suppressed once navigation begins, even before the next desk loads", async () => {
+  const h = await harness(), { saveFinding } = await findingActions, pending = deferred(), messages = [];
+  let first = true;
+  h.setOverride(c => {
+    if (c.method === "PUT" && first) { first = false; return pending.promise; }
+  });
+  h.store.annotate("Saved on A");
+  const saving = saveFinding(h.window.CtrlFVideoPersistence, message => messages.push(message));
+  await tick();
+  const navigation = h.window.testWorkspace.openDesk("desk-B");
+  pending.resolve(response({ revision: 2 }));
+  await saving;
+  await navigation;
+  assert.equal(h.window.testWorkspace.get().current.id, "desk-B");
+  assert.deepEqual(messages, []);
+});
+
+test("unavailable finding persistence cannot report a successful save", async () => {
+  const { saveFinding } = await findingActions, messages = [];
+  await saveFinding(undefined, message => messages.push(message));
+  assert.match(messages[0], /^Not saved\./);
+});
+
+test("opening a named finding clears a filter that would otherwise select the wrong object", async () => {
+  const { openFinding } = await findingActions;
+  const { visiblePins } = require("../src/ctrlf_video/static/workbench-model.js");
+  const pins = [{ id: "finding-1", kind: "evidence" }, { id: "finding-2", kind: "conclusion" }];
+  let filter = "evidence", editingId = "finding-1";
+  openFinding("finding-2", value => { editingId = value; }, value => { filter = value; });
+  assert.equal(visiblePins(pins, filter).find(pin => pin.id === editingId)?.id, "finding-2");
+  assert.equal(filter, "all");
 });

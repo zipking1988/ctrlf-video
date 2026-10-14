@@ -10,11 +10,12 @@ import httpx
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from frameseek.agent import AgentError, Endpoint, Provider, Runtime, checked_embeddings
-from frameseek.api import create_app
-from frameseek.attempts import ApprovedBudget, AttemptLedger, BudgetDenied
-from frameseek.config import Settings
-from frameseek.schema import Answer
+from ctrlf_video.agent import AgentError, Endpoint, Provider, Runtime, checked_embeddings
+from ctrlf_video.api import create_app
+from ctrlf_video.attempts import ApprovedBudget, AttemptLedger, BudgetDenied
+from ctrlf_video.config import Settings
+from ctrlf_video.gemini import BASE_URL
+from ctrlf_video.schema import Answer
 
 
 @pytest.fixture
@@ -22,16 +23,23 @@ def anyio_backend():
     return "asyncio"
 
 
+@pytest.fixture(autouse=True)
+def gemini_mock_key(monkeypatch):
+    monkeypatch.setenv("TEST_GEMINI_KEY", "test-secret")
+
+
 def configuration():
     def endpoint(role):
         return Endpoint(
-            base_url="http://127.0.0.1:9000/v1",
-            model="nvidia/" + role,
+            base_url=BASE_URL,
+            model="gemini-test-" + role,
             revision="mock-contract-test",
+            key_env="TEST_GEMINI_KEY",
             max_cost_micro=1,
         )
 
     return Runtime(
+        allow_google_media=True,
         vision=endpoint("vision"),
         embed=endpoint("embed"),
         rerank=endpoint("rerank"),
@@ -41,7 +49,20 @@ def configuration():
         resource_cutoff_reference="MOCK",
         valid_until=time.time() + 3600,
         attempt_seconds=2,
-        self_hosted_hosts=["127.0.0.1"],
+    )
+
+
+def generation_response(result):
+    return httpx.Response(
+        200,
+        json={
+            "candidates": [
+                {
+                    "finishReason": "STOP",
+                    "content": {"parts": [{"text": json.dumps(result)}]},
+                }
+            ],
+        },
     )
 
 
@@ -58,29 +79,17 @@ def handler(calls, fail_zoom=False):
     def respond(request):
         payload = json.loads(request.content)
         calls.append((str(request.url), payload))
-        if request.url.path.endswith("/embeddings"):
+        assert request.url.host == "generativelanguage.googleapis.com"
+        if request.url.path.endswith(":batchEmbedContents"):
             return httpx.Response(
                 200,
-                json={
-                    "data": [
-                        {"index": i, "embedding": [1.0, 0.0]} for i in range(len(payload["input"]))
-                    ]
-                },
+                json={"embeddings": [{"values": [1.0, 0.0]} for _ in payload["requests"]]},
             )
-        if request.url.path.endswith("/rerank"):
-            return httpx.Response(
-                200,
-                json={
-                    "results": [
-                        {"index": i, "relevance_score": 1.0}
-                        for i in range(min(payload["top_n"], len(payload["documents"])))
-                    ]
-                },
-            )
-        content = payload["messages"][1]["content"]
-        if isinstance(content, list):
-            selected = [json.loads(item["text"]) for item in content[1:] if item["type"] == "text"]
-            if content[0]["text"].startswith("Describe"):
+        parts = payload["contents"][0]["parts"]
+        content = parts[0]["text"]
+        if any("inlineData" in part for part in parts):
+            selected = [json.loads(part["text"]) for part in parts[1:] if "text" in part]
+            if content.startswith("Describe"):
                 result = {
                     "frames": [
                         {"frame_id": f["frame_id"], "caption": "纸箱在工作台上"} for f in selected
@@ -100,7 +109,9 @@ def handler(calls, fail_zoom=False):
                 }
         else:
             prompt = json.loads(content)
-            if "candidates" in prompt:
+            if "documents" in prompt:
+                result = {"results": [{"index": i} for i in range(len(prompt["documents"]))]}
+            elif "candidates" in prompt:
                 result = {"inspect": list(range(min(3, len(prompt["candidates"]))))}
             else:
                 result = {
@@ -108,7 +119,7 @@ def handler(calls, fail_zoom=False):
                     "followups": ["之后的位置呢？"],
                     "unresolved": [],
                 }
-        return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps(result)}}]})
+        return generation_response(result)
 
     return respond
 
@@ -122,19 +133,19 @@ async def setup_real(
     runtime_factory=configuration,
     response_handler=None,
 ):
-    import frameseek.api
+    import ctrlf_video.api
 
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path))
-    monkeypatch.setattr(frameseek.api, "load_runtime", runtime_factory)
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(ctrlf_video.api, "load_runtime", runtime_factory)
     app = create_app(Settings(mode="real"))
     app.state.agent.transport = httpx.MockTransport(response_handler or handler(calls, fail_zoom))
     client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     session = (await client.get("/api/session")).json()
-    client.headers["x-fs-csrf"] = session["csrf"]
+    client.headers["x-ctrlf-csrf"] = session["csrf"]
     approve(app.state.agent.ledger, session["owner_id"])
     upload = await client.post(
         "/api/videos",
-        content=Path("src/frameseek/static/demo/parcel.mp4").read_bytes(),
+        content=Path("src/ctrlf_video/static/demo/parcel.mp4").read_bytes(),
         headers={"content-type": "video/mp4"},
     )
     video = upload.json()["id"]
@@ -204,11 +215,10 @@ async def test_upload_index_query_multi_turn_same_id_and_source_ownership(
         ).status_code == 409
         records = (await client.get(f"/api/investigations/{desk['id']}/requests")).json()["items"]
         assert len(records) == 2 and all(r["state"] == "done" for r in records)
-        # Media reaches only the self-hosted vision role, text gets no image URLs.
-        for _, payload in calls:
-            if payload.get("model") == "nvidia/text":
-                assert isinstance(payload["messages"][1]["content"], str)
-                assert "base64" not in payload["messages"][1]["content"]
+        # Only vision sends inline JPEGs; text and embeddings receive no images.
+        for url, payload in calls:
+            if "/models/gemini-test-text:" in url:
+                assert all("inlineData" not in part for part in payload["contents"][0]["parts"])
         with app.state.agent.ledger._connect() as c:
             attempts = c.execute("SELECT kind,state FROM attempts").fetchall()
             assert all(r["state"] == "completed" for r in attempts)
@@ -237,7 +247,12 @@ async def test_unknown_same_request_never_resends_or_refunds(tmp_path, monkeypat
             zoom = c.execute("SELECT * FROM attempts WHERE kind='zoom'").fetchone()
             assert zoom["state"] == "unknown" and zoom["money"] == 1
         data = (await client.get(f"/api/investigations/{desk['id']}/requests")).json()["items"][0]
-        assert data["input"] == {**body, "parent_request_id": None}
+        assert data["input"] == {
+            **body,
+            "parent_request_id": None,
+            "task_brief": "",
+            "study_type": "ux_research",
+        }
         assert data["state"] == "unknown"
     finally:
         await client.aclose()
@@ -280,7 +295,17 @@ async def test_pending_duplicate_and_reset_discard_late_answer(tmp_path, monkeyp
 
 
 @pytest.mark.anyio
-async def test_cancel_stops_later_dispatch_and_preserves_terminal_result(tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    "research_context",
+    [
+        {},
+        {"task_brief": "Verify the task outcome", "study_type": "technical_sample"},
+    ],
+    ids=["default-context", "explicit-context"],
+)
+async def test_cancel_stops_later_dispatch_and_preserves_terminal_result(
+    tmp_path, monkeypatch, research_context
+):
     calls = []
     app, client, _, desk = await setup_real(tmp_path, monkeypatch, calls)
     started, release = threading.Event(), threading.Event()
@@ -297,14 +322,21 @@ async def test_cancel_stops_later_dispatch_and_preserves_terminal_result(tmp_pat
         "request_id": "req_cancel",
         "generation": 0,
         "question": "纸箱在哪？",
+        **research_context,
     }
     route = f"/api/investigations/{desk['id']}/requests/req_cancel/cancel"
     try:
         first = asyncio.create_task(client.post("/api/chat", json=body))
         assert await asyncio.to_thread(started.wait, 2)
+        requests = (await client.get(f"/api/investigations/{desk['id']}/requests")).json()
+        submitted = requests["items"][0]["input"]
+        assert submitted["task_brief"] == research_context.get("task_brief", "")
+        assert submitted["study_type"] == research_context.get("study_type", "ux_research")
         before = len(calls)
         cancelled = await client.post(route)
         assert cancelled.status_code == 200
+        assert cancelled.json()["task_brief"] == submitted["task_brief"]
+        assert cancelled.json()["study_type"] == submitted["study_type"]
         assert cancelled.json()["response"]["errors"][0]["code"] == "query_cancelled"
         release.set()
         assert (await first).json() == cancelled.json()
@@ -343,13 +375,13 @@ def test_unapproved_budget_and_expired_calibration_dispatch_nothing(tmp_path):
 @pytest.mark.parametrize(
     "stage,malformed,expected_status",
     [
-        ("envelope", {"choices": [None]}, "error"),
+        ("planning", {"inspect": [None]}, "error"),
         ("zoom", {"observations": [None], "unresolved": []}, "error"),
         ("zoom", {"observations": [], "unresolved": None}, "error"),
         ("synthesis", {"answer": None, "followups": [], "unresolved": []}, "partial"),
         ("synthesis", {"answer": "answer", "followups": {}, "unresolved": []}, "partial"),
         ("rerank", {"results": [None]}, "error"),
-        ("embed", {"data": [{"index": "0", "embedding": [1.0, 0.0]}]}, "error"),
+        ("embed", {"embeddings": [{"values": ["bad-value"]}]}, "error"),
     ],
 )
 async def test_malformed_model_output_is_terminal_and_keeps_verified_evidence(
@@ -361,27 +393,29 @@ async def test_malformed_model_output_is_terminal_and_keeps_verified_evidence(
 
     def respond(request):
         payload = json.loads(request.content)
-        content = payload.get("messages", [{}, {}])[1].get("content")
+        parts = payload.get("contents", [{"parts": []}])[0]["parts"]
+        content = parts[0]["text"] if parts else None
+        images = any("inlineData" in part for part in parts)
+        prompt = json.loads(content) if content and content.startswith("{") else {}
         replace = (
             stage == "embed"
-            and request.url.path.endswith("/embeddings")
+            and request.url.path.endswith(":batchEmbedContents")
             or stage == "rerank"
-            and request.url.path.endswith("/rerank")
-            or stage == "envelope"
-            and isinstance(content, str)
+            and "documents" in prompt
+            or stage == "planning"
+            and "candidates" in prompt
             or stage == "zoom"
-            and isinstance(content, list)
+            and images
             or stage == "synthesis"
-            and isinstance(content, str)
-            and "observations" in json.loads(content)
+            and not images
+            and "observations" in prompt
         )
         if replace:
-            result = (
-                malformed
-                if stage in {"embed", "rerank", "envelope"}
-                else {"choices": [{"message": {"content": json.dumps(malformed)}}]}
+            return (
+                httpx.Response(200, json=malformed)
+                if stage == "embed"
+                else generation_response(malformed)
             )
-            return httpx.Response(200, json=result)
         return normal(request)
 
     app.state.agent.transport = httpx.MockTransport(respond)
@@ -414,46 +448,26 @@ async def test_malformed_model_output_is_terminal_and_keeps_verified_evidence(
         ([{"index": 0, "embedding": [1.0]}, None], "indices"),
     ],
 )
-def test_embedding_response_requires_unique_complete_indices_and_dimensions(tmp_path, data, code):
-    ledger = AttemptLedger(tmp_path / "ledger.sqlite")
-    approve(ledger, "owner")
-    provider = Provider(
-        configuration(),
-        ledger,
-        lambda: None,
-        httpx.MockTransport(lambda _: httpx.Response(200, json={"data": data})),
-    )
-    result = provider.call(
-        "embed",
-        "/embeddings",
-        {"input": ["one", "two"]},
-        owner="owner",
-        attempt="embedding",
-        kind="embed",
-        version="test_v1",
-        category="ingest",
-        deadline=time.monotonic() + 10,
-    )
+def test_embedding_response_requires_unique_complete_indices_and_dimensions(data, code):
     with pytest.raises(AgentError, match=code):
-        checked_embeddings(result, 2)
+        checked_embeddings({"data": data}, 2)
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("legacy_runtime", [False, True])
 async def test_exact_initial_budget_allows_cache_only_ingest_resume_and_checks_revocation(
-    tmp_path, monkeypatch, legacy_runtime
+    tmp_path, monkeypatch
 ):
-    import frameseek.api
+    import ctrlf_video.api
 
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path))
-    monkeypatch.setattr(frameseek.api, "load_runtime", configuration)
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(ctrlf_video.api, "load_runtime", configuration)
     app = create_app(Settings(mode="real"))
     calls = []
     app.state.agent.transport = httpx.MockTransport(handler(calls))
     client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     session = (await client.get("/api/session")).json()
     owner = session["owner_id"]
-    client.headers["x-fs-csrf"] = session["csrf"]
+    client.headers["x-ctrlf-csrf"] = session["csrf"]
     for scope in ("*", owner):
         app.state.agent.ledger.install_approved_record(
             ApprovedBudget(scope, "test_v1", "TEST ONLY", 1, 3, 3, "USD_MICRO")
@@ -471,7 +485,7 @@ async def test_exact_initial_budget_allows_cache_only_ingest_resume_and_checks_r
     try:
         upload = await client.post(
             "/api/videos",
-            content=Path("src/frameseek/static/demo/parcel.mp4").read_bytes(),
+            content=Path("src/ctrlf_video/static/demo/parcel.mp4").read_bytes(),
             headers={"content-type": "video/mp4"},
         )
         video = upload.json()["id"]
@@ -487,13 +501,6 @@ async def test_exact_initial_budget_allows_cache_only_ingest_resume_and_checks_r
                 break
             await asyncio.sleep(0.03)
         assert detail["job"]["state"] == "failed"
-        if legacy_runtime:
-            generation = app.state.workspace.owned("videos", video, owner)["generation"]
-            frozen = tmp_path / video / f"run-config-{generation}.json"
-            saved = json.loads(frozen.read_text())
-            saved["runtime"].pop("provider")
-            saved["runtime"].pop("allow_google_media")
-            frozen.write_text(json.dumps(saved))
         before = len(calls)
         app.state.agent.admit_ingest(video, owner)
         response = await client.post(f"/api/videos/{video}/analyze")
@@ -519,7 +526,7 @@ async def test_cancelled_analysis_can_start_new_generation_without_overwriting_o
 ):
     calls = []
     app, client, video, _ = await setup_real(tmp_path, monkeypatch, calls)
-    owner = app.state.workspace.authenticate(client.cookies.get("fs_session"))["id"]
+    owner = app.state.workspace.authenticate(client.cookies.get("ctrlf_session"))["id"]
     directory = tmp_path / video
     original = json.loads((directory / "segments-1.json").read_text())
     original_frames = {
@@ -570,5 +577,42 @@ async def test_cancelled_analysis_can_start_new_generation_without_overwriting_o
         assert response.status_code == 409
         assert response.json()["detail"] == "unknown_attempt_do_not_resend"
         assert len(calls) == before
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.anyio
+async def test_task_brief_reaches_gemini_and_is_bound_to_idempotent_request(tmp_path, monkeypatch):
+    calls = []
+    app, client, _, desk = await setup_real(tmp_path, monkeypatch, calls)
+    try:
+        brief = "Inspect the participant's invitation attempt; do not assume success."
+        body = {
+            "investigation_id": desk["id"],
+            "request_id": "research_context",
+            "generation": 0,
+            "question": "What is visible?",
+            "task_brief": brief,
+            "study_type": "technical_sample",
+        }
+        before = len(calls)
+        response = await client.post("/api/chat", json=body)
+        assert response.status_code == 200, response.text
+        assert response.json()["task_brief"] == brief
+        assert response.json()["study_type"] == "technical_sample"
+        # Retrieval, relevance, planning, visual verification and synthesis all see the brief.
+        assert len(calls[before:]) >= 5
+        assert all(brief in json.dumps(payload) for _, payload in calls[before:])
+        count = len(calls)
+        assert (await client.post("/api/chat", json=body)).json() == response.json()
+        assert (
+            await client.post("/api/chat", json={**body, "task_brief": "Changed"})
+        ).status_code == 409
+        assert len(calls) == count
+        requests = (await client.get(f"/api/investigations/{desk['id']}/requests")).json()["items"]
+        assert requests[0]["input"]["task_brief"] == brief
+        assert (
+            await client.post("/api/chat/prepare", json={**body, "task_brief": "x" * 2001})
+        ).status_code == 422
     finally:
         await client.aclose()

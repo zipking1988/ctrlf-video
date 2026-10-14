@@ -1,74 +1,69 @@
 # Working on CtrlF Video
 
-## Product and scope
+## Product and authorized scope
 
-CtrlF Video ("Ctrl+F for video") is the Gemini / AI Builder Cup edition of FrameSeek, developed in the separate private `zipking1988/ctrlf-video` repository. The user authorized this private repository and local import commit on 2026-10-14, then instructed that the first commit must remain unpushed. Hold all pushes until the user explicitly requests one; the original FrameSeek repository and workspace must remain preserved for a future hackathon. Keep the internal `frameseek` package/configuration/module names compatible. Historical FrameSeek documents describe the inherited source and its original route.
+CtrlF Video ("Ctrl+F for video") is a desktop video investigation agent for AI Builder Cup 2026. Its workspace is a spatial canvas of questions, evidence frames and conclusions with multi-turn context and a source player. Mobile is outside this edition's scope.
 
-CtrlF Video is a desktop video investigation agent. Its central workspace is a spatial canvas of questions, evidence frames and conclusions, with multi-turn context and a source player. Preserve this product direction; a mobile application is outside the current scope.
+On 2026-10-14 the user requested a complete rename and a Gemini-only cleanup of this checkout, explicitly authorizing removal of the other provider integration and obsolete docs/source snapshots. The package is `ctrlf_video`; settings use `CTRLF_VIDEO_*`, runtime/infrastructure use `CTRLF_*`, and browser globals use `CtrlFVideo*`. Do not add previous-brand compatibility aliases. The original separate repository/workspace must remain untouched.
 
-The default `fixture` mode uses explicitly labeled synthetic demo answers and sends no model requests. Upload, media preflight, private playback and durable investigation storage work locally. NVIDIA/Nebius agent integration is covered by mock transports; live model quality, paid resource calibration and production deployment are still unverified.
+The private repository and local import commit were authorized. On 2026-10-14 the user explicitly authorized code review, fixes, an English README update and pushing the reviewed work to private `main`, superseding the earlier unpushed-import hold. Future pushes still require explicit authorization. Do not change visibility or publish source without explicit authorization. See [hackathon.md](hackathon.md) and [provenance](docs/provenance.md); event requirements are not permission to publish or deploy.
 
-The user authorized a separate Gemini / AI Builder Cup route on 2026-10-11 while preserving NVIDIA/Nebius. See `docs/AI_BUILDER_CUP.md` and `docs/deployment.md`. The implementation/deployment-preparation and private-repository authorizations do not permit GCP startup/provisioning, paid model execution, approval installation or public repository publication. The explicit Gemini media exception is limited to locally decoded JPEGs sent to Google's fixed Gemini API origin when enabled in trusted runtime configuration; original NVIDIA/Nebius self-hosted media rules remain intact.
+Default `fixture` mode has labeled synthetic answers and makes no model requests. Upload, preflight, playback, investigations and exports work locally. Gemini integration is mock-tested; live model quality, calibrated costs and GCP deployment remain unverified. Do not claim complete MVP or GO.
 
 ## Read before changing behavior
 
-- [README.md](README.md): setup, workflow and repository map.
-- [ARCHITECTURE.md](ARCHITECTURE.md): technical requirements and evidence/budget contracts. Implementation status does not waive requirements.
-- [docs/WORKSPACE_RUNTIME.md](docs/WORKSPACE_RUNTIME.md): current implementation and live-runtime prerequisites.
-- [DESIGN.md](DESIGN.md): selected desktop canvas direction and design history; use the current-status note when older entries differ.
-- [docs/api.md](docs/api.md), [docs/configuration.md](docs/configuration.md), and [docs/errors.md](docs/errors.md): public interfaces and configuration.
-- [TODOS.md](TODOS.md) and [docs/autoplan/IMPLEMENTATION_TASKS.md](docs/autoplan/IMPLEMENTATION_TASKS.md): remaining acceptance work.
+Read [README](README.md), [ARCHITECTURE](ARCHITECTURE.md), [DESIGN](DESIGN.md), [runtime](docs/WORKSPACE_RUNTIME.md), [API](docs/api.md), [configuration](docs/configuration.md), [errors](docs/errors.md) and [TODOS](TODOS.md).
 
 ## Source map
 
 | Location | Responsibility |
 | --- | --- |
-| `src/frameseek/api.py`, `routes.py` | FastAPI app, owned HTTP operations, workers and media delivery |
-| `workspace.py` | SQLite investigations, ownership, revisions, generation and expiry |
-| `agent.py`, `attempts.py` | Model adapters, retrieval/evidence pipeline and approved-budget reservations |
-| `evaluation.py`, `readiness.py` | Offline artifact scoring and readonly local dispatch prerequisites |
-| `media.py`, `media_limits.py`, `windows.py` | Isolated decoding, real timestamps, bounded sampling and window planning |
-| `schema.py`, `config.py`, `preflight.py` | Output contracts, finite settings and readiness reporting |
-| `frontend/workbench.jsx` | Authored React workbench components |
-| `src/frameseek/static/app.js`, `workspace.js` | Player/session UI and durable client orchestration |
-| `static/workbench-model.js`, `static/investigation-canvas.js` | Shared UI state and canvas geometry/navigation |
-| `scripts/build_frontend.mjs` | React bundle and static asset content hashes |
-| `tests/` | Pytest integration/contracts and Node frontend regressions |
+| `src/ctrlf_video/api.py`, `routes.py` | App, owned HTTP operations, workers and media |
+| `workspace.py` | SQLite investigations, ownership, CAS, generations and expiry |
+| `agent.py`, `gemini.py`, `attempts.py` | Gemini, retrieval/evidence and approved budgets |
+| `media.py`, `media_limits.py`, `windows.py` | Isolated decoding and bounded sampling |
+| `schema.py`, `config.py`, `preflight.py`, `readiness.py` | Contracts and local prerequisites |
+| `evaluation.py` | Offline artifact scoring |
+| `gateway.py`, `server.py` | Stateless ingress and guarded single-process startup |
+| `frontend/workbench.jsx` | Authored React components |
+| `src/ctrlf_video/static/` | Authored browser modules/styles and generated build |
+| `tests/`, `scripts/` | Regressions, build and schema tools |
 
-Paths beginning with `static/` above are relative to `src/frameseek/`. Historical `docs/*/source-before/` files and patches are review evidence, not production source.
+Bare module paths above are relative to `src/ctrlf_video/`.
 
-## Development commands
+## Development
 
-Use Python 3.13 and the committed `uv.lock`. Node.js 20+ is needed for frontend development, not for serving the committed build. FFmpeg/ffprobe are needed for uploaded-media preflight and real evidence extraction.
+Use Python 3.13 and the committed `uv.lock`; Node.js 20+ for frontend work; FFmpeg/ffprobe for real media.
 
 ```sh
 make setup
 make preflight
-make run                    # http://127.0.0.1:8765; one API/worker process
-make test                   # backend; isolated fixtures/mock transports
-make check                  # Ruff lint/format and schema drift
-make eval-check             # offline unrun templates; NOT_ACCEPTED expected
-make agent-check            # readonly prerequisites; no calls or approvals
+make run
+make test
+make check
+make eval-check
+make agent-check
 npm ci --ignore-scripts
-npm test                    # all frontend regressions
-npm run build               # bundle and static content hashes
+npm test
+npm run build
 ```
 
-After editing authored frontend JS, JSX or CSS, run `npm run build` and include the resulting `static/index.html` hashes and generated bundle/license changes if any. Do not manually edit `static/workbench.js`; edit its JSX source. Preserve third-party licenses. After changing output models, run `make schema` and review the generated schema changes.
+After authored JS/JSX/CSS edits, rebuild and include `static/index.html` hashes and generated bundle/license changes. Never manually edit `static/workbench.js`. Preserve third-party notices. After output-model changes, run `make schema` and review the exports.
 
-Run relevant existing tests for behavioral changes. Add focused regressions for actual failure modes, especially asynchronous ownership, worker lifecycle, budget accounting and evidence validation. Documentation-only edits need link/command/whitespace checks rather than new tests. Keep verification claims specific: mocks establish integration behavior, not live model quality or GPU cost/performance.
+Run relevant existing regressions for behavioral changes, especially ownership, async navigation, worker lifecycle, budget accounting and evidence validation. Documentation-only work needs link/command/whitespace checks. Mock transports establish integration, not live quality or cost/performance.
 
-## Invariants to preserve
+## Invariants
 
-- **Evidence:** keep schema version 0.1 and the four final statuses (`ok`, `partial`, `no_result`, `error`). Query-control pending/unknown envelopes are separate. References use actual decoded frames and absolute source-video timestamps. Validate model output before accepting evidence; preserve verified partial results when later stages fail. Never substitute demo answers for real sources or infer unverified identities.
-- **Ownership:** session cookie, CSRF/Origin checks and owner/expiry checks protect every private source, frame, job, query and investigation. Keep SQLite revision CAS, video generations and request idempotency. Validate stale context anchors; cancellation/deletion must prevent late publication and release worker capacity.
-- **Async UI:** check investigation identity and navigation epoch after awaits. Capture context when submitting a question. Preserve drafts typed during a query and drain old-desk edits before navigation restores another desk. Do not let continuously advancing playback keep save draining indefinitely.
-- **Paid calls:** all model dispatch goes through the approved-budget ledger. Owner and deployment reservations are atomic; unknown/dispatched attempts are not automatically resent or refunded. Completed cached ingest work is not charged again at admission, but zero-new-call resumes still require active approvals. Keep configuration/checkpoints/frame names generation-specific.
-- **Media/resources:** retain upload/storage/decoder/time/window/sampling bounds and process isolation. Use one API/worker process per workspace; do not introduce multiple Uvicorn workers against it. Mac isolation is locally verified; Linux/deployed isolation needs separate proof.
-- **Providers:** retain the approved NVIDIA/Nebius architecture. Media goes only to explicitly configured self-hosted hosts; Nebius Token Factory receives text. Do not enable live requests, install spending approvals, provision GPUs or raise budgets without explicit authorization covering finite numeric spending and calibration prerequisites. A private code push does not provide that authorization.
+- **Evidence:** schema `0.1`, final statuses `ok` / `partial` / `no_result` / `error`; pending/unknown controls are separate. References use actual decoded frames and absolute source-video timestamps. Validate output, retain verified partial evidence and disclose unresolved ranges. Do not fabricate identities, speech, frames or global negatives from limited review.
+- **Ownership:** session cookie, CSRF/Origin and owner/expiry checks protect every private object. Preserve SQLite revision CAS, video generations and request idempotency. Validate context anchors. Cancellation/deletion prevents late publication and releases capacity.
+- **Async UI:** recheck investigation identity/navigation epoch after awaits. Capture submission context, preserve newly typed drafts, drain old-desk edits before restoring another desk, and do not let advancing playback keep save draining indefinitely.
+- **Budgets:** every model request passes through atomic owner/deployment reservations. Unknown/dispatched attempts are not automatically resent or refunded. Completed cached work is not charged again at admission; zero-new-call resumes still need active approvals. Configuration/checkpoints/frame names stay generation-specific.
+- **Media/resources:** retain upload/storage/decoder/time/window/sampling limits and process isolation. One API/worker process per workspace. macOS isolation is locally verified; Linux deployment needs proof.
+- **Gemini:** only bounded locally decoded JPEGs may reach Google's fixed Gemini API origin, with trusted `allow_google_media` consent. Original video stays on the backend; text stages send no media. No external-media fetching, Files API uploads, automatic retries or ASR. Reject unsupported audio questions.
+- **Authorization:** do not enable live calls, install spending approvals, provision resources or raise budgets without explicit finite numeric spending/calibration authorization. Private pushes do not grant those permissions.
 
-## Repository hygiene and delivery
+## Hygiene and delivery
 
-Keep `.frameseek-data/`, `.frameseek-eval/`, uploaded private media, session databases, `.env`, private runtime/approval records, caches, `.venv/` and `node_modules/` out of Git. `.env.example` and `docs/runtime.example.json` are templates, not operational approvals; `.env` is not automatically loaded.
+Inspect `git status` before edits and preserve unrelated work. Keep `.ctrlf-video-data/`, `.ctrlf-video-eval/`, private videos, databases, `.env`, runtime/approval records, caches, `.venv/` and `node_modules/` out of Git. Templates are not operational approvals; `.env` is not loaded automatically.
 
-Inspect `git status` before edits and preserve unrelated work. Follow the user's authorized commit/push scope, keep the repository private, and never force-push or publish it without an explicit request. Update current docs when behavior changes, distinguish design history from current behavior, and report what passed plus material verification limits. Do not label the project a complete MVP or GO while live acceptance requirements remain open.
+Keep current docs consistent with behavior. Report passed checks and material verification limits. Preserve the actual source lineage even when removing old branding or documents; renaming does not establish hackathon eligibility. Never force-push or rewrite history without authorization.

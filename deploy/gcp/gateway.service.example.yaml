@@ -3,7 +3,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: frameseek-gateway
+  name: ctrlf-video-gateway
 spec:
   template:
     metadata:
@@ -22,13 +22,13 @@ spec:
               cpu: '1'
               memory: 512Mi
           env:
-            - name: FS_COMPONENT
+            - name: CTRLF_COMPONENT
               value: gateway
-            - name: FS_PUBLIC_ORIGIN
+            - name: CTRLF_PUBLIC_ORIGIN
               value: https://REPLACE_WITH_PUBLIC_GATEWAY_HOST
-            - name: FS_BACKEND_ORIGIN
+            - name: CTRLF_BACKEND_ORIGIN
               value: https://REPLACE_WITH_GCP_BACKEND_HOST
-            - name: FS_GATEWAY_TOKEN
+            - name: CTRLF_GATEWAY_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: REPLACE_WITH_PRIVATE_GATEWAY_SECRET

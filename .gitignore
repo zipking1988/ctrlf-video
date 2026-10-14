@@ -2,7 +2,7 @@
 .env
 .env.*
 !.env.example
-.frameseek/
+.ctrlf-video/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -12,8 +12,8 @@ dist/
 
 node_modules/
 
-.frameseek-data/
+.ctrlf-video-data/
 .runtime*.json
 
 # Private evaluation annotations, source manifests and run artifacts
-.frameseek-eval/
+.ctrlf-video-eval/

@@ -5,22 +5,24 @@ import time
 
 from httpx import ASGITransport, AsyncClient
 
-from frameseek.agent import Endpoint, Runtime
-from frameseek.api import create_app
-from frameseek.attempts import ApprovedBudget, AttemptLedger
-from frameseek.config import Settings
-from frameseek.readiness import budget_ready, readiness_report
+from ctrlf_video.agent import Endpoint, Runtime
+from ctrlf_video.api import create_app
+from ctrlf_video.attempts import ApprovedBudget, AttemptLedger
+from ctrlf_video.config import Settings
+from ctrlf_video.gemini import BASE_URL
+from ctrlf_video.readiness import budget_ready, readiness_report
 
 
 def runtime():
     endpoint = Endpoint(
-        base_url="http://127.0.0.1:9000/v1",
-        model="nvidia/test",
+        base_url=BASE_URL,
+        model="gemini-test",
         revision="MOCK-NOT-LIVE",
         key_env="TEST_READINESS_KEY",
         max_cost_micro=1,
     )
     return Runtime(
+        allow_google_media=True,
         vision=endpoint,
         embed=endpoint,
         rerank=endpoint,
@@ -30,20 +32,19 @@ def runtime():
         resource_cutoff_reference="TEST ONLY",
         valid_until=time.time() + 300,
         attempt_seconds=2,
-        self_hosted_hosts=["127.0.0.1"],
     )
 
 
 def test_readiness_does_not_claim_live_verification_or_leak_credentials(monkeypatch):
     monkeypatch.setenv("TEST_READINESS_KEY", "synthetic-secret-do-not-expose")
-    monkeypatch.setattr("frameseek.readiness.shutil.which", lambda tool: "/test/" + tool)
+    monkeypatch.setattr("ctrlf_video.readiness.shutil.which", lambda tool: "/test/" + tool)
     report = readiness_report(Settings(mode="real"), runtime(), approved=True)
     assert report["dispatch_prerequisites_met"]
     assert not report["live_verified"]
     assert report["model_requests_sent_by_check"] == 0
     assert "synthetic-secret-do-not-expose" not in json.dumps(report)
     assert "base_url" not in json.dumps(report)
-    assert report["models"][-1]["optional"] and not report["models"][-1]["configured"]
+    assert len(report["models"]) == 4 and all(not r["optional"] for r in report["models"])
 
 
 def test_fixture_missing_keys_calibration_and_budget_are_distinct_gates(monkeypatch):
@@ -73,7 +74,7 @@ def test_budget_readiness_requires_both_active_same_version_scopes(tmp_path):
 
 
 def test_owned_status_is_read_only_and_not_public(tmp_path, monkeypatch):
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path))
     app = create_app(Settings())
 
     async def verify():
@@ -97,7 +98,7 @@ def test_cli_does_not_create_private_storage_for_a_check(tmp_path, monkeypatch):
 
     directory = tmp_path / "does-not-exist"
     completed = subprocess.run(
-        [sys.executable, "-m", "frameseek.readiness", "--data-dir", str(directory)],
+        [sys.executable, "-m", "ctrlf_video.readiness", "--data-dir", str(directory)],
         capture_output=True,
         text=True,
     )

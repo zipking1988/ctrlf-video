@@ -3,8 +3,8 @@ import copy
 import pytest
 from pydantic import ValidationError
 
-from frameseek.evaluation import Dataset, Interval, Run, covers_events, digest, score
-from frameseek.fixtures import examples
+from ctrlf_video.evaluation import Dataset, Interval, Run, covers_events, digest, score
+from ctrlf_video.fixtures import examples
 
 
 def artifacts():

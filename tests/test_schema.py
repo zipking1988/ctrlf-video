@@ -5,8 +5,8 @@ from jsonschema import Draft202012Validator
 from jsonschema import ValidationError as JSONSchemaError
 from pydantic import ValidationError
 
-from frameseek.fixtures import examples
-from frameseek.schema import Answer, QueryControl, hms
+from ctrlf_video.fixtures import examples
+from ctrlf_video.schema import Answer, QueryControl, hms
 
 
 def test_all_four_fixtures_round_trip_with_required_nullable_fields():

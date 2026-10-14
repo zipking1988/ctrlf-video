@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from frameseek.api import create_app
-from frameseek.config import Settings
-from frameseek.workspace import Workspace
+from ctrlf_video.api import create_app
+from ctrlf_video.config import Settings
+from ctrlf_video.workspace import Workspace
 
 
 @pytest.fixture
@@ -18,14 +18,14 @@ def anyio_backend():
 
 @pytest.fixture
 def app(tmp_path, monkeypatch):
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path))
     return create_app(Settings())
 
 
 async def client_for(app):
     client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     session = (await client.get("/api/session")).json()
-    client.headers["x-fs-csrf"] = session["csrf"]
+    client.headers["x-ctrlf-csrf"] = session["csrf"]
     return client
 
 
@@ -49,7 +49,7 @@ async def test_refresh_durable_cas_and_owner_isolation(app):
         assert (await b.get("/api/investigations")).json()["items"] == []
         # A fresh DB wrapper simulates process restart, with the same owner cookie.
         restored = Workspace(app.state.workspace.root).get(
-            created["id"], app.state.workspace.authenticate(a.cookies.get("fs_session"))["id"]
+            created["id"], app.state.workspace.authenticate(a.cookies.get("ctrlf_session"))["id"]
         )
         assert restored["state"] == state and restored["revision"] == 1
         assert (await a.delete(route)).status_code == 204
@@ -65,9 +65,9 @@ async def test_csrf_origin_expired_session_and_request_boundary(app):
     try:
         response = await a.post("/api/investigations", json={}, headers={"origin": "http://evil"})
         assert response.status_code == 403
-        token = a.headers.pop("x-fs-csrf")
+        token = a.headers.pop("x-ctrlf-csrf")
         assert (await a.post("/api/investigations", json={})).status_code == 403
-        a.headers["x-fs-csrf"] = token
+        a.headers["x-ctrlf-csrf"] = token
         assert (await a.post("/api/investigations", json={"budget_cap": 1000})).status_code == 422
         desk = (await a.post("/api/investigations", json={})).json()
         for state in ({"records": None}, {"pins": {}}, {"records": 1}):
@@ -85,10 +85,34 @@ async def test_csrf_origin_expired_session_and_request_boundary(app):
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("collection", ["records", "pins"])
+@pytest.mark.parametrize("entry", [None, "bad", 3, [], True])
+async def test_snapshot_rejects_non_object_entries_without_saving(app, collection, entry):
+    client = await client_for(app)
+    try:
+        desk = (await client.post("/api/investigations", json={})).json()
+        route = f"/api/investigations/{desk['id']}"
+        state = {"title": "Keep this investigation", "records": [], "pins": []}
+        saved = await client.put(route, json={"revision": 0, "state": state})
+        assert saved.status_code == 200
+        response = await client.put(
+            route,
+            json={"revision": 1, "state": {**state, collection: [entry]}},
+        )
+        assert response.status_code == 422
+        assert response.json() == {"detail": "invalid_snapshot"}
+        restored = (await client.get(route)).json()
+        assert restored["revision"] == 1
+        assert restored["state"] == state
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.anyio
 async def test_delete_or_cancel_before_worker_start_releases_capacity(app, monkeypatch):
     import types
 
-    import frameseek.routes
+    import ctrlf_video.routes
 
     pending = []
 
@@ -102,7 +126,9 @@ async def test_delete_or_cancel_before_worker_start_releases_capacity(app, monke
         def run(self):
             self.target(*self.args)
 
-    monkeypatch.setattr(frameseek.routes, "threading", types.SimpleNamespace(Thread=DeferredThread))
+    monkeypatch.setattr(
+        ctrlf_video.routes, "threading", types.SimpleNamespace(Thread=DeferredThread)
+    )
     a = await client_for(app)
     try:
         for _ in range(2):
@@ -146,7 +172,7 @@ def test_restart_recovers_queued_jobs_without_replaying(tmp_path):
 @pytest.mark.anyio
 async def test_real_upload_probe_private_frames_range_delete_and_cascade(app):
     a, b = await client_for(app), await client_for(app)
-    content = Path("src/frameseek/static/demo/parcel.mp4").read_bytes()
+    content = Path("src/ctrlf_video/static/demo/parcel.mp4").read_bytes()
     try:
         uploaded = await a.post(
             "/api/videos",
@@ -257,3 +283,61 @@ async def test_cross_video_and_forged_real_evidence_cannot_be_saved(app):
         assert response.status_code == 422
     finally:
         await a.aclose()
+
+
+@pytest.mark.anyio
+async def test_research_snapshot_validation_and_restore(app):
+    client = await client_for(app)
+    try:
+        desk = (await client.post("/api/investigations", json={})).json()
+        route = f"/api/investigations/{desk['id']}"
+        state = {"taskBrief": "Create a project", "studyType": "technical_sample"}
+        saved = await client.put(route, json={"revision": 0, "state": state})
+        assert saved.status_code == 200
+        assert (await client.get(route)).json()["state"] == state
+        for invalid in (
+            {"taskBrief": 12},
+            {"taskBrief": "x" * 2001},
+            {"studyType": "live"},
+            {"studyType": []},
+            {"pins": [{"research": {"observation": 12}}]},
+            {"pins": [{"research": {"interpretation": "x" * 2001}}]},
+        ):
+            response = await client.put(route, json={"revision": 1, "state": invalid})
+            assert response.status_code == 422, response.text
+        assert (await client.get(route)).json()["revision"] == 1
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.anyio
+async def test_retained_demo_answers_survive_catalog_translation(app, monkeypatch):
+    from copy import deepcopy
+
+    import ctrlf_video.routes as routes
+
+    client = await client_for(app)
+    try:
+        desk = (await client.post("/api/investigations", json={})).json()
+        route = f"/api/investigations/{desk['id']}"
+        original = routes.catalog()
+        query = deepcopy(original["queries"][0])
+        state = {"records": [{"id": "task-1", "query": query}], "pins": []}
+        assert (await client.put(route, json={"revision": 0, "state": state})).status_code == 200
+        translated = deepcopy(original)
+        translated["queries"][0]["response"]["answer"] = "Translated catalog answer"
+        monkeypatch.setattr(routes, "catalog", lambda: translated)
+        state["note"] = "New researcher note"
+        state["pins"] = [{"id": "finding-1", "kind": "conclusion", "query": query}]
+        assert (await client.put(route, json={"revision": 1, "state": state})).status_code == 200
+        # New desks cannot introduce an obsolete answer; only retained owned data is trusted.
+        other = (await client.post("/api/investigations", json={})).json()
+        assert (
+            await client.put(
+                f"/api/investigations/{other['id']}", json={"revision": 0, "state": state}
+            )
+        ).status_code == 422
+        state["records"][0]["query"]["response"]["answer"] = "Forged evidence"
+        assert (await client.put(route, json={"revision": 2, "state": state})).status_code == 422
+    finally:
+        await client.aclose()

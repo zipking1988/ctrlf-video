@@ -5,20 +5,22 @@ import React, {
   useEffect,
 } from "react";
 import { createRoot } from "react-dom/client";
+import { createPortal } from "react-dom";
+import { openFinding, saveFinding } from "./finding-editor-actions.mjs";
 
-const store = window.FrameSeekWorkbenchModel.createStore();
-window.FrameSeekWorkbench = store;
-const clock = window.FrameSeekWorkbenchModel.clock;
+const store = window.CtrlFVideoWorkbenchModel.createStore();
+window.CtrlFVideoWorkbench = store;
+const clock = window.CtrlFVideoWorkbenchModel.clock;
 const useDesk = () => useSyncExternalStore(store.subscribe, store.getSnapshot);
-const ui = () => window.FrameSeekUI;
+const ui = () => window.CtrlFVideoUI;
 const icon = (name) => (
   <img className="icon" src={`/static/icons/${name}.svg`} alt="" />
 );
 const labels = {
-  ok: "画面可确认",
-  partial: "仍有未确认项",
-  no_result: "未找到画面",
-  error: "未完成",
+  ok: "Supported by frames",
+  partial: "Partially verified",
+  no_result: "No matching frames",
+  error: "Incomplete",
 };
 
 function WorkspaceNavigation() {
@@ -60,46 +62,46 @@ function WorkspaceNavigation() {
       <button
         ref={trigger}
         className="rail-button menu-trigger"
-        aria-label="工作区菜单"
+        aria-label="Workspace menu"
         aria-expanded={open}
         aria-controls="workspace-menu"
-        title={open ? "收起工作区菜单" : "展开工作区菜单"}
+        title={open ? "Close workspace menu" : "Open workspace menu"}
         onClick={() => setOpen(!open)}
       >
         {icon("list")}
-        <span>菜单</span>
+        <span>Menu</span>
       </button>
       {open && (
         <section
           id="workspace-menu"
           className="workspace-menu"
           role="dialog"
-          aria-label="工作区菜单"
+          aria-label="Workspace menu"
         >
           <div className="workspace-menu-heading">
             <div>
-              <span>本次调查</span>
-              <strong>{state.title || "未命名调查"}</strong>
+              <span>This investigation</span>
+              <strong>{state.title || "Untitled investigation"}</strong>
             </div>
             <button
               className="icon-button"
-              aria-label="关闭工作区菜单"
+              aria-label="Close workspace menu"
               onClick={() => run(() => {})}
             >
               {icon("x")}
             </button>
           </div>
           <p className="workspace-summary">
-            {state.records.length} 轮问题 · {state.pins.length} 项发现
+            {state.records.length} questions · {state.pins.length} findings
           </p>
-          <p className="menu-section-label">工作区</p>
+          <p className="menu-section-label">Workspace</p>
           <button
             className="workspace-menu-item"
             onClick={() => run(() => ui()?.canvas())}
           >
             {icon("chats-circle")}
             <span>
-              调查画布<small>回到当前调查</small>
+              Evidence canvas<small>Return to this investigation</small>
             </span>
             {icon("arrow-right")}
           </button>
@@ -109,7 +111,7 @@ function WorkspaceNavigation() {
           >
             {icon("folder-open")}
             <span>
-              素材与视频<small>展开或收起素材面板</small>
+              Source video<small>Show or hide the player</small>
             </span>
           </button>
           <button
@@ -118,7 +120,7 @@ function WorkspaceNavigation() {
           >
             {icon("stack")}
             <span>
-              发现集合<small>证据、结论与调查笔记</small>
+              Findings<small>Evidence, conclusions and notes</small>
             </span>
             <span className="menu-count">{state.pins.length}</span>
           </button>
@@ -128,17 +130,18 @@ function WorkspaceNavigation() {
           >
             {icon("paperclip")}
             <span>
-              问题详情<small>查看所选问题的依据</small>
+              Question details<small>Inspect the selected question</small>
             </span>
           </button>
-          <p className="menu-section-label">调查操作</p>
+          <button className="workspace-menu-item" onClick={() => run(() => document.getElementById("open-agent-setup").click())}>{icon("code")}<span>Model setup<small>Readiness and approved budgets</small></span></button>
+          <p className="menu-section-label">Investigation actions</p>
           <button
             className="workspace-menu-item"
             onClick={() => run(() => ui()?.newTask())}
           >
             {icon("plus")}
             <span>
-              新调查<small>清空当前画布，重新开始</small>
+              New investigation<small>Start a new investigation</small>
             </span>
           </button>
           <button
@@ -147,7 +150,7 @@ function WorkspaceNavigation() {
           >
             {icon("play")}
             <span>
-              演示库<small>探索 6 条预设调查路径</small>
+              Demo library<small>Explore six synthetic demo paths</small>
             </span>
           </button>
           <button
@@ -156,11 +159,11 @@ function WorkspaceNavigation() {
           >
             {icon("folder-open")}
             <span>
-              上传视频<small>保存素材并检查可分析状态</small>
+              Upload video<small>Save a recording and check readiness</small>
             </span>
           </button>
-          <button className="workspace-menu-item" onClick={() => run(() => window.FrameSeekPersistence?.library())}>{icon("chats-circle")}<span>调查库<small>恢复、切换与管理调查</small></span></button>
-          <button className="workspace-menu-item" onClick={() => run(() => window.FrameSeekPersistence?.library("videos"))}>{icon("folder-open")}<span>素材库<small>上传、分析与管理视频</small></span></button>
+          <button className="workspace-menu-item" onClick={() => run(() => window.CtrlFVideoPersistence?.library())}>{icon("chats-circle")}<span>Investigations<small>Resume and manage investigations</small></span></button>
+          <button className="workspace-menu-item" onClick={() => run(() => window.CtrlFVideoPersistence?.library("videos"))}>{icon("folder-open")}<span>Sources<small>Upload and manage recordings</small></span></button>
           <a
             className="workspace-menu-item"
             href="/docs"
@@ -169,11 +172,11 @@ function WorkspaceNavigation() {
             onClick={() => setOpen(false)}
           >
             {icon("code")}
-            <span>API 文档</span>
+            <span>API Docs</span>
             {icon("arrow-right")}
           </a>
           <div className="menu-footnote">
-            保存在本机<small>默认保留 24 小时 · 可恢复调查</small>
+            Saved locally<small>Retained for 24 hours by default</small>
           </div>
         </section>
       )}
@@ -185,27 +188,58 @@ function ProjectTitle() {
   const state = useDesk();
   return (
     <div className="project-name">
-      <span>工作区 /</span>
+      <span>Workspace /</span>
       <input
-        aria-label="调查名称"
+        aria-label="Investigation name"
         value={state.title}
         onChange={(e) => store.rename(e.target.value)}
         onBlur={() =>
-          !store.getSnapshot().title.trim() && store.rename("未命名调查")
+          !store.getSnapshot().title.trim() && store.rename("Untitled investigation")
         }
         maxLength={80}
       />
-      <span className="session-label">自动保存</span>
+      <span className="session-label">Autosaved</span>
     </div>
   );
+}
+function ResearchTask() {
+  const state = useDesk();
+  return ( <details className="research-context"><summary>Research context <span>{state.studyType === "technical_sample" ? "Technical sample" : "UX research"}</span></summary><section className="research-brief" aria-label="Research setup">
+        <h2>Research task</h2>
+        <label htmlFor="study-type">Recording purpose</label>
+        <select id="study-type" value={state.studyType}
+          onChange={e => store.setStudyType(e.target.value)}>
+          <option value="ux_research">UX research</option>
+          <option value="technical_sample">Technical sample</option>
+        </select>
+        <label htmlFor="task-brief">{state.studyType === "technical_sample" ? "Technical test objective" : "Participant's task"}</label>
+        <textarea id="task-brief" aria-label="Research task" maxLength={2000} value={state.taskBrief}
+          placeholder="What was the participant asked to complete?"
+          onChange={e => store.setTaskBrief(e.target.value)} />
+        <p className="session-footnote">Saved with this investigation. Each question keeps the task as it was when submitted.</p>
+        {state.studyType === "technical_sample" && <p className="research-sample-note" role="status">
+          Technical sample only. This recording does not validate UX research value.
+        </p>}
+        <details className="sample-guide">
+          <summary>Sports technical sample</summary>
+          <p>Highlights: Maine 13, Villanova 10. Upload a local copy, then test visible evidence and follow-up context. Published reference answers are excluded.</p>
+          <a href="https://www.youtube.com/watch?v=-1UXq-FzmQA" target="_blank" rel="noopener noreferrer">Open source video</a>
+          <button type="button" className="outline-button" onClick={() => {
+            store.setStudyType("technical_sample");
+            store.setTaskBrief("Technical test: locate readable brand or title graphics in the sports highlights, verify their source timestamps, and inspect the surrounding footage. Visible branding does not establish sponsorship contracts. This is not a UX participant task.");
+          }}>Use technical test brief</button>
+          <p>Suggested question: Find a clearly readable brand or title graphic and show the supporting frames.</p>
+        </details>
+      </section></details>
+);
 }
 function Outline() {
   const state = useDesk();
   return (
     <section className="investigation-outline">
       <div className="section-line">
-        <h2>调查脉络</h2>
-        <span>{state.records.length} 轮</span>
+        <h2>Questions</h2>
+        <span>{state.records.length} questions</span>
       </div>
       {state.records.length ? (
         <ol>
@@ -228,22 +262,62 @@ function Outline() {
         </ol>
       ) : (
         <p className="muted-text">
-          每次追问会留在画布上。选中旧问题，可以从那里继续。
+          Questions stay on the canvas. Select one to follow up.
         </p>
       )}
-      <p className="session-footnote">素材与问题独立保存 · 可继续上次调查</p>
+      <p className="session-footnote">Sources and questions are saved for your next visit</p>
     </section>
   );
+}
+function AgentConversation() {
+  const state = useDesk();
+  const selected = state.records.find(record => record.id === state.selectedId);
+  if (!selected) return <section className="agent-conversation agent-welcome">
+    <div className="partner-identity">{icon("chats-circle")}<strong>CtrlF Research partner</strong></div>
+    <h2>What should we investigate?</h2>
+    <p>Ask about a moment in your recording. Review the source frames, then turn the evidence into a finding.</p>
+    <p className="agent-disclosure">{state.local ? "Playback only · this source is not ready for analysis." : state.sourceInfo?.id && state.sourceInfo.id !== "demo_parcel" ? "Uploaded source · analysis requires model readiness." : "Synthetic demo · preset answers, no model calls"}</p>
+    <button className="outline-button" onClick={() => document.getElementById("question").focus()}>Ask about the video {icon("arrow-right")}</button>
+  </section>;
+  const {query} = selected;
+  const response = query.response;
+  const frames = [...new Map(response.events.flatMap(event => event.evidence).map(frame => [frame.uri, frame])).values()];
+  return <section className="agent-conversation" aria-label="Agent conversation">
+    {state.records.length > 1 && <label className="agent-history">Conversation<select aria-label="Conversation question" value={selected.id} onChange={event => ui()?.select(event.target.value)}>{state.records.map((record, index) => <option key={record.id} value={record.id}>{index + 1}. {record.query.question}</option>)}</select></label>}
+    <div className="agent-user"><span className="speaker-label">You</span><p>{query.question}</p></div>
+    <div className="agent-assistant">
+    <p className="agent-answer">{response.answer}</p>
+    <p className="agent-disclosure">{query.mode === "real" ? labels[response.status] : "Synthetic demo · preset result"}</p>
+    <details className="agent-activity"><summary>{frames.length} supporting {frames.length === 1 ? "frame" : "frames"} {icon("paperclip")}</summary>
+      <p>{query.mode === "real" ? `${response.trace?.visible?.segments_reviewed ?? 0} segments reviewed. These frames support this answer; they do not establish what happened between samples.` : "This example uses preset answers and synthetic source frames. No model request was made."}</p>
+      <button className="text-button" onClick={() => ui()?.openInspector("context")}>Inspect evidence details</button>
+    </details>
+    {!!frames.length && <div className="agent-frames">{frames.map(frame => <button key={frame.uri} onClick={() => ui()?.seek(frame.t, query)} aria-label={`Replay agent frame ${clock(frame.t)}`}><img src={frame.uri} alt={frame.caption} /><span>{clock(frame.t)}</span></button>)}</div>}
+    {!!response.unresolved.length && <details className="agent-unresolved"><summary>What remains unknown</summary>{response.unresolved.map(text => <p key={text}>{text}</p>)}</details>}
+    </div>
+    <div className="agent-result-actions"><button className="text-button" disabled={state.local} onClick={() => ui()?.continueFrom(selected.id)}>Follow up {icon("arrow-right")}</button>{["ok", "partial"].includes(response.status) && <button className="text-button" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>Edit as finding</button>}</div>
+  </section>;
+}
+function ComposerSource() {
+  const state = useDesk();
+  return <span className="composer-source">{icon("play")}<span>{state.sourceInfo?.name || (state.local ? "Local video" : "Synthetic demo")}</span></span>;
 }
 function Inspector() {
   const state = useDesk();
   const tab = state.inspectorTab;
   const setTab = store.showPanel;
   const [filter, setFilter] = useState("all");
+  const [editingId, setEditingId] = useState(null);
+  useEffect(() => {
+    const edit = event => openFinding(event.detail, setEditingId, setFilter);
+    window.addEventListener("ctrlf-video-edit-finding", edit);
+    return () => window.removeEventListener("ctrlf-video-edit-finding", edit);
+  }, []);
   const [order, setOrder] = useState("saved");
   const [message, setMessage] = useState("");
   useEffect(() => {
     setMessage("");
+    setEditingId(null);
     setFilter("all");
     setOrder("saved");
   }, [state.epoch]);
@@ -274,7 +348,7 @@ function Inspector() {
       ]
     : [];
   const pinnedFrames = state.pins.filter((p) => p.kind === "evidence");
-  const visiblePins = window.FrameSeekWorkbenchModel.visiblePins(
+  const visiblePins = window.CtrlFVideoWorkbenchModel.visiblePins(
     state.pins,
     filter,
     order,
@@ -283,22 +357,27 @@ function Inspector() {
     const result = fn();
     setMessage(
       result
-        ? "已加入关键发现，保留来源关联。"
-        : "暂时无法保存，发现集合最多保留 8 项。",
+        ? "Saved to findings with its source."
+        : "Cannot save. Keep up to eight findings per investigation.",
     );
   };
   function exportNotes() {
-    const captured = window.FrameSeekReport.create(window.FrameSeekSessionUI.snapshot());
+    const captured = window.CtrlFVideoReport.create(window.CtrlFVideoSessionUI.snapshot());
     setReportData(captured);
-    setReportText(window.FrameSeekReport.markdown(captured));
+    setReportText(window.CtrlFVideoReport.markdown(captured));
     setReportStatus("");
     report.current.showModal();
   }
+  useEffect(() => {
+    const trigger = document.getElementById("export-report");
+    trigger.addEventListener("click", exportNotes);
+    return () => trigger.removeEventListener("click", exportNotes);
+  }, []);
   function downloadFile(content, extension, type) {
     const url = URL.createObjectURL(new Blob([content], {type}));
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `CtrlF Video-调查报告.${extension}`;
+    anchor.download = `CtrlF Video-Investigation report.${extension}`;
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -314,8 +393,8 @@ function Inspector() {
       let bytes = 0;
       try {
         if (includeImages) for (const frame of reportData.evidence.slice(0, 24)) {
-          if (!window.FrameSeekReport.safeFrameUri(reportData.source.id, frame.uri)) continue;
-          setReportStatus(`正在收集证据画面 ${Object.keys(images).length} / ${reportData.evidence.length}…`);
+          if (!window.CtrlFVideoReport.safeFrameUri(reportData.source.id, frame.uri)) continue;
+          setReportStatus(`Collecting evidence images ${Object.keys(images).length} / ${reportData.evidence.length}…`);
           try {
             const response = await fetch(frame.uri, {credentials: "same-origin", signal: controller.signal});
             if (!response.ok) continue;
@@ -343,22 +422,22 @@ function Inspector() {
           } catch (error) { if (controller.signal.aborted) throw error; }
         }
         if (controller.signal.aborted) return;
-        downloadFile(window.FrameSeekReport.html(reportData, images), "html", "text/html;charset=utf-8");
-        setReportStatus(`HTML 已导出，内嵌 ${Object.keys(images).length} / ${reportData.evidence.length} 张画面。未内嵌项保留说明；文件可离线打开或打印为 PDF。`);
+        downloadFile(window.CtrlFVideoReport.html(reportData, images), "html", "text/html;charset=utf-8");
+        setReportStatus(`HTML Exported with ${Object.keys(images).length} / ${reportData.evidence.length} images embedded. Other references remain listed; open offline or print as PDF.`);
       } finally { setExporting(false); exportController.current = null; }
       return;
     }
-    setReportStatus("下载已发起。这份报告保留打开导出窗口时的调查快照。");
+    setReportStatus("Download started. This report captures the investigation when export was opened.");
   }
   return (
     <>
       <div className="inspector-heading">
         <span>
-          调查检查器<small>从结论回到证据</small>
+          Finding editor<small>Keep observations linked to their source</small>
         </span>
         <button
           className="icon-button"
-          aria-label="收起调查检查器"
+          aria-label="Hide finding editor"
           onClick={() => ui()?.toggleInspector()}
         >
           {icon("x")}
@@ -367,7 +446,7 @@ function Inspector() {
       <div
         className="inspector-tabs"
         role="tablist"
-        aria-label="调查检查器内容"
+        aria-label="Investigation panels"
         onKeyDown={(event) => {
           if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
           event.preventDefault();
@@ -387,7 +466,7 @@ function Inspector() {
           aria-selected={tab === "context"}
           onClick={() => setTab("context")}
         >
-          当前问题
+          Evidence details
         </button>
         <button
           id="inspector-findings-tab"
@@ -398,7 +477,7 @@ function Inspector() {
           aria-selected={tab === "findings"}
           onClick={() => setTab("findings")}
         >
-          发现 <span>{state.pins.length}</span>
+          Findings <span>{state.pins.length}</span>
         </button>
       </div>
       <div
@@ -406,7 +485,7 @@ function Inspector() {
         ref={scroll}
         className="inspector-scroll"
         role="tabpanel"
-        aria-label={tab === "context" ? "当前问题详情" : "已保存的发现"}
+        aria-label={tab === "context" ? "Current question details" : "Saved findings"}
         aria-labelledby={
           tab === "context" ? "inspector-context-tab" : "inspector-findings-tab"
         }
@@ -416,7 +495,7 @@ function Inspector() {
             <>
               <div className="inspector-context-line">
                 <p className="inspector-kicker">
-                  问题{" "}
+                  Question{" "}
                   {String(state.records.indexOf(selected) + 1).padStart(2, "0")}
                 </p>
                 <span
@@ -426,29 +505,37 @@ function Inspector() {
                 </span>
               </div>
               <h2 className="inspector-question">{selected.query.question}</h2>
+              <details className="sample-guide">
+                <summary>Task context at submission</summary>
+                <p>{selected.query.task_brief || "No task brief was recorded for this question."}</p>
+                <p>{selected.query.study_type === "technical_sample"
+                  ? "Technical sample — not UX validation."
+                  : selected.query.study_type === "ux_research" ? "UX research" : "Purpose was not recorded."}</p>
+                <p>The task provides context, not observed evidence.</p>
+              </details>
               <div className="inspector-primary-actions">
                 <button
                   className="outline-button"
                   disabled={state.local}
                   onClick={() => ui()?.continueFrom(selected.id)}
                 >
-                  继续追问 {icon("arrow-right")}
+                  Follow up {icon("arrow-right")}
                 </button>
                 <button
                   className="text-button"
                   onClick={() => ui()?.select(selected.id)}
                 >
-                  定位画布
+                  Locate on canvas
                 </button>
               </div>
               <div className="inspector-conclusion">
                 <div className="section-line">
-                  <h3>当前结论</h3>
+                  <h3>Source answer</h3>
                   {["ok", "partial"].includes(
                     selected.query.response.status,
                   ) && (
                     <button
-                      aria-label="保存当前结论"
+                      aria-label="Save current answer as finding"
                       className="text-button"
                       onClick={() =>
                         action(() =>
@@ -456,7 +543,7 @@ function Inspector() {
                         )
                       }
                     >
-                      保存结论
+                      Save finding
                     </button>
                   )}
                 </div>
@@ -464,7 +551,7 @@ function Inspector() {
               </div>
               {!!selected.query.response.unresolved.length && (
                 <div className="open-questions">
-                  <h3>仍需核实</h3>
+                  <h3>Needs verification</h3>
                   {selected.query.response.unresolved.map((text) => (
                     <p key={text}>{text}</p>
                   ))}
@@ -473,7 +560,7 @@ function Inspector() {
               {!!frames.length && (
                 <section className="inspector-evidence">
                   <div className="section-line">
-                    <h3>引用画面</h3>
+                    <h3>Supporting frames</h3>
                     <span>{frames.length}</span>
                   </div>
                   {frames.map((frame) => (
@@ -482,7 +569,7 @@ function Inspector() {
                         className="frame-preview"
                         draggable={false}
                         data-drag-evidence
-                        title="拖到画布保存，或点击回看"
+                        title="Drag to canvas to save, or click to replay"
                         onPointerDown={(event) => {
                           if (event.button !== 0) return;
                           event.preventDefault();
@@ -549,7 +636,7 @@ function Inspector() {
                           }
                           ui()?.seek(frame.t, selected.query);
                         }}
-                        aria-label={`回看引用 ${clock(frame.t)}`}
+                        aria-label={`Replay reference ${clock(frame.t)}`}
                       >
                         <img src={frame.uri} alt={frame.caption} />
                         <span>{clock(frame.t)}</span>
@@ -567,9 +654,9 @@ function Inspector() {
                               ),
                             )
                           }
-                          aria-label={`保存证据 ${clock(frame.t)}`}
+                          aria-label={`Save evidence ${clock(frame.t)}`}
                         >
-                          留在画布 {icon("plus")}
+                          Pin to canvas {icon("plus")}
                         </button>
                       </div>
                     </div>
@@ -578,22 +665,22 @@ function Inspector() {
               )}
               <details className="basis-section">
                 <summary>
-                  这轮依据<span>{frames.length} 张证据 · {selected.query.mode === "real" ? "模型回看" : "预设匹配"}</span>
+                  Evidence basis<span>{frames.length} frames · {selected.query.mode === "real" ? "Model review" : "Preset match"}</span>
                 </summary>
                 <ol className="basis-steps">
                   <li>
                     <span>01</span>
                     <div>
-                      查看范围<small>{state.sourceInfo?.name || "合成视频"} · 00:00–{clock(state.sourceInfo?.metadata?.duration || 18)}</small>
+                      Review scope<small>{state.sourceInfo?.name || "Synthetic video"} · 00:00–{clock(state.sourceInfo?.metadata?.duration || 18)}</small>
                     </div>
                   </li>
                   <li>
                     <span>02</span>
                     <div>
-                      {selected.query.mode === "real" ? "检索与模型回看" : "固定样例匹配"}
+                      {selected.query.mode === "real" ? "Retrieval and visual review" : "Preset example match"}
                       <small>
-                        {selected.query.response.events.length} 段事件 ·{" "}
-                        {frames.length} 张证据帧
+                        {selected.query.response.events.length} events ·{" "}
+                        {frames.length} frames
                       </small>
                     </div>
                   </li>
@@ -601,7 +688,7 @@ function Inspector() {
                     <span>03</span>
                     <div>
                       {labels[selected.query.response.status]}
-                      <small>{selected.query.mode === "real" ? `${selected.query.response.trace.visible.segments_reviewed} 个片段已回看` : "未执行新的模型推理"}</small>
+                      <small>{selected.query.mode === "real" ? `${selected.query.response.trace.visible.segments_reviewed} segments reviewed` : "No new model request"}</small>
                     </div>
                   </li>
                 </ol>
@@ -610,17 +697,18 @@ function Inspector() {
           ) : (
             <div className="inspector-empty">
               <p className="inspector-kicker">FOLLOW THE EVIDENCE</p>
-              <h2>让结论有据可查。</h2>
-              <p>选中画布中的问题，在这里查看它的依据、证据和未确认项。</p>
+              <h2>Start with the evidence.</h2>
+              <p>Select a question to inspect its evidence and unresolved details.</p>
               <button className="outline-button" onClick={() => ui()?.demos()}>
-                探索演示路径 {icon("arrow-right")}
+                Explore a demo {icon("arrow-right")}
               </button>
             </div>
           )
         ) : (
           <>
+            <details className="collection-options"><summary>Organize findings <span>{state.pins.length} / 8 saved</span></summary>
             <label className="inspector-kicker" htmlFor="finding-group">
-              发现分组
+              Finding collection
             </label>
             <input
               id="finding-group"
@@ -630,26 +718,26 @@ function Inspector() {
               maxLength={60}
             />
             <div className="collection-summary">
-              <span>{state.pins.length} / 8 项已保存</span>
+              <span>{state.pins.length} / 8 saved</span>
               <span>
-                {pinnedFrames.length} 张证据 ·{" "}
-                {state.pins.length - pinnedFrames.length} 个结论
+                {pinnedFrames.length} frames ·{" "}
+                {state.pins.length - pinnedFrames.length} conclusions
               </span>
             </div>
             <div className="finding-controls">
               <div
                 className="finding-filters"
                 role="group"
-                aria-label="发现类型筛选"
+                aria-label="Filter findings"
               >
                 {[
-                  ["all", "全部"],
-                  ["evidence", "证据"],
-                  ["conclusion", "结论"],
+                  ["all", "All"],
+                  ["evidence", "Evidence"],
+                  ["conclusion", "Finding"],
                 ].map(([value, label]) => (
                   <button
                     key={value}
-                    aria-label={`筛选${label}发现`}
+                    aria-label={`Filter ${label.toLowerCase()} findings`}
                     aria-pressed={filter === value}
                     onClick={() => setFilter(value)}
                   >
@@ -663,24 +751,26 @@ function Inspector() {
                 ))}
               </div>
               <label className="sr-only" htmlFor="finding-order">
-                发现排序
+                Sort findings
               </label>
               <select
                 id="finding-order"
                 value={order}
                 onChange={(e) => setOrder(e.target.value)}
               >
-                <option value="saved">保存顺序</option>
-                <option value="time">视频时间</option>
+                <option value="saved">Saved order</option>
+                <option value="time">Video time</option>
               </select>
             </div>
+            </details>
+            {visiblePins.length > 1 && <label className="finding-picker">Edit finding<select aria-label="Edit finding" value={visiblePins.some(pin => pin.id === editingId) ? editingId : visiblePins.at(-1).id} onChange={e => setEditingId(e.target.value)}>{visiblePins.map(pin => <option key={pin.id} value={pin.id}>{pin.title}</option>)}</select></label>}
             {visiblePins.length ? (
               <div className="finding-list">
-                {visiblePins.map((pin) => (
+                {visiblePins.filter(pin => pin.id === (visiblePins.some(item => item.id === editingId) ? editingId : visiblePins.at(-1).id)).map((pin) => (
                   <div className={`finding-row ${pin.kind}`} key={pin.id}>
-                    <button
+                    <details className="finding-original"><summary>Source answer</summary><button
                       className="finding-main"
-                      aria-label={`定位发现：${pin.title}`}
+                      aria-label={`Locate finding: ${pin.title}`}
                       onClick={() => ui()?.focusFinding(pin.id)}
                     >
                       {pin.kind === "evidence" ? (
@@ -690,7 +780,7 @@ function Inspector() {
                       )}
                       <span>
                         <small>
-                          {pin.kind === "evidence" ? "证据帧" : "结论"} /{" "}
+                          {pin.kind === "evidence" ? "Evidence frame" : "Finding"} /{" "}
                           {pin.kind === "evidence"
                             ? clock(pin.frame.t)
                             : labels[pin.query.response.status]}
@@ -702,10 +792,11 @@ function Inspector() {
                         </span>
                       </span>
                     </button>
+                    </details>
                     <div className="finding-provenance">
                       <button
                         className="text-button"
-                        aria-label={`查看发现来源：${pin.title}`}
+                        aria-label={`View finding source: ${pin.title}`}
                         disabled={
                           !state.records.some(
                             (record) => record.id === pin.turnId,
@@ -719,73 +810,96 @@ function Inspector() {
                             .focus();
                         }}
                       >
-                        来源：{pin.query.question}
+                        Source: {pin.query.question}
                       </button>
                       {pin.kind === "evidence" && (
                         <button
                           className="text-button"
-                          aria-label={`回看已保存证据 ${clock(pin.frame.t)}`}
+                          aria-label={`Replay saved evidence ${clock(pin.frame.t)}`}
                           onClick={() => ui()?.seek(pin.frame.t, pin.query)}
                         >
-                          {icon("play")}回看
+                          {icon("play")}Replay
                         </button>
                       )}
                     </div>
                     <button
                       className="icon-button remove-finding"
-                      aria-label={`移除${pin.title}`}
+                      aria-label={`Remove ${pin.title}`}
                       onClick={() => ui()?.removeFinding(pin.id)}
                     >
                       {icon("x")}
                     </button>
+                    <section className="finding-research" aria-label="Edit research finding">
+                      <label>Finding title<input value={pin.title} maxLength={200} onChange={e => store.renameFinding(pin.id, e.target.value)} /></label>
+                      <p className="session-footnote">Researcher-authored notes; source evidence remains unchanged.</p>
+                      {[
+                        ["observation", "Observed facts", "Describe what you verified in the source."],
+                        ["openQuestions", "Open questions", "What still needs verification?"],
+                        ["interpretation", "Interpretation / hypothesis", "Explain a possible meaning, not a proven cause."],
+                      ].map(([field, label, placeholder]) => {
+                        const input = <label key={field}>{label}<textarea value={pin.research?.[field] || ""} maxLength={2000} placeholder={placeholder} onChange={e => store.editFinding(pin.id, field, e.target.value)} /></label>;
+                        return field === "interpretation" ? <details className="finding-interpretation" key={field}><summary>Interpretation / hypothesis{pin.research?.interpretation ? " · saved" : ""}</summary>{input}</details> : input;
+                      })}
+                      <div className="supporting-evidence"><h3>Supporting evidence</h3><div>
+                        {(pin.kind === "evidence" ? [pin.frame] : [...new Map(pin.query.response.events.flatMap(event => event.evidence).map(frame => [frame.uri, frame])).values()]).map(frame => <button key={frame.uri} type="button" onClick={() => ui()?.seek(frame.t, pin.query)} aria-label={`Replay supporting frame ${clock(frame.t)}`}>
+                          <img src={frame.uri} alt={frame.caption || "Source frame"} /><span>{clock(frame.t)}</span>
+                        </button>)}
+                      </div></div>
+                      <div className="finding-edit-actions"><button className="export-button" onClick={() => saveFinding(window.CtrlFVideoPersistence, setMessage)}>Save finding</button><button className="outline-button" onClick={() => {
+                        const frame = pin.kind === "evidence" ? pin.frame : pin.query.response.events.flatMap(event => event.evidence)[0];
+                        if (frame) ui()?.seek(Math.max(0, frame.t - 2), pin.query);
+                      }}>Replay context</button></div>
+                    </section>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="muted-text">
                 {state.pins.length
-                  ? "这个分类还没有发现。切换到全部可查看已保存内容。"
-                  : "把引用画面或当前结论保存到这里。它们会作为独立对象留在画布上。"}
+                  ? "No findings in this category. Choose All to see saved items."
+                  : "Select a question and save its answer or a source frame to start a finding."}
               </p>
             )}
-            <button
+            {!state.pins.length && selected && ["ok", "partial"].includes(selected.query.response.status) && <button className="export-button" onClick={() => action(() => ui()?.saveConclusion(selected.id, selected.query))}>Create finding from selected answer</button>}
+            <details className="collection-extras"><summary>Compare frames and investigation notes</summary><button
               className="outline-button compare-button"
               disabled={pinnedFrames.length < 2}
               onClick={() => compare.current.showModal()}
             >
-              并排核对两帧{" "}
+              Compare frames{" "}
               <span>
                 {pinnedFrames.length < 2
-                  ? "需 2 张证据"
-                  : `${pinnedFrames.length} 张可用`}
+                  ? "Save two frames first"
+                  : `${pinnedFrames.length} available`}
               </span>
             </button>
             <label
               className="section-line note-label"
               htmlFor="investigation-note"
             >
-              调查笔记 <span>{state.note.length} / 1200</span>
+              Investigation notes <span>{state.note.length} / 1200</span>
             </label>
             <textarea
               id="investigation-note"
-              aria-label="调查笔记"
-              placeholder="记录观察、疑问或下一步…"
+              aria-label="Investigation notes"
+              placeholder="Observations, questions or next steps…"
               value={state.note}
               onChange={(e) => store.annotate(e.target.value)}
               maxLength={1200}
             />
             <p className="session-footnote">
-              名称、发现和笔记自动保存在本机，刷新后可继续。
+              Your title, findings and notes save locally as you edit.
             </p>
             <button className="export-button" onClick={exportNotes}>
-              导出调查记录 {icon("arrow-right")}
-            </button>
+              Export report {icon("arrow-right")}
+            </button></details>
           </>
         )}
         <p className="inspector-message" role="status">
           {message}
         </p>
       </div>
+      {createPortal(<>
       <dialog
         className="compare-dialog"
         ref={compare}
@@ -794,11 +908,11 @@ function Inspector() {
         <header>
           <div>
             <p className="inspector-kicker">EVIDENCE / COMPARISON</p>
-            <h2 id="compare-title">并排核对</h2>
+            <h2 id="compare-title">Compare evidence</h2>
           </div>
           <button
             className="icon-button"
-            aria-label="关闭证据对照"
+            aria-label="Close comparison"
             onClick={() => compare.current.close()}
           >
             {icon("x")}
@@ -818,14 +932,14 @@ function Inspector() {
                     ui()?.seek(pin.frame.t, pin.query);
                   }}
                 >
-                  回看此帧 {icon("play")}
+                  Replay this frame {icon("play")}
                 </button>
               </figcaption>
             </figure>
           ))}
         </div>
         <p className="muted-text">
-          同一素材的证据帧。可见位置变化不等于已确认连续移动。
+          Frames from the same source. Different positions do not establish continuous movement.
         </p>
       </dialog>
       <dialog
@@ -837,41 +951,54 @@ function Inspector() {
         <header>
           <div>
             <p className="inspector-kicker">INVESTIGATION / RECORD</p>
-            <h2 id="report-title">调查报告</h2>
+            <h2 id="report-title">Investigation report</h2>
           </div>
           <button
             className="icon-button"
-            aria-label="关闭调查记录"
+            aria-label="Close report"
             onClick={() => report.current.close()}
           >
             {icon("x")}
           </button>
         </header>
-        <p className="report-summary">{reportData?.questions.length || 0} 个问题 · {reportData?.findings.length || 0} 项发现 · {reportData?.evidence.length || 0} 张证据画面。包含当前保留的对话与发现来源；未确认项单独列出。</p>
-        <textarea aria-label="调查记录 Markdown" value={reportText} readOnly />
-        <label className="report-image-option"><input type="checkbox" checked={includeImages} onChange={e => setIncludeImages(e.target.checked)} disabled={exporting} /> HTML 内嵌证据画面（最多 24 张、16 MB，形成可分享的本地副本）</label>
+        <p className="report-summary">{reportData?.questions.length || 0} questions · {reportData?.findings.length || 0} findings · {reportData?.evidence.length || 0} evidence frames. Includes retained questions and finding sources; unresolved details are listed separately.</p>
+        {reportData && <section className="report-preview" aria-label="Report preview">
+          <h3>{reportData.title}</h3>
+          <p>{window.CtrlFVideoReport.provenance(reportData)}</p>
+          <p><strong>Research task</strong><br />{reportData.research_context?.task_brief || "Not provided"}</p>
+          {reportData.research_context?.study_type === "technical_sample" && <p>Technical sample only — does not validate UX research value.</p>}
+          {reportData.findings.map(finding => <article key={finding.id}>
+            <h4>{finding.title}</h4>
+            <dl>{[["observation", "Observed facts"], ["interpretation", "Interpretation / hypothesis"], ["openQuestions", "Open questions"]].map(([field, label]) => <React.Fragment key={field}><dt>{label}</dt><dd>{finding.research?.[field] || "Not recorded"}</dd></React.Fragment>)}</dl>
+          </article>)}
+          {!reportData.findings.length && <p>No saved findings yet.</p>}
+          <p className="muted-text">{reportData.scope}</p>
+        </section>}
+        <details className="report-source-text"><summary>Full Markdown and source references</summary><textarea aria-label="Investigation record Markdown" value={reportText} readOnly /></details>
+        <label className="report-image-option"><input type="checkbox" checked={includeImages} onChange={e => setIncludeImages(e.target.checked)} disabled={exporting} /> Embed evidence images in HTML (up to 24 images, 16 MB)</label>
         <div className="report-actions">
           <button
             className="outline-button"
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(reportText);
-                setReportStatus("Markdown 已复制。");
+                setReportStatus("Markdown copied.");
               } catch {
-                setReportStatus("可在上方选择文字，使用浏览器复制。");
+                setReportStatus("Open Full Markdown and source references, select the text, and use browser copy.");
               }
             }}
           >
-            复制 Markdown
+            Copy Markdown
           </button>
-          <button className="outline-button" disabled={exporting} onClick={() => downloadReport("md")}>下载 Markdown</button>
-          <button className="outline-button" disabled={exporting} onClick={() => downloadReport("json")}>下载 JSON</button>
-          <button className="outline-button" disabled={exporting} onClick={() => downloadReport("html").catch(() => setReportStatus("导出已取消或失败，请重试。"))}>{exporting ? "收集画面…" : "下载 HTML"}</button>
+          <button className="outline-button" disabled={exporting} onClick={() => downloadReport("md")}>Download Markdown</button>
+          <button className="outline-button" disabled={exporting} onClick={() => downloadReport("json")}>Download JSON</button>
+          <button className="export-button" disabled={exporting} onClick={() => downloadReport("html").catch(() => setReportStatus("Export cancelled or failed. Please retry."))}>{exporting ? "Collecting images…" : "Download HTML"}</button>
         </div>
         <p className="muted-text" role="status">
           {reportStatus}
         </p>
       </dialog>
+      </>, document.querySelector(".agent-shell"))}
     </>
   );
 }
@@ -885,3 +1012,9 @@ createRoot(document.getElementById("investigation-outline")).render(
 createRoot(document.getElementById("workbench-inspector")).render(
   <Inspector />,
 );
+
+createRoot(document.getElementById("research-task")).render(<ResearchTask />);
+
+createRoot(document.getElementById("composer-source")).render(<ComposerSource />);
+
+createRoot(document.getElementById("agent-conversation-root")).render(<AgentConversation />);

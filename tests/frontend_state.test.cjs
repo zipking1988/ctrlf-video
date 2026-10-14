@@ -148,7 +148,7 @@ async function harness(readyState = 1, width = 1440) {
   });
   vm.runInContext(
     fs.readFileSync(
-      path.join(__dirname, "../src/frameseek/static/app.js"),
+      path.join(__dirname, "../src/ctrlf_video/static/app.js"),
       "utf8",
     ),
     context,
@@ -186,13 +186,13 @@ test("reset after media failure cannot claim readiness; reload updates source wi
   const h = await harness();
   h.player.dispatch("error");
   h.run("newTask()");
-  assert.equal(h.get("source-step-state").textContent, "需重试");
-  assert.equal(h.get("attached-source-state").textContent, "加载失败");
+  assert.equal(h.get("source-step-state").textContent, "Retry needed");
+  assert.equal(h.get("attached-source-state").textContent, "Load failed");
   h.run("turns = 2");
   h.get("reload-video").click();
-  assert.equal(h.get("source-step-state").textContent, "加载中");
+  assert.equal(h.get("source-step-state").textContent, "Loading");
   h.player.dispatch("loadedmetadata");
-  assert.equal(h.get("source-step-state").textContent, "已就绪");
+  assert.equal(h.get("source-step-state").textContent, "Ready");
 });
 test("selecting an older task synchronizes the canvas and exposes selected history", async () => {
   const h = await harness();
@@ -200,21 +200,21 @@ test("selecting an older task synchronizes the canvas and exposes selected histo
     `renderAnswer(${JSON.stringify(h.answer("ok", [{ action: "包裹", start: 5, end: 11, evidence: [], summary: "位置" }]))})`,
   );
   h.run(`renderAnswer(${JSON.stringify(h.answer("no_result"))})`);
-  assert.equal(h.get("run-state").textContent, "未找到相关画面");
+  assert.equal(h.get("run-state").textContent, "No matching frames");
   const old = h.get("task-list").children[1];
   old.click();
-  assert.equal(h.get("run-state").textContent, "已提供证据");
+  assert.equal(h.get("run-state").textContent, "Evidence available");
   assert.equal(old.getAttribute("aria-current"), "true");
-  assert.equal(h.get("evidence-step-state").textContent, "待选择");
+  assert.equal(h.get("evidence-step-state").textContent, "Select evidence");
 });
 test("mobile evidence reveal and collapse retain task draft", async () => {
   const h = await harness(1, 375);
-  h.get("question").value = "保留我的任务";
+  h.get("question").value = "Keep我 任务";
   h.run("seek(6)");
   assert.equal(h.get("toggle-evidence").getAttribute("aria-expanded"), "true");
   assert.equal(h.shell.classList.contains("evidence-open"), true);
   h.get("toggle-evidence").click();
-  assert.equal(h.get("question").value, "保留我的任务");
+  assert.equal(h.get("question").value, "Keep我 任务");
   assert.equal(h.shell.classList.contains("evidence-open"), false);
 });
 test("local playback and new task retain unindexed state and disabled question", async () => {
@@ -222,8 +222,8 @@ test("local playback and new task retain unindexed state and disabled question",
   h.run("setLocalMode(true)");
   h.run("newTask()");
   assert.equal(h.get("question").disabled, true);
-  assert.equal(h.get("run-state").textContent, "未建立索引");
-  assert.equal(h.get("source-step-state").textContent, "未索引");
+  assert.equal(h.get("run-state").textContent, "Not indexed");
+  assert.equal(h.get("source-step-state").textContent, "Not indexed");
   assert.equal(h.get("empty-state").hidden, false);
   assert.equal(h.get("restore-demo").hidden, false);
 });
@@ -244,33 +244,33 @@ test("bounded session history removes the same oldest task as the conversation",
 
 test("source rail toggles the open panel and evidence restores its state without clearing the draft", async () => {
   const h = await harness();
-  h.run("window.FrameSeekWorkbench = {}; investigation = { evidence() {} }");
-  h.get("question").value = "保留当前追问";
+  h.run("window.CtrlFVideoWorkbench = {}; investigation = { evidence() {} }");
+  h.get("question").value = "KeepCurrentFollow-up";
   const rail = h.get("rail-source");
   assert.equal(rail.getAttribute("aria-expanded"), "true");
   rail.click();
   assert.equal(h.shell.classList.contains("source-collapsed"), true);
   assert.equal(rail.getAttribute("aria-expanded"), "false");
-  assert.equal(rail.getAttribute("aria-label"), "打开素材");
+  assert.equal(rail.getAttribute("aria-label"), "Open source");
   rail.click();
   assert.equal(h.shell.classList.contains("source-collapsed"), false);
   assert.equal(rail.getAttribute("aria-expanded"), "true");
   h.get("collapse-source").click();
-  assert.equal(rail.focused, true);
+  assert.equal(h.get("source-launcher").focused, true);
   assert.equal(rail.getAttribute("aria-expanded"), "false");
   h.run("seek(13)");
   assert.equal(h.shell.classList.contains("source-collapsed"), false);
   assert.equal(rail.getAttribute("aria-expanded"), "true");
-  assert.equal(rail.getAttribute("aria-label"), "收起素材");
+  assert.equal(rail.getAttribute("aria-label"), "Hide source");
   assert.equal(h.player.currentTime, 13);
-  assert.equal(h.get("question").value, "保留当前追问");
+  assert.equal(h.get("question").value, "KeepCurrentFollow-up");
 });
 
-test("发现导航显式展开小桌面检查器并保留输入", async () => {
+test("FindingsMap显式Expand小桌面Findings并Keep输入", async () => {
   const h = await harness(1, 1200);
-  h.get("question").value = "保留追问";
+  h.get("question").value = "KeepFollow-up";
   h.run(
-    "window.FrameSeekWorkbench = { showPanel(tab) { window.lastPanel = tab; } }",
+    "window.CtrlFVideoWorkbench = { showPanel(tab) { window.lastPanel = tab; } }",
   );
   h.shell.classList.add("inspector-collapsed");
   h.get("rail-findings").click();
@@ -279,5 +279,41 @@ test("发现导航显式展开小桌面检查器并保留输入", async () => {
   assert.equal(h.shell.classList.contains("inspector-collapsed"), false);
   assert.equal(h.get("toggle-inspector").getAttribute("aria-expanded"), "true");
   assert.equal(h.get("inspector-findings-tab").focused, true);
-  assert.equal(h.get("question").value, "保留追问");
+  assert.equal(h.get("question").value, "KeepFollow-up");
+});
+
+
+test("floating agent and finding editor preserve the draft and canvas view", async () => {
+  const h = await harness();
+  h.run("window.CtrlFVideoWorkbench = { showPanel() {} }; investigation = { fit() { throw Error('Do not move the canvas on panel toggle'); }, choose(id) { window.contextId = id; } }");
+  h.get("question").value = "Keep this unfinished question";
+  h.get("collapse-agent").click();
+  assert.equal(h.shell.classList.contains("chat-collapsed"), true);
+  assert.equal(h.get("agent-launcher").focused, true);
+  h.get("agent-launcher").click();
+  assert.equal(h.shell.classList.contains("chat-collapsed"), false);
+  assert.equal(h.get("question").focused, true);
+  h.run("openInspector('findings')");
+  assert.equal(h.shell.classList.contains("chat-collapsed"), true);
+  assert.equal(h.shell.classList.contains("inspector-collapsed"), false);
+  h.run("window.CtrlFVideoUI.continueFrom('task-1')");
+  assert.equal(h.shell.classList.contains("chat-collapsed"), false);
+  assert.equal(h.shell.classList.contains("inspector-collapsed"), true);
+  assert.equal(h.run("window.contextId"), "task-1");
+  assert.equal(h.get("question").value, "Keep this unfinished question");
+});
+
+test("expanding and hiding the floating source retains playback and draft", async () => {
+  const h = await harness();
+  h.player.currentTime = 10;
+  h.get("question").value = "Draft";
+  h.get("expand-source").click();
+  assert.equal(h.shell.classList.contains("source-expanded"), true);
+  h.get("collapse-source").click();
+  assert.equal(h.shell.classList.contains("source-expanded"), false);
+  assert.equal(h.shell.classList.contains("source-collapsed"), true);
+  h.get("source-launcher").click();
+  assert.equal(h.shell.classList.contains("source-collapsed"), false);
+  assert.equal(h.player.currentTime, 10);
+  assert.equal(h.get("question").value, "Draft");
 });

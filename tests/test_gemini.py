@@ -6,14 +6,15 @@ from pathlib import Path
 
 import httpx
 import pytest
+from pydantic import ValidationError
 from test_agent import approve, setup_real
 
-from frameseek.agent import AgentError, Endpoint, Provider, Runtime, load_runtime
-from frameseek.attempts import AttemptLedger, BudgetDenied
-from frameseek.config import Settings
-from frameseek.gemini import BASE_URL, normalize_response, prepare_request
-from frameseek.readiness import readiness_report
-from frameseek.schema import Answer
+from ctrlf_video.agent import AgentError, Endpoint, Provider, Runtime, load_runtime
+from ctrlf_video.attempts import AttemptLedger, BudgetDenied
+from ctrlf_video.config import Settings
+from ctrlf_video.gemini import BASE_URL, normalize_response, prepare_request
+from ctrlf_video.readiness import readiness_report
+from ctrlf_video.schema import Answer
 
 
 @pytest.fixture
@@ -211,6 +212,37 @@ async def test_gemini_cannot_accept_invented_frame_references(tmp_path, monkeypa
         await client.aclose()
 
 
+@pytest.mark.anyio
+async def test_audio_question_is_rejected_without_any_model_dispatch(tmp_path, monkeypatch):
+    monkeypatch.setenv("TEST_GEMINI_KEY", "test-secret")
+    calls = []
+    _, client, _, desk = await setup_real(
+        tmp_path,
+        monkeypatch,
+        calls,
+        runtime_factory=configuration,
+        response_handler=handler(calls),
+    )
+    try:
+        before = len(calls)
+        result = await client.post(
+            "/api/chat",
+            json={
+                "investigation_id": desk["id"],
+                "request_id": "req_audio_unsupported",
+                "generation": 0,
+                "question": "What was said in the audio?",
+            },
+        )
+        assert result.status_code == 502, result.text
+        answer = Answer.model_validate(result.json()["response"])
+        assert answer.status == "error" and not answer.events
+        assert answer.errors[0].code == "audio_channel_unavailable"
+        assert len(calls) == before
+    finally:
+        await client.aclose()
+
+
 @pytest.mark.parametrize(
     "mutation,code",
     [
@@ -218,7 +250,6 @@ async def test_gemini_cannot_accept_invented_frame_references(tmp_path, monkeypa
         ("http", "gemini_endpoint_not_allowed"),
         ("model", "invalid_gemini_model"),
         ("consent", "google_media_not_enabled"),
-        ("asr", "gemini_asr_not_supported"),
         ("key", "model_key_missing"),
     ],
 )
@@ -234,8 +265,6 @@ def test_gemini_configuration_blocks_unsafe_routes(monkeypatch, mutation, code):
         config.embed.model = "bad/model?key=secret"
     if mutation == "consent":
         config.allow_google_media = False
-    if mutation == "asr":
-        config.asr = config.vision
     if mutation == "key":
         config.text.key_env = None
     assert code in config.blockers()
@@ -300,7 +329,7 @@ def test_gemini_external_media_and_oversized_requests_rejected_before_reservatio
             [{"type": "image_url", "image_url": {"url": "https://private.example/x.jpg"}}],
             **kwargs(),
         )
-    monkeypatch.setattr("frameseek.gemini.MAX_REQUEST_BYTES", 200)
+    monkeypatch.setattr("ctrlf_video.gemini.MAX_REQUEST_BYTES", 200)
     with pytest.raises(AgentError, match="gemini_request_limit"):
         p.chat("text", "too large", **kwargs())
     assert not calls and p.ledger.read_attempt("req_test_plan", "owner") is None
@@ -329,16 +358,19 @@ def test_gemini_ignores_thoughts_and_rejects_function_calls():
         normalize_response("text", content)
 
 
-def test_templates_are_valid_but_blocked_and_legacy_route_stays_default(monkeypatch):
-    for name, expected in [
-        ("runtime.example.json", "nvidia_nebius"),
-        ("runtime.gemini.example.json", "gemini"),
-    ]:
-        monkeypatch.setenv("FS_RUNTIME_FILE", str(Path("docs") / name))
-        config = load_runtime()
-        assert config.provider == expected
-        assert "calibration_expired" in config.blockers()
-        assert "resource_cost_bound_unverified" in config.blockers()
+def test_template_is_valid_but_blocked_and_gemini_is_the_only_provider(monkeypatch):
+    monkeypatch.setenv("CTRLF_RUNTIME_FILE", str(Path("docs/runtime.example.json")))
+    config = load_runtime()
+    assert config.provider == "gemini"
+    assert "calibration_expired" in config.blockers()
+    assert "resource_cost_bound_unverified" in config.blockers()
+    assert "google_media_not_enabled" in config.blockers()
+    values = config.model_dump()
+    values.pop("provider")
+    assert Runtime.model_validate(values).provider == "gemini"
+    for changes in ({"provider": "other_provider"}, {"asr": values["vision"]}):
+        with pytest.raises(ValidationError):
+            Runtime.model_validate({**values, **changes})
     _, wire = prepare_request(
         "embed", "/embeddings", {"model": "test", "input": ["one", "two"]}, "ingest"
     )

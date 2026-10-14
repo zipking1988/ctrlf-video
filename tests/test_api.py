@@ -3,10 +3,10 @@ import socket
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from frameseek.api import create_app
-from frameseek.config import Settings
-from frameseek.fixtures import examples
-from frameseek.preflight import report
+from ctrlf_video.api import create_app
+from ctrlf_video.config import Settings
+from ctrlf_video.fixtures import examples
+from ctrlf_video.preflight import report
 
 
 @pytest.mark.anyio
@@ -27,7 +27,7 @@ async def test_local_health_and_schema_do_not_claim_real_readiness():
             "error",
         ]
         assert "QueryControl" in schemas
-        assert "调查画布" in (await client.get("/")).text
+        assert "Evidence canvas" in (await client.get("/")).text
         assert (await client.get("/docs/errors")).status_code == 200
         assert (await client.post("/api/chat", json={"question": "anything"})).status_code == 401
 
@@ -57,7 +57,7 @@ def test_contract_fixtures_never_open_a_network_socket(monkeypatch):
 
 @pytest.mark.anyio
 async def test_public_demo_has_real_local_assets_and_range_playback():
-    from frameseek.schema import Answer
+    from ctrlf_video.schema import Answer
 
     async with AsyncClient(
         transport=ASGITransport(app=create_app(Settings())), base_url="http://test"

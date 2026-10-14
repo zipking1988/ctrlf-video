@@ -1,5 +1,5 @@
 {
-  "name": "frameseek-workbench",
+  "name": "ctrlf-video-workbench",
   "private": true,
   "scripts": {
     "build": "node scripts/build_frontend.mjs",

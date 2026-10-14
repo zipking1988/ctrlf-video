@@ -4,8 +4,8 @@ import argparse
 import json
 from pathlib import Path
 
-from frameseek.fixtures import examples
-from frameseek.schema import Answer, QueryControl
+from ctrlf_video.fixtures import examples
+from ctrlf_video.schema import Answer, QueryControl
 
 
 def main() -> None:

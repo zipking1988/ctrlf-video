@@ -4,7 +4,7 @@ from threading import Barrier
 
 import pytest
 
-from frameseek.attempts import ApprovedBudget, AttemptLedger, BudgetDenied
+from ctrlf_video.attempts import ApprovedBudget, AttemptLedger, BudgetDenied
 
 
 def install(ledger, scope, *, money=100, calls=40, primary=32):

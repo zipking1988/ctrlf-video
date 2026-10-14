@@ -6,11 +6,11 @@ await build({
   bundle: true,
   minify: true,
   legalComments: "external",
-  outfile: "src/frameseek/static/workbench.js",
+  outfile: "src/ctrlf_video/static/workbench.js",
   define: { "process.env.NODE_ENV": '"production"' },
   target: ["es2022"],
 });
-const base = "src/frameseek/static/";
+const base = "src/ctrlf_video/static/";
 let html = await readFile(base + "index.html", "utf8");
 for (const file of [
   "app.js",

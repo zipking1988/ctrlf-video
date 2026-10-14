@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>CtrlF Video · Ctrl+F for video</title>
+    <meta name="description" content="Ctrl+F for video. Ask questions, find evidence frames and follow up on a desktop investigation canvas." />
+    <link rel="icon" href="/static/icons/play.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="/static/fonts/InstrumentSans.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/static/styles.css?v=4a8bf0f3fefb" />
+    <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
+    <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
+    <script src="/static/investigation-canvas.js?v=ef0ebc094960" defer></script>
+    <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
+    <script src="/static/investigation-report.js?v=ed151f859e0d" defer></script>
+    <script src="/static/workbench.js?v=8194befb0668" defer></script>
+    <script src="/static/workspace.js?v=9aaaaba433f6" defer></script>
+    <script src="/static/app.js?v=fc6fc04be063" defer></script>
+  </head>
+  <body>
+    <a href="#question" class="skip-link">Skip to question input</a>
+    <div class="desktop-message">
+      <h1>CtrlF Video</h1>
+      <p>This workspace needs a desktop browser.</p>
+    </div>
+    <div class="agent-shell workbench-shell review-desk canvas-first inspector-collapsed">
+      <header class="studio-header">
+        <div id="workspace-navigation"></div>
+        <a class="brand" href="/" aria-label="CtrlF Video Home" title="Ctrl+F for video">CtrlF Video</a>
+        <div id="project-title"></div>
+        <button id="save-state" class="save-state" type="button" aria-live="polite">Connecting to local service…</button>
+        <button id="resume-query" class="outline-button" type="button" hidden>Resume query</button>
+        <button id="open-investigations" class="outline-button" type="button">Investigations</button>
+        <button id="open-sources" class="outline-button" type="button">Sources</button>
+        <button id="open-agent-setup" class="outline-button" type="button" disabled>Model setup</button>
+        <span id="composer-mode-text" class="header-mode"
+          >Synthetic demo · no model calls</span
+        >
+        <button id="open-demos" class="outline-button" type="button" disabled>
+          Demo library
+        </button>
+        <button id="open-local" class="open-source" type="button">
+          <img
+            class="icon"
+            src="/static/icons/folder-open.svg"
+            alt=""
+          />Upload video
+        </button>
+        <button id="export-report" class="outline-button">Export report</button>
+      </header>
+      <nav class="studio-rail" aria-label="Workspace navigation">
+
+        <button
+          id="rail-canvas"
+          class="rail-button active"
+          aria-label="Return to evidence canvas"
+        >
+          <img class="icon" src="/static/icons/chats-circle.svg" alt="" /><span
+            >Investigation</span
+          >
+        </button>
+        <button
+          id="rail-source"
+          class="rail-button"
+          aria-label="Hide source"
+          aria-controls="source-dock"
+          aria-expanded="true"
+          title="Hide player"
+        >
+          <img class="icon" src="/static/icons/folder-open.svg" alt="" /><span
+            >Source</span
+          >
+        </button>
+        <button
+          id="rail-findings"
+          class="rail-button"
+          aria-label="View findings"
+          aria-controls="workbench-inspector"
+        >
+          <img class="icon" src="/static/icons/stack.svg" alt="" /><span
+            >Findings</span
+          >
+          <span id="rail-findings-count" class="rail-count" aria-hidden="true"
+            >0</span
+          >
+        </button>
+        <a
+          href="/docs"
+          target="_blank"
+          rel="noopener"
+          class="rail-button rail-docs"
+          aria-label="API Docs"
+          ><img class="icon" src="/static/icons/code.svg" alt="" /><span
+            >Docs</span
+          ></a
+        >
+      </nav>
+      <main
+        id="chat-content"
+        class="canvas-viewport"
+        aria-label="Evidence canvas"
+        tabindex="0"
+      >
+        <canvas id="canvas-links" aria-hidden="true"></canvas>
+        <div id="canvas-plane">
+          <div id="finding-group-region" hidden>
+            <span id="finding-group-label">Key findings</span>
+          </div>
+          <div id="messages"></div>
+          <div id="board-artifacts"></div>
+        </div>
+        <div id="empty-state" class="empty-state">
+          <div class="task-intro">
+            <span id="empty-eyebrow" class="eyebrow">Synthetic demo loaded</span>
+            <h1>Start with a question.</h1>
+            <p>Evidence stays connected here. Ask, review and build a finding.</p>
+            <div id="suggestions" class="suggestions" aria-label="Example questions">
+              <button data-query="center">
+                When is the package at the center?<img
+                  class="icon"
+                  src="/static/icons/arrow-right.svg"
+                  alt=""
+                />
+              </button>
+              <button data-query="person">Can we identify who moved it?</button>
+              <button data-query="forklift">Is there a forklift?</button>
+            </div>
+            <button id="demo-library-empty" class="text-button" disabled>
+              Browse six demo paths →
+            </button>
+          </div>
+        </div>
+      </main>
+      <section class="canvas-topbar" aria-label="Canvas controls">
+        <button id="rail-video" class="source-tile" aria-label="View current video">
+          <img
+            id="source-thumbnail"
+            src="/media/demo_parcel/frames/0.jpg"
+            alt="Synthetic warehouse video"
+          />
+          <span class="source-item"
+            ><strong id="attached-source-name">Package positions · Synthetic demo</strong
+            ><span id="attached-source-state">Loading</span></span
+          >
+          <img class="icon" src="/static/icons/play.svg" alt="" />
+        </button>
+        <div class="canvas-actions">
+          <span id="board-label" class="board-label">Evidence canvas</span>
+          <button id="canvas-search" class="outline-button" title="Search canvas(⌘ / Ctrl + K)">Search</button>
+          <span id="demo-current" class="demo-current" hidden></span>
+          <button id="expand-paths" class="outline-button" hidden>
+            Expand all
+          </button>
+          <label class="sr-only" for="arrange-mode">Layout</label>
+          <select id="arrange-mode">
+            <option value="threads">Question paths</option>
+            <option value="spread">Horizontal</option>
+            <option value="workspace">By object type</option>
+            <option value="time">Video time</option>
+            <option value="status">By status</option>
+          </select>
+          <button id="arrange-canvas" class="outline-button">Arrange</button>
+          <button
+            id="toggle-inspector"
+            class="outline-button"
+            aria-label="Toggle finding editor"
+            aria-expanded="true"
+          >
+            Findings
+          </button>
+          <button id="reset-chat" class="outline-button">
+            <img class="icon" src="/static/icons/plus.svg" alt="" />New investigation
+          </button>
+        </div>
+      </section>
+      <section id="source-dock" class="source-dock" aria-label="Source video and questions">
+        <div class="source-dock-heading">
+          <span>Source recording</span><button id="expand-source" class="outline-button" aria-label="Expand source player" aria-expanded="false">Expand</button><button
+            id="collapse-source"
+            class="icon-button"
+            aria-label="Hide player"
+          >
+            <img class="icon" src="/static/icons/x.svg" alt="" />
+          </button>
+        </div>
+        <aside
+          id="evidence-canvas"
+          class="evidence-viewer"
+          aria-labelledby="evidence-question"
+        >
+          <header class="viewer-heading">
+            <h2 id="evidence-question">Source recording</h2>
+            <button
+              id="toggle-evidence"
+              class="icon-button"
+              aria-label="Close source player"
+              aria-expanded="false"
+              aria-controls="evidence-canvas"
+            >
+              <img class="icon" src="/static/icons/x.svg" alt="" />
+            </button>
+          </header>
+          <div class="viewer-source">
+            <span id="video-heading">Package positions · Synthetic demo</span
+            ><span id="video-state">Demo source</span>
+          </div>
+          <div class="player-wrap">
+            <video
+              id="player"
+              controls
+              playsinline
+              preload="auto"
+              poster="/media/demo_parcel/frames/0.jpg"
+              aria-label="Source video player"
+            >
+              <source src="/demo/video" type="video/mp4" /></video
+            ><span id="video-watermark">Synthetic demo</span>
+          </div>
+          <div class="player-footer">
+            <span id="seek-status">Select evidence to replay the source</span
+            ><button id="reload-video" class="text-button" hidden>
+              Reload video
+            </button>
+          </div>
+          <p id="video-meta">18 seconds · 1600 × 900 · No audio</p>
+          <div id="demo-timeline" class="timeline-section">
+            <span id="playback-time">00:00 / 00:18</span>
+            <div class="timeline">
+              <div id="playhead" aria-hidden="true"></div>
+              <button
+                class="chapter"
+                data-time="0"
+                aria-label="Seek to left stage 00:00"
+              >
+                Left</button
+              ><button
+                class="chapter"
+                data-time="5"
+                aria-label="Seek to center stage 00:05"
+              >
+                Center</button
+              ><button
+                class="chapter"
+                data-time="11"
+                aria-label="Seek to right stage 00:11"
+              >
+                Right
+              </button>
+            </div>
+          </div>
+          <p id="local-note" class="local-note" hidden>
+            Browser playback only. Not uploaded, indexed or sent to a model.
+          </p>
+          <button id="restore-demo" class="restore-button" hidden>
+            Return to the evidence demo
+          </button>
+          <details class="demo-details">
+            <summary>About this demo</summary>
+            <p id="demo-notice-text">
+              Synthetic source and preset answers. Supports preset follow-ups; no uploads or model calls.
+            </p>
+            <button data-query="failure" class="text-button">
+              View failure example
+            </button>
+          </details>
+          <div class="source-filmstrip" aria-label="Source keyframes">
+            <button
+              class="segment"
+              data-time="0"
+              aria-label="Replay left stage 00:00"
+            >
+              <img
+                src="/media/demo_parcel/frames/0.jpg"
+                alt="Package on the left"
+              /><span>00:00</span>
+            </button>
+            <button
+              class="segment"
+              data-time="6"
+              aria-label="Replay center stage 00:06"
+            >
+              <img
+                src="/media/demo_parcel/frames/6.jpg"
+                alt="Package at the center"
+              /><span>00:06</span>
+            </button>
+            <button
+              class="segment"
+              data-time="13"
+              aria-label="Replay right stage 00:13"
+            >
+              <img
+                src="/media/demo_parcel/frames/13.jpg"
+                alt="Package on the right"
+              /><span>00:13</span>
+            </button>
+          </div>
+        </aside>
+        <div id="investigation-outline"></div>
+      </section>
+      <aside
+        id="workbench-inspector"
+        class="workbench-inspector"
+        aria-label="Evidence details and finding editor"
+      ></aside>
+      <p id="form-notice" class="form-notice" role="status" hidden></p>
+      <section id="agent-chat" class="agent-chat" aria-label="Research agent">
+        <header class="agent-chat-heading"><span><img class="icon" src="/static/icons/chats-circle.svg" alt="" />Agent</span><button id="collapse-agent" class="icon-button" aria-label="Minimize agent chat"><img class="icon" src="/static/icons/x.svg" alt="" /></button></header>
+        <div id="research-task"></div>
+        <div id="agent-conversation-root"></div>
+      <section class="composer-area" aria-label="Ask about the recording">
+        <form id="question-form">
+          <div class="composer-context">
+            <label id="composer-label" for="question">Ask CtrlF Video</label
+            ><button
+              id="clear-context"
+              class="text-button"
+              type="button"
+              hidden
+            >
+              New question
+            </button>
+          </div>
+          <textarea
+            id="question"
+            rows="2"
+            maxlength="1000"
+            placeholder="Ask a follow-up or give the agent a task…"
+          ></textarea>
+          <div class="composer-tools">
+            <button
+              id="attach-local"
+              class="icon-button"
+              type="button"
+              aria-label="Open local video"
+            >
+              <img
+                class="icon"
+                src="/static/icons/paperclip.svg"
+                alt=""
+              /></button
+            ><span id="composer-source"></span
+            ><button
+              id="send-question"
+              class="send-button"
+              type="submit"
+              aria-label="Send question"
+              disabled
+            >
+              <img class="icon" src="/static/icons/arrow-right.svg" alt="" />
+            </button>
+          </div>
+        </form>
+      </section>
+      </section>
+      <button id="agent-launcher" class="agent-launcher" aria-label="Toggle agent chat" aria-controls="agent-chat" aria-expanded="true"><img class="icon" src="/static/icons/chats-circle.svg" alt="" /></button>
+      <button id="source-launcher" class="outline-button source-launcher" aria-label="Open source player"><img class="icon" src="/static/icons/play.svg" alt="" />Source</button>
+      <section class="canvas-footer" aria-label="Canvas view">
+        <div class="canvas-navigation">
+          <section
+            id="canvas-minimap"
+            class="empty"
+            aria-label="Canvas minimap"
+          >
+            <div class="minimap-heading">
+              <span>Overview</span><span id="canvas-node-count">0 objects</span>
+            </div>
+            <div id="minimap-content" role="group" aria-label="Click an object to locate it">
+              <div id="minimap-window" aria-hidden="true"></div>
+            </div>
+            <p>Click to locate · green marks selection</p>
+          </section>
+          <p id="canvas-hint">Drag the background to pan · ⌘ / Ctrl + Scroll to zoom</p>
+        </div>
+        <div class="view-controls">
+          <button id="canvas-undo" disabled title="Undo canvas action(⌘ / Ctrl + Z)">Undo</button>
+          <button id="canvas-redo" disabled title="Redo canvas action(⌘ / Ctrl + Shift + Z)">Redo</button>
+          <button id="canvas-shortcuts" title="Canvas shortcuts">Shortcuts</button>
+          <button
+            id="toggle-minimap"
+            aria-label="Toggle minimap"
+            aria-expanded="true"
+            aria-controls="canvas-minimap"
+          >
+            Map
+          </button>
+          <button id="focus-card" disabled title="Focus selection (in canvas press F)">
+            Focus
+          </button>
+          <button id="zoom-out" aria-label="Zoom out">−</button
+          ><button id="zoom-reset" aria-label="Reset zoom">100%</button
+          ><button id="zoom-in" aria-label="Zoom in">
+            <img class="icon" src="/static/icons/plus.svg" alt="" /></button
+          ><button id="fit-canvas">Fit view</button>
+        </div>
+      </section>
+      <details class="conversation-history">
+        <summary>This investigation <span id="task-count">0</span> questions</summary>
+        <p id="history-empty">Switch between questions here</p>
+        <nav id="task-list" aria-label="Session tasks"></nav>
+        <span>Latest 12 questions in this session</span>
+      </details>
+      <div id="canvas-selection-tools" class="canvas-selection-tools" hidden role="group" aria-label="Selection actions">
+        <span id="canvas-selection-count"></span>
+        <button id="canvas-group">Name group</button><button id="canvas-ungroup">Ungroup</button>
+        <label class="sr-only" for="canvas-alignment">Alignment</label>
+        <select id="canvas-alignment"><option value="left">Align left</option><option value="top">Align top</option><option value="horizontal">Space horizontally</option><option value="vertical">Space vertically</option></select>
+        <button id="canvas-align">Align</button><button id="canvas-clear-selection">Clear selection</button>
+      </div>
+      <dialog id="canvas-group-dialog" class="branch-name-dialog" aria-labelledby="canvas-group-title">
+        <form id="canvas-group-form"><h2 id="canvas-group-title">Name object group</h2><p>Grouping changes layout only; question context and evidence sources are preserved.</p>
+          <label for="canvas-group-name">Group name</label><input id="canvas-group-name" maxlength="60" required autocomplete="off" />
+          <div class="branch-name-actions"><button type="button" id="canvas-group-cancel" class="outline-button">Cancel</button><button type="submit" class="branch-save">Create group</button></div>
+        </form>
+      </dialog>
+      <dialog id="canvas-search-dialog" class="canvas-search-dialog compare-dialog" aria-labelledby="canvas-search-title">
+        <header><h2 id="canvas-search-title">Search investigation</h2><button id="canvas-search-close" class="icon-button" aria-label="Close search">×</button></header>
+        <label class="sr-only" for="canvas-search-input">Search questions, answers, evidence or groups</label><input id="canvas-search-input" placeholder="Search questions, answers, evidence or groups…" autocomplete="off" />
+        <p id="canvas-search-status" role="status"></p><div id="canvas-search-results" class="canvas-search-results"></div>
+      </dialog>
+      <dialog id="canvas-shortcuts-dialog" class="canvas-search-dialog compare-dialog" aria-labelledby="canvas-shortcuts-title">
+        <header><h2 id="canvas-shortcuts-title">Canvas shortcuts</h2><button id="canvas-shortcuts-close" class="icon-button" aria-label="Close shortcuts">×</button></header>
+        <dl class="shortcut-list"><dt>Search investigation</dt><dd>⌘ / Ctrl + K</dd><dt>Select multiple objects</dt><dd>Shift + Click card selection buttons</dd><dt>Move selection</dt><dd>Drag the title of any selected card</dd><dt>Undo / Redo</dt><dd>⌘ / Ctrl + Z / Shift + Z</dd><dt>Select all / Clear selection</dt><dd>In the canvas ⌘ / Ctrl + A / Esc</dd><dt>Move card</dt><dd>Arrow keys when title is focused · Shift Faster</dd><dt>Focus / Fit view</dt><dd>In the canvas F / Home</dd><dt>Pan / Zoom</dt><dd>Drag background / ⌘ + Scroll wheel</dd></dl>
+        <p class="muted-text">Undo affects layout, groups and paths in this session. Layout persists after refresh; undo history resets.</p>
+      </dialog>
+      <input id="file-input" type="file" accept="video/*" hidden />
+      <dialog
+        id="branch-name-dialog"
+        class="branch-name-dialog"
+        aria-labelledby="branch-name-title"
+      >
+        <form id="branch-name-form">
+          <h2 id="branch-name-title">Name investigation path</h2>
+          <p id="branch-name-source"></p>
+          <label for="branch-name-input">Path name</label>
+          <input
+            id="branch-name-input"
+            maxlength="60"
+            required
+            autocomplete="off"
+          />
+          <p class="branch-name-note">
+            Names organize the canvas without changing original questions or evidence. Saved with this investigation.
+          </p>
+          <div class="branch-name-actions">
+            <button
+              id="cancel-branch-name"
+              type="button"
+              class="outline-button"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="branch-save">Save name</button>
+          </div>
+        </form>
+      </dialog>
+      <div hidden>
+        <button id="mobile-reset">New conversation</button
+        ><span id="mode-label">Demo mode</span>
+        <h2 id="frame-heading">Source keyframes</h2>
+        <div id="segments"></div>
+        <div class="run-context">
+          <span id="run-state"></span>
+          <ol class="run-steps">
+            <li>
+              <span id="source-step"></span><span id="source-step-state"></span>
+            </li>
+            <li>
+              <span id="result-step"></span><span id="result-step-state"></span>
+            </li>
+            <li>
+              <span id="evidence-step"></span
+              ><span id="evidence-step-state"></span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <dialog id="demo-library" aria-labelledby="demo-library-title">
+      <header class="demo-library-heading">
+        <div>
+          <span class="eyebrow">CtrlF Video / Demo library</span>
+          <h2 id="demo-library-title">Choose an investigation path</h2>
+        </div>
+        <button id="close-demos" class="icon-button" aria-label="Close demo library">
+          <img class="icon" src="/static/icons/x.svg" alt="" />
+        </button>
+      </header>
+      <p class="demo-library-intro">
+        Six demo paths. Replay evidence, organize the canvas or select a question to follow up.
+      </p>
+      <div id="demo-scenarios" class="demo-scenarios"></div>
+      <p class="demo-library-note">
+        Loading replaces the current canvas. All paths use the same 18
+        second synthetic video and preset answers; no model calls.
+      </p>
+    </dialog>
+    <dialog id="workspace-library" class="workspace-library">
+      <header><div><span class="eyebrow">CTRLF VIDEO / WORKSPACE</span><h2 id="library-title">Investigations</h2></div><button id="close-library" class="icon-button" aria-label="Close library">×</button></header>
+      <p id="library-intro"></p><div class="library-toolbar"><button id="library-add" class="outline-button">New investigation</button><button id="library-refresh" class="text-button">Refresh</button></div>
+      <div id="library-items" class="library-items"></div><p id="library-notice" role="status"></p>
+    </dialog>
+    <dialog id="rename-source-dialog" class="delete-dialog"><h2>Rename source</h2><form id="rename-source-form"><label for="rename-source-input">Source name</label><input id="rename-source-input" required maxlength="180"><div class="library-toolbar"><button id="rename-source-cancel" type="button" class="outline-button">Cancel</button><button type="submit" class="outline-button">Save name</button></div></form></dialog>
+    <dialog id="delete-dialog" class="delete-dialog"><h2>Confirm deletion</h2><p id="delete-description"></p><div><button id="delete-cancel" class="outline-button">Keep</button><button id="delete-confirm" class="outline-button danger">Delete</button></div></dialog>
+    <div
+      id="announcement"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    ></div>
+    <dialog id="agent-setup-dialog" class="agent-setup-dialog" aria-labelledby="agent-setup-title">
+      <header><div><p class="inspector-kicker">CTRLF VIDEO / AGENT</p><h2 id="agent-setup-title">Model setup</h2></div>
+        <button id="close-agent-setup" class="icon-button" type="button" aria-label="Close model setup">×</button></header>
+      <p id="agent-setup-summary" role="status">Reading local configuration…</p>
+      <div id="agent-readiness-checks" class="agent-readiness-checks"></div>
+      <details><summary>Model roles and versions</summary><div id="agent-model-roles"></div></details>
+      <details><summary>Prepare model analysis</summary>
+        <ol><li>Use Gemini   <code>docs/runtime.example.json</code>, to prepare private local configuration. Template placeholders are not runnable.</li>
+          <li>Gemini Explicitly permit locally decoded sample JPEG frames to be sent to Google; Audio transcription is not supported. Keep credentials in server environment variables.</li>
+          <li>Define finite spending and call limits, calibrate costs and resource cutoffs, then have the local operator record both budget approvals.</li>
+          <li>Set <code>CTRLF_RUNTIME_FILE</code> and <code>CTRLF_VIDEO_MODE=real</code>, then restart and check again. Sources applies admission limits using the actual window count.</li></ol>
+        <p>Read-only checks: <code>uv run --frozen python -m ctrlf_video.readiness</code>.Budget checks can use an existing <code>--owner</code>, This does not approve spending.</p>
+      </details>
+      <footer><button id="refresh-agent-setup" class="outline-button" type="button">Check again</button>
+        <span class="muted-text">Checks do not call models, provision GPU or approve spending.</span></footer>
+    </dialog>
+  </body>
+</html>

@@ -1,25 +1,35 @@
-# 错误与恢复（D1）
+# CtrlF Video — Errors and Recovery
 
-## Gemini 与 Google Cloud 入口（2026-10-11）
+Updated: 2026-10-14. Current adapters and HTTP recovery are implemented; live provider behavior remains unverified. Do not resolve an error by bypassing ownership, isolation, media consent or budget checks.
 
-- `google_media_not_enabled` / `gemini_endpoint_not_allowed` / `invalid_gemini_model`：私有runtime尚未明确启用Google帧发送，或端点/模型ID非法；不会dispatch。不要从浏览器解除保护。
-- `gemini_embedding_input_limit` / `gemini_request_limit`：完整窗口批次超过100，或inline请求超过19MiB；显式拒绝，不截尾发布ready。选择较短素材或以后实现经评审的完整有界批次方案。
-- `gemini_inline_jpeg_required`：只允许本机解码的inline JPEG，不抓取外部媒体URL。
-- `gemini_incomplete_response` / `invalid_gemini_response`：模型安全阻断、输出截短或格式无效。若已dispatch则作为 `model_unknown` 保留费用，禁止自动重发；已有verified部分按原恢复协议保留。
-- `gemini_asr_not_supported` / `audio_channel_unavailable`：当前Gemini路线只有视觉，音轨问题不能用视觉回答冒充。
-- `gateway_auth_required`（401）：后端未收到有效私有入口token；token不能替代用户cookie/CSRF/拥有权。只由操作者检查服务端配置。
-- `workspace_backend_unavailable`（502）：入口无法连接持久后端；不切换fixture，不重试模型请求。
-- `gateway_upload_limit_30_mib`（413）：Cloud Run HTTP/1入口只接收≤30MiB请求体，本地直接上传仍保留500MiB上限。
-- workspace在`K_SERVICE`环境启动拒绝：必须使用无状态gateway和持久单后端，不把SQLite预算/调查放进Cloud Run临时盘。
+| Code/state | Meaning and recovery |
+| --- | --- |
+| `invalid_config` / config exit 2 | Correct TOML names/types/protected limits; errors do not echo supplied secrets |
+| `real_blocked` | Complete trusted model, media-consent, calibration and approved-budget prerequisites |
+| `google_media_not_enabled` | Google JPEG transmission requires trusted runtime consent |
+| `gemini_endpoint_not_allowed` / `invalid_gemini_model` | Use fixed Google API origin and verified model identifiers |
+| `model_key_missing` / `model_revision_missing` | Supply backend credentials and verified revision without exposing them |
+| `gemini_embedding_input_limit` / `gemini_request_limit` | Complete batch >100 windows or request >19 MiB; choose smaller footage, never truncate readiness |
+| `gemini_inline_jpeg_required` | Only decoded inline JPEGs are allowed; no remote media URL |
+| `audio_channel_unavailable` | This edition has no audio transcription; ask a visible-fact question |
+| `model_unknown` / `unknown_attempt_do_not_resend` | Dispatched outcome is uncertain; preserve charge and stop automatic replay |
+| `gemini_incomplete_response` / `invalid_gemini_response` | Provider output incomplete/blocked/invalid; dispatched attempts become unknown |
+| `invalid_observations` / `invalid_synthesis` / `invalid_rerank` | Model output failed validation; retain verified partial evidence when available |
+| `index_configuration_changed` | Frozen config/provider/model/budget no longer matches; rebuild with a new generation |
+| `video_not_ready` / `preflight_required` | Finish complete local preflight/approved analysis before questions |
+| `invalid_context_anchor` / `stale_chat_generation` | Select current owned verified context; stale requests cannot publish |
+| `revision_conflict` | Another tab changed the desk; reload/reconcile instead of overwriting |
+| `csrf_rejected` / `origin_rejected` | Reload the same-origin session; cross-origin writes are rejected |
+| `expired_or_deleted` | Private source/investigation is no longer accessible |
+| `upload_limit` / `storage_limit` | Use smaller footage or delete an unneeded owned source |
+| `invalid_media` / `media_timeout` / `media_isolation_unavailable` | Check/re-encode media and verify isolation; do not disable protection |
+| `query_cancelled` | Terminal idempotent cancellation; later stages do not dispatch |
+| `gateway_auth_required` | Operator checks backend's private ingress token; user ownership still applies |
+| `workspace_backend_unavailable` | Gateway cannot reach durable backend; no fixture/model fallback |
+| `gateway_upload_limit_30_mib` | Gateway body limit is 30 MiB; direct local upload limit is 500 MiB |
 
+A pending query uses HTTP 202 with a bounded polling delay; unknown uses 409 and stops polling. A completed final error is distinct from unknown. A retained partial response does not prove the entire request succeeded.
 
-| 当前入口 | 原因 | 恢复动作 |
-|---|---|---|
-| invalid_config / 退出码2 | TOML不可读、未知字段、非法类型或保护限额 | 检查配置名称/类型；不通过普通配置批准新额度 |
-| real预检 / 退出码2 | model、权限、预算、GPU费用上界及媒体保护未就绪 | 补实际信息并完成校准/实现，不能自动fixture代替real |
-| BudgetDenied（内部） | 缺批准、额度不足、币种/载荷冲突、撤销或非法状态 | 不dispatch；重新核对有效批准与同请求身份 |
-| unknown attempt（内部） | dispatch前后结果不确定 | 保留预算，禁止自动重新dispatch；供应商验证复取或明确新尝试尚待接入 |
+`BudgetDenied` rejects missing/revoked/insufficient or conflicting approval before dispatch. SQLite contention has bounded waiting; failures do not authorize calls. Real `preflight` always exits 2 for open deployment acceptance; `agent-check` is the independent local readiness check.
 
-当前model adapter不存在，以上不会发出付费请求。配置错误不输出输入值、密钥或路径。SQLite繁忙有1秒有限等待，异常不得绕过预算开启模型调用。
-
-后续HTTP四状态与400/401/403/404/409/410/429/502/504映射、query pending/unknown恢复及UI保留草稿仍未实现；按X03/E17交付时同时验证。`/docs/errors`当前提供本地简要说明。
+Cloud Run `K_SERVICE` cannot start a stateful workspace. Run the stateless gateway there and use one durable backend. See [API](api.md), [runtime](WORKSPACE_RUNTIME.md), [deployment](deployment.md) and [ARCHITECTURE](../ARCHITECTURE.md).

@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { resolve } = require("../src/frameseek/static/demo-conversation.js");
+const { resolve } = require("../src/ctrlf_video/static/demo-conversation.js");
 const queries = [
   { id: "center", question: "包裹什么时候出现在中央？" },
   { id: "right", question: "什么时候移到右侧？" },
@@ -37,7 +37,7 @@ test("未实现的问题不伪造回答，也不改动问题或目录", () => {
   assert.equal(queries.length, 4);
 });
 
-const { materialize } = require("../src/frameseek/static/demo-conversation.js");
+const { materialize } = require("../src/ctrlf_video/static/demo-conversation.js");
 const scopedQueries = [
   {
     id: "left",

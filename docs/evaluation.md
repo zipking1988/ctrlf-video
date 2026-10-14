@@ -4,20 +4,20 @@ The evaluator scores a frozen dataset and a recorded run locally. It never invok
 
 ```sh
 make eval-check  # validates/scores the unrun templates; NOT_ACCEPTED is expected
-mkdir -m 700 .frameseek-eval
-cp eval/diagnostics.template.json .frameseek-eval/dataset.json
-uv run --frozen python -m frameseek.evaluation validate \
-  --dataset .frameseek-eval/dataset.json
-uv run --frozen python -m frameseek.evaluation score \
-  --dataset .frameseek-eval/dataset.json --run .frameseek-eval/run.json \
-  --output .frameseek-eval/report.json
+mkdir -m 700 .ctrlf-video-eval
+cp eval/diagnostics.template.json .ctrlf-video-eval/dataset.json
+uv run --frozen python -m ctrlf_video.evaluation validate \
+  --dataset .ctrlf-video-eval/dataset.json
+uv run --frozen python -m ctrlf_video.evaluation score \
+  --dataset .ctrlf-video-eval/dataset.json --run .ctrlf-video-eval/run.json \
+  --output .ctrlf-video-eval/report.json
 ```
 
-Private datasets, annotations, source manifests and results belong in ignored `.frameseek-eval/`. Output files use mode 0600 and refuse overwrite. Input artifacts are bounded to 16 MiB each. Exit 2 means invalid input or unavailable output; exit 0 means scoring completed, **not acceptance**. Read `diagnostic_gate.status` and `gaps`.
+Private datasets, annotations, source manifests and results belong in ignored `.ctrlf-video-eval/`. Output files use mode 0600 and refuse overwrite. Input artifacts are bounded to 16 MiB each. Exit 2 means invalid input or unavailable output; exit 0 means scoring completed, **not acceptance**. Read `diagnostic_gate.status` and `gaps`.
 
 ## Prepare a dataset
 
-`Dataset` in `src/frameseek/evaluation.py` defines the versioned schema; unknown fields, duplicate IDs, undeclared sources and nonfinite values are rejected. Each source declares its video ID, `real`/`synthetic` provenance and file SHA-256. Use `shasum -a 256 /absolute/path/video.mp4` locally; do not include private source media in Git.
+`Dataset` in `src/ctrlf_video/evaluation.py` defines the versioned schema; unknown fields, duplicate IDs, undeclared sources and nonfinite values are rejected. Each source declares its video ID, `real`/`synthetic` provenance and file SHA-256. Use `shasum -a 256 /absolute/path/video.mp4` locally; do not include private source media in Git.
 
 A diagnostic dataset needs at least two human-reviewed questions in each category: `short_visual`, `speech`, `cross_window`, `no_match`. Record query/audio/on-screen-text languages. Human annotation supplies absolute source-video event intervals and all relevant window IDs for positive questions. Negatives contain no positive events/windows. `annotation_state: reviewed` requires an `annotated_by` identity and frozen source hashes; incomplete annotations remain `draft`.
 
@@ -42,3 +42,8 @@ For evidence review, list every observable event claim in `claims`, indexed by `
 - **Cost:** total only when every request has an observed amount and a declared currency; partial observed totals/counts are labeled separately.
 
 `GO` applies only to the declared diagnostic artifacts when all four categories, real-source/run declarations, candidate/event coverage, correct negatives and bound human claim/playback reviews meet the checks. The evaluator cannot authenticate a declaration of live execution, inspect supplier billing, verify model permissions, or prove a reviewer actually played the video. Its report explicitly limits this gate to diagnostics. Full MVP, live performance/cost and production deployment acceptance remain separate and open.
+
+
+## Gemini-only edition scope
+
+The existing diagnostic protocol still requires a speech category. Gemini audio transcription is deliberately outside this edition, so unsupported speech cases must remain rejected/missing and the full diagnostic gate remains NOT_ACCEPTED. The templates and evaluator have not been weakened to award acceptance to the visual demo. Any later protocol revision must be explicit, versioned before observing results, and distinguish visual evaluation from the previous broader target. Visual review and hybrid-retrieval comparisons still require real, instrumented runs; no experiment label establishes execution.

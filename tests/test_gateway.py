@@ -6,10 +6,10 @@ import time
 import httpx
 import pytest
 
-from frameseek.api import create_app
-from frameseek.config import Settings
-from frameseek.gateway import create_gateway, https_origin
-from frameseek.server import server_command
+from ctrlf_video.api import create_app
+from ctrlf_video.config import Settings
+from ctrlf_video.gateway import create_gateway, https_origin
+from ctrlf_video.server import server_command
 
 TOKEN = "synthetic-test-token-not-for-deployment-123456"
 
@@ -20,10 +20,10 @@ def anyio_backend():
 
 
 def configure(monkeypatch, tmp_path):
-    monkeypatch.setenv("FS_PUBLIC_ORIGIN", "https://public.example")
-    monkeypatch.setenv("FS_BACKEND_ORIGIN", "https://backend.example")
-    monkeypatch.setenv("FS_GATEWAY_TOKEN", TOKEN)
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("CTRLF_PUBLIC_ORIGIN", "https://public.example")
+    monkeypatch.setenv("CTRLF_BACKEND_ORIGIN", "https://backend.example")
+    monkeypatch.setenv("CTRLF_GATEWAY_TOKEN", TOKEN)
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path))
 
 
 @pytest.mark.anyio
@@ -42,7 +42,7 @@ async def test_gateway_preserves_secure_cookie_csrf_origin_and_private_range_med
             assert "Secure" in session.headers["set-cookie"]
             assert "HttpOnly" in session.headers["set-cookie"]
             assert TOKEN not in session.text
-            headers = {"x-fs-csrf": session.json()["csrf"], "origin": "https://public.example"}
+            headers = {"x-ctrlf-csrf": session.json()["csrf"], "origin": "https://public.example"}
             created = await client.post("/api/investigations", json={}, headers=headers)
             assert created.status_code == 201, created.text
             rejected = await client.post(
@@ -81,7 +81,7 @@ async def test_gateway_preserves_secure_cookie_csrf_origin_and_private_range_med
         ) as direct:
             assert (await direct.get("/api/session")).status_code == 401
             assert (
-                await direct.get("/api/session", headers={"x-fs-gateway-token": "spoofed"})
+                await direct.get("/api/session", headers={"x-ctrlf-gateway-token": "spoofed"})
             ).status_code == 401
 
 
@@ -94,7 +94,7 @@ async def test_gateway_has_no_storage_replaces_spoofed_headers_and_preserves_coo
 
     def upstream(request):
         calls.append(request)
-        assert request.headers["x-fs-gateway-token"] == TOKEN
+        assert request.headers["x-ctrlf-gateway-token"] == TOKEN
         assert request.headers["host"] == "public.example"
         assert "forwarded" not in request.headers and "x-forwarded-for" not in request.headers
         return httpx.Response(
@@ -111,7 +111,7 @@ async def test_gateway_has_no_storage_replaces_spoofed_headers_and_preserves_coo
             result = await client.get(
                 "/api/test?owner=x",
                 headers={
-                    "x-fs-gateway-token": "spoofed",
+                    "x-ctrlf-gateway-token": "spoofed",
                     "forwarded": "host=evil",
                     "x-forwarded-for": "fake",
                     "x-forwarded-host": "evil",
@@ -164,16 +164,16 @@ def test_container_refuses_ephemeral_workspace_and_uses_one_process(monkeypatch)
         server_command({"K_SERVICE": "test"})
     with pytest.raises(RuntimeError, match="PORT"):
         server_command({"PORT": "8080;echo"})
-    command = server_command({"K_SERVICE": "test", "FS_COMPONENT": "gateway", "PORT": "9000"})
-    assert "frameseek.gateway:create_gateway" in command
+    command = server_command({"K_SERVICE": "test", "CTRLF_COMPONENT": "gateway", "PORT": "9000"})
+    assert "ctrlf_video.gateway:create_gateway" in command
     assert command[command.index("--workers") + 1] == "1"
     assert command[command.index("--port") + 1] == "9000"
-    monkeypatch.setattr("frameseek.server.os.path.ismount", lambda _: False)
+    monkeypatch.setattr("ctrlf_video.server.os.path.ismount", lambda _: False)
     with pytest.raises(RuntimeError, match="volume mount"):
-        server_command({"FS_REQUIRE_DATA_MOUNT": "1"})
+        server_command({"CTRLF_REQUIRE_DATA_MOUNT": "1"})
     # The stateless component does not create or require a workspace volume.
-    assert "frameseek.gateway:create_gateway" in server_command(
-        {"FS_COMPONENT": "gateway", "FS_REQUIRE_DATA_MOUNT": "1"}
+    assert "ctrlf_video.gateway:create_gateway" in server_command(
+        {"CTRLF_COMPONENT": "gateway", "CTRLF_REQUIRE_DATA_MOUNT": "1"}
     )
 
 
@@ -181,7 +181,7 @@ def test_direct_factory_also_refuses_cloud_run_workspace_before_creating_data(
     monkeypatch, tmp_path
 ):
     monkeypatch.setenv("K_SERVICE", "test")
-    monkeypatch.setenv("FS_DATA_DIR", str(tmp_path / "must-not-exist"))
+    monkeypatch.setenv("CTRLF_DATA_DIR", str(tmp_path / "must-not-exist"))
     with pytest.raises(RuntimeError, match="Cloud Run"):
         create_app(Settings())
     assert not os.path.exists(tmp_path / "must-not-exist")
@@ -192,7 +192,7 @@ async def test_gateway_streams_binary_upload_and_rejects_declared_and_streamed_l
     monkeypatch, tmp_path
 ):
     configure(monkeypatch, tmp_path)
-    monkeypatch.setattr("frameseek.gateway.MAX_BODY_BYTES", 16)
+    monkeypatch.setattr("ctrlf_video.gateway.MAX_BODY_BYTES", 16)
     calls = []
 
     def upstream(request):
