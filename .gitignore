@@ -14,6 +14,7 @@ node_modules/
 
 .ctrlf-video-data/
 .runtime*.json
+gha-creds-*.json
 
 # Private evaluation annotations, source manifests and run artifacts
 .ctrlf-video-eval/

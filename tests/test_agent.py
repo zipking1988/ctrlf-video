@@ -149,9 +149,15 @@ async def setup_real(
         headers={"content-type": "video/mp4"},
     )
     video = upload.json()["id"]
-    for _ in range(100):
+    # Cold decoding on the bounded deployment VM can exceed three seconds;
+    # wait for the real terminal state rather than assuming desktop CPU speed.
+    preflight_deadline = time.monotonic() + 30
+    while True:
         detail = (await client.get("/api/videos/" + video)).json()
-        if detail["job"]["state"] not in {"queued", "probing"}:
+        if (
+            detail["job"]["state"] not in {"queued", "probing"}
+            or time.monotonic() >= preflight_deadline
+        ):
             break
         await asyncio.sleep(0.03)
     assert detail["job"]["state"] == "awaiting_configuration", detail
