@@ -23,7 +23,7 @@ Updated: 2026-10-16. This is the current acceptance backlog, consolidated from o
 
 - [x] Verify account-accessible generation/embedding IDs and revisions, live JSON/image dispatch and both embedding task types.
 - [ ] Validate over-limit embedding inputs and a representative multilingual dataset against the real provider.
-- [x] Record the explicit JPY 3,000 authorization, JPY 600 shared model sublimit, conservative per-role maximum costs, finite attempts/validity and existing resource cutoffs.
+- [x] Record the explicit JPY 3,000 authorization, JPY 1,200 cumulative model pool (historical reservations retained, replacement grant JPY 761), conservative per-role maximum costs, finite attempts/validity and existing resource cutoffs.
 - [x] Run one uploaded synthetic clip through real ingestion, retrieval, visual verification, synthesis, editable finding saving and refresh after a real-mode rollback.
 - [ ] Resolve observed spatial wording errors (the first live answer called a left-of-center box centered); preserve source-linked human corrections.
 - [ ] Run authorized ingestion -> question -> follow-up -> actual source evidence -> findings/export -> refresh/restore.

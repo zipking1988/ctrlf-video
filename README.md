@@ -40,7 +40,7 @@ To test your own authorized recording, refresh the existing browser session,
 choose **Workspace menu → Upload video**, then **Sources → Start analysis**.
 Begin with a 30–120 second clip. Open the indexed source and ask a visual question.
 Google receives sampled JPEGs and retrieval text; the original video stays on the
-backend, and audio is not transcribed. The shared **JPY 600 model allowance is
+backend, and audio is not transcribed. The cumulative **JPY 1,200 model reservation pool is
 part of the JPY 3,000 total**, including calibration and smoke tests. Other browser
 sessions are not automatically funded. See [live test limits](docs/LIVE_GEMINI_TEST.md).
 

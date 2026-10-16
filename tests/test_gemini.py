@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from test_agent import approve, setup_real
 
 from ctrlf_video.agent import AgentError, Endpoint, Provider, Runtime, load_runtime
-from ctrlf_video.attempts import AttemptLedger, BudgetDenied
+from ctrlf_video.attempts import ApprovedBudget, AttemptLedger, BudgetDenied
 from ctrlf_video.config import Settings
 from ctrlf_video.gemini import BASE_URL, normalize_response, prepare_request
 from ctrlf_video.readiness import readiness_report
@@ -180,6 +180,100 @@ async def test_gemini_upload_index_followup_evidence_ownership_and_idempotency(
         async with foreign:
             await foreign.get("/api/session")
             assert (await foreign.get(answer.events[0].evidence[0].uri)).status_code == 404
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("case", ["allowed", "unlisted", "unfunded", "changed_model"])
+async def test_query_budget_rollover_preserves_index_and_old_reservations(
+    tmp_path, monkeypatch, case
+):
+    monkeypatch.setenv("TEST_GEMINI_KEY", "test-secret")
+    calls = []
+    runtime = configuration()
+    app, client, video, desk = await setup_real(
+        tmp_path,
+        monkeypatch,
+        calls,
+        runtime_factory=lambda: runtime,
+        response_handler=handler(calls),
+    )
+    try:
+        ledger = app.state.agent.ledger
+        with ledger._connect() as conn:
+            owner = conn.execute("SELECT scope FROM budgets WHERE scope!='*'").fetchone()[0]
+        ledger.reserve(
+            attempt_id="old_unknown",
+            owner=owner,
+            version="test_v1",
+            payload_hash="prior-dispatch",
+            kind="text",
+            money_units=1,
+            currency_unit="USD_MICRO",
+        )
+        ledger.transition("old_unknown", "dispatched")
+        ledger.transition("old_unknown", "unknown")
+        with app.state.workspace.db() as conn:
+            old_manifest = conn.execute(
+                "SELECT manifest FROM videos WHERE id=?", (video,)
+            ).fetchone()[0]
+        with ledger._connect() as conn:
+            old_attempts = [tuple(r) for r in conn.execute("SELECT * FROM attempts ORDER BY id")]
+            budgets = [dict(r) for r in conn.execute("SELECT * FROM budgets")]
+        for budget in budgets:
+            ledger.restrict(budget["scope"], "test_v1")
+            if case != "unfunded":
+                ledger.install_approved_record(
+                    ApprovedBudget(
+                        budget["scope"], "test_v2", "MOCK ROLLOVER", 6, 40, 100, "USD_MICRO"
+                    )
+                )
+        runtime.budget_version = "test_v2"
+        runtime.query_index_budget_versions = [] if case == "unlisted" else ["test_v1"]
+        if case == "changed_model":
+            runtime.vision.revision = "DIFFERENT-REVISION"
+        before_calls = len(calls)
+        result = await client.post(
+            "/api/chat",
+            json={
+                "investigation_id": desk["id"],
+                "request_id": "req_rollover",
+                "generation": 0,
+                "question": "Where is the box?",
+            },
+        )
+        if case == "allowed":
+            assert result.status_code == 200, result.text
+            assert Answer.model_validate(result.json()["response"]).status == "ok"
+            assert len(calls) > before_calls
+        else:
+            assert len(calls) == before_calls
+            assert result.status_code != 200 or result.json()["response"]["status"] == "error"
+        with ledger._connect() as conn:
+            assert [
+                tuple(r)
+                for r in conn.execute("SELECT * FROM attempts WHERE version='test_v1' ORDER BY id")
+            ] == old_attempts
+            for old in budgets:
+                current = dict(
+                    conn.execute(
+                        "SELECT * FROM budgets WHERE scope=? AND version='test_v1'", (old["scope"],)
+                    ).fetchone()
+                )
+                assert current == {**old, "active": 0}
+            new_attempts = conn.execute("SELECT * FROM attempts WHERE version='test_v2'").fetchall()
+            assert len(new_attempts) == len(calls) - before_calls
+            if case == "allowed":
+                assert all(r["kind"] != "coarse" for r in new_attempts)
+                assert all(r["state"] == "completed" for r in new_attempts)
+        detail = (await client.get("/api/videos/" + video)).json()
+        assert detail["job"]["state"] == "ready"
+        with app.state.workspace.db() as conn:
+            assert (
+                conn.execute("SELECT manifest FROM videos WHERE id=?", (video,)).fetchone()[0]
+                == old_manifest
+            )
     finally:
         await client.aclose()
 

@@ -34,5 +34,6 @@
   "calibration_reference": "",
   "valid_until": 0.0,
   "attempt_seconds": 60,
-  "resource_cutoff_reference": ""
+  "resource_cutoff_reference": "",
+  "query_index_budget_versions": []
 }

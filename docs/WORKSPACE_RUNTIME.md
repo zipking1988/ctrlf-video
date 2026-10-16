@@ -45,7 +45,7 @@ uv run python -m ctrlf_video.budget_admin install --file /private/approved-recor
 uv run python -m ctrlf_video.budget_admin revoke --scope APPROVED_OWNER_ID --version APPROVED_VERSION
 ```
 
-`budget_admin show` opens/initializes the local ledger; use `make agent-check` for a non-creating readiness check. Browser/API operations cannot install approvals. Config/version changes require a new compatible index generation.
+`budget_admin show` opens/initializes the local ledger; use `make agent-check` for a non-creating readiness check. Browser/API operations cannot install approvals. Increasing a cap requires a fresh approved version and revoking the prior unused allowance. For fully ready indices only, trusted `query_index_budget_versions` can list up to eight explicitly approved predecessor versions (default empty). Provider and all model/revision identities must still match; new queries charge only the current grant. Old manifests, frozen ingest configuration and all reservations remain unchanged. This exception never authorizes spending or resumes old ingestion; other incompatible changes require a new index generation.
 
 ## Authorized real smoke, still pending
 

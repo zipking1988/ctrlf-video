@@ -10,7 +10,7 @@ import re
 import threading
 import time
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from fastapi import HTTPException
@@ -43,6 +43,10 @@ class Runtime(BaseModel):
     rerank: Endpoint
     text: Endpoint
     budget_version: str
+    # Trusted, query-only compatibility; this list never authorizes spending.
+    query_index_budget_versions: list[Annotated[str, Field(pattern=r"^[A-Za-z0-9_-]{1,128}$")]] = (
+        Field(default_factory=list, max_length=8)
+    )
     currency_unit: str = "USD_MICRO"
     calibration_reference: str
     valid_until: float
@@ -693,7 +697,8 @@ class Agent:
         if (
             manifest.get("provider") != self.runtime.provider
             or manifest["models"] != frozen_models
-            or manifest["budget_version"] != self.runtime.budget_version
+            or manifest["budget_version"]
+            not in [self.runtime.budget_version, *self.runtime.query_index_budget_versions]
         ):
             raise AgentError("index_configuration_changed")
         provider = self.provider(video, owner, generation)
@@ -706,7 +711,9 @@ class Agent:
 
             provider.check = query_check
         segments = manifest["segments"]
-        version = manifest["budget_version"]
+        # Index provenance remains immutable. New work uses the current grant,
+        # including both owner/deployment admission and every paid reservation.
+        version = self.runtime.budget_version
         zooms = min(3, len(segments), self.settings.rerank_k)
         query_cost = (
             self.runtime.embed.max_cost_micro
