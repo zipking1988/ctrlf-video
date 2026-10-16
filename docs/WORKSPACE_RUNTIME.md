@@ -1,6 +1,6 @@
 # CtrlF Video — Runtime and Workflow
 
-Updated: 2026-10-16. Gemini-only implementation. The split GCP deployment now permits a limited real Gemini test for one explicitly approved browser session. A complete uploaded-synthetic-video pipeline and finding save passed; broad model quality, actual UX value and settled operating costs remain unverified. See [live test limits](LIVE_GEMINI_TEST.md). See [deployment status](deployment.md). Default `fixture` sends no model requests.
+Updated: 2026-10-17. Gemini-only implementation. The split GCP deployment now permits a limited real Gemini test for one explicitly approved browser session. A complete uploaded-synthetic-video pipeline and finding save passed; broad model quality, actual UX value and settled operating costs remain unverified. See [live test limits](LIVE_GEMINI_TEST.md). See [deployment status](deployment.md). Default `fixture` sends no model requests.
 
 ## Local workflow
 
@@ -8,7 +8,7 @@ Use `make setup`, `make preflight`, `make run` and open http://127.0.0.1:8765. T
 
 Investigation storage includes the latest 12 questions, up to eight findings, notes, layout, groups, paths, viewport, drafts and player position in local SQLite. Default retention is 24 hours. Ownership follows the `ctrlf_session` cookie; clearing it does not transfer an old investigation. There is no account-based cross-device sync.
 
-The synthetic library uses a public 18-second static-scene demo. It demonstrates the UI and contracts; it cannot answer uploaded-source questions or establish model quality. New visitors see a UX recording review entry first, with upload primary and this demo secondary. Returning work restores directly. The entry's upload uses the same owned upload/preflight path and does not start model analysis. A demo starter desk is initialized for ownership/saving, without dispatching a model request.
+The synthetic library uses a public 18-second static-scene demo. It demonstrates the UI and contracts; it cannot answer uploaded-source questions or establish model quality. New visitors see a product entry with an actual screenshot and a source-linked example first, with this labeled demo primary and recording upload secondary. Returning work restores directly. The entry's upload uses the same owned upload/preflight path and does not start model analysis. A demo starter desk is initialized for ownership/saving, without dispatching a model request.
 
 ## Trusted Gemini configuration
 

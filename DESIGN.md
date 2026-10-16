@@ -1,10 +1,14 @@
 # CtrlF Video — Desktop Workspace Design
 
-Updated: 2026-10-16. Current direction: the user selected the first colorful concept, Coral Fieldnotes.
+Updated: 2026-10-17. Current direction: the user selected the first colorful concept, Coral Fieldnotes.
 
 ## Product experience
 
-First use opens a research entry page in the selected Coral Fieldnotes palette. Upload a UX recording is primary; the synthetic package demo is optional and explicitly described as a workflow sample rather than a UX study or model-quality result. Returning recordings, drafts, research context, notes and populated investigations restore directly. An untouched starter demo remains behind the entry page. Upload cancellation or failure keeps the entry available with an actionable notice; session/catalog failures offer reload. The rail brand reopens the entry without clearing the investigation. Demo library has a direct header button as well as its existing menu route.
+First use opens a judge-facing research entry page in the selected Coral Fieldnotes palette. The October 17 landing selection is the third displayed design, `exec-69b41fc8-ec56-43d3-b43a-ace1ae36edcd.png`: a deep teal hero with concise copy, a large actual product screenshot and a warm paper question → frame → finding section. Explore synthetic demo is primary; Upload a recording uses the existing upload/preflight path. The product navigation links to the evidence example, API docs and the existing workspace when connected.
+
+The shipped screenshot (`static/landing/workspace-demo.png`) is captured from the actual local fixture workspace at 1280 × 800. It shows a preset question, a pinned source frame at 00:06 and a researcher-saved observation from the existing synthetic package demo. The lower evidence image is the actual existing `static/demo/frames/6.jpg`. This deliberately replaces the concept's basketball sample with the repository's public synthetic source. The screenshot is presentation material, not a new answer or evidence object. No generated mockup, private recording, fabricated UX study, accuracy metric or continuous-motion claim is used. Its original source/answer labels and an adjacent disclosure remain visible. The full-size screenshot opens directly; browser Back returns to the entry.
+
+Returning recordings, drafts, research context, notes and populated investigations restore directly. The explicit `/#start` link keeps the entry visible after restoration, with Open workspace returning to the restored desk. An untouched starter demo remains behind the entry page. Upload cancellation or failure keeps the entry available with an actionable notice; session/catalog failures offer reload. The rail brand reopens the entry without clearing the investigation. Demo library has a direct header button as well as its existing menu route.
 
 The spatial investigation canvas is the central workspace. Questions form paths, evidence frames remain connected to their questions, and findings preserve their source. A synchronized player lets users inspect the original footage at absolute timestamps.
 

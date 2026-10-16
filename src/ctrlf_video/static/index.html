@@ -16,14 +16,14 @@
     />
     <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
-    <link rel="stylesheet" href="/static/fieldnotes.css?v=d0b1b75d05cb" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=e2dc9b9f3622" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
     <script src="/static/investigation-canvas.js?v=fe12c071635a" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=ed151f859e0d" defer></script>
     <script src="/static/workbench.js?v=65c28575112a" defer></script>
     <script src="/static/workspace.js?v=6569e1ca571e" defer></script>
-    <script src="/static/app.js?v=592aff4a08a9" defer></script>
+    <script src="/static/app.js?v=e890122e63ba" defer></script>
   </head>
   <body>
     <a id="skip-link" href="#welcome-title" class="skip-link">Skip to main content</a>
@@ -32,29 +32,68 @@
       <p>This workspace needs a desktop browser.</p>
     </div>
     <section id="research-welcome" class="research-welcome" aria-labelledby="welcome-title">
-      <header class="welcome-header"><a href="/" class="welcome-brand">CtrlF Video<span>Ctrl+F for video</span></a><span class="welcome-edition">A workspace for UX recording review</span></header>
-      <div class="welcome-content">
-        <div class="welcome-intro">
-          <span class="welcome-kicker">FROM RECORDING TO FINDING</span>
-          <h1 id="welcome-title" tabindex="-1">Find the moment.<br /><em>Keep the evidence.</em></h1>
-          <p>Review usability recordings with visual questions. Replay supporting frames, follow up and turn observations into findings you can trace back to the source.</p>
-          <div class="welcome-actions"><button id="welcome-upload" class="welcome-primary" type="button" disabled>Upload a UX recording <span aria-hidden="true">↗</span></button><button id="welcome-demos" class="welcome-secondary" type="button" disabled>Explore synthetic demo</button></div>
-          <p class="welcome-access">Upload and playback are available without model analysis. Gemini analysis requires an approved test session. Audio transcription is unavailable.</p>
-          <p id="welcome-notice" role="status">Connecting to your workspace…</p>
-          <button id="welcome-retry" class="text-button" type="button" hidden>Reload to reconnect</button>
-          <button id="welcome-resume" class="text-button" type="button" hidden>Return to your investigation →</button>
+      <div class="welcome-stage">
+        <header class="welcome-header">
+          <a href="/" class="welcome-brand">CtrlF Video<span>Ctrl+F for video</span></a>
+          <nav class="welcome-nav" aria-label="Product navigation">
+            <button id="welcome-resume" type="button" hidden>Open workspace</button>
+            <a href="#evidence-chain">Evidence</a>
+            <a href="/docs">API docs</a>
+          </nav>
+        </header>
+        <div class="welcome-content">
+          <div class="welcome-intro">
+            <span class="welcome-kicker">A VIDEO INVESTIGATION WORKSPACE</span>
+            <h1 id="welcome-title" tabindex="-1">Find the moment<br />behind your finding.</h1>
+            <p>Ask visual questions. Replay the source. Build findings you can trace back to the video.</p>
+            <div class="welcome-actions">
+              <button id="welcome-demos" class="welcome-primary" type="button" disabled>Explore synthetic demo <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></button>
+              <button id="welcome-upload" class="welcome-secondary" type="button" disabled><img src="/static/icons/folder-open.svg" width="20" height="20" alt="" /> Upload a recording</button>
+            </div>
+            <p class="welcome-access">Synthetic demo uses preset answers.<br />Gemini analysis requires an approved session.</p>
+            <p id="welcome-notice" role="status">Connecting to your workspace…</p>
+            <button id="welcome-retry" class="text-button" type="button" hidden>Reload to reconnect</button>
+            <p class="welcome-stack">Built with Gemini · Deployed on Google Cloud</p>
+          </div>
+          <figure class="welcome-product">
+            <a href="/static/landing/workspace-demo.png" aria-label="View the full-size product screenshot">
+              <img src="/static/landing/workspace-demo.png" width="1280" height="800" fetchpriority="high" alt="Actual CtrlF Video workspace: a question about the package connects to the source frame at 00:06 and a researcher-saved finding. The source and answers are explicitly labeled synthetic demo." />
+            </a>
+            <figcaption>Actual product screenshot · Synthetic demo, preset answers</figcaption>
+          </figure>
         </div>
-        <aside class="welcome-workflow" aria-label="Recording review workflow">
-          <span class="welcome-workflow-label">YOUR REVIEW, CONNECTED</span>
-          <ol>
-            <li><span class="welcome-step">01</span><div><h2>Set the task</h2><p>Upload your recording and add what the participant was trying to do.</p></div></li>
-            <li><span class="welcome-step">02</span><div><h2>Ask. Replay. Follow up.</h2><p>Check the visible evidence and its source timestamp before drawing a conclusion.</p></div></li>
-            <li><span class="welcome-step">03</span><div><h2>Build a finding</h2><p>Keep observations, interpretations and open questions separate. Export the evidence with them.</p></div></li>
-          </ol>
-          <p class="welcome-demo-note">The optional demo uses an 18-second synthetic package video and preset answers. It demonstrates the workflow; it is not a UX study or a model-quality test.</p>
-        </aside>
       </div>
-      <footer class="welcome-footer"><span>Questions · Evidence · Findings</span><span>Designed for desktop review</span></footer>
+      <section id="evidence-chain" class="welcome-proof" aria-labelledby="welcome-proof-title">
+        <span class="welcome-proof-kicker">EVERY FINDING HAS A SOURCE</span>
+        <h2 id="welcome-proof-title">A question. A frame. A finding you can check.</h2>
+        <ol class="welcome-chain">
+          <li class="welcome-chain-question">
+            <div class="welcome-step-heading"><span class="welcome-step">01</span><h3>Ask a question</h3></div>
+            <blockquote>“When is the package at the center?”</blockquote>
+            <p>Start with a visual question. In this synthetic example, inspect the package’s position on the workbench.</p>
+            <img class="welcome-chain-arrow" src="/static/icons/arrow-right.svg" width="28" height="28" alt="" />
+          </li>
+          <li class="welcome-chain-evidence">
+            <div class="welcome-step-heading"><span class="welcome-step">02</span><h3>Replay the evidence</h3></div>
+            <figure>
+              <img class="welcome-source-frame" src="/static/demo/frames/6.jpg" width="1598" height="900" loading="lazy" alt="Actual frame at 00:06 of the synthetic source: a package centered on a workbench." />
+              <figcaption>Source frame at <time datetime="PT6S">00:06</time></figcaption>
+            </figure>
+            <p>Return to the source timestamp. Check the frame and its context before drawing a conclusion.</p>
+            <img class="welcome-chain-arrow" src="/static/icons/arrow-right.svg" width="28" height="28" alt="" />
+          </li>
+          <li class="welcome-chain-finding">
+            <div class="welcome-step-heading"><span class="welcome-step">03</span><h3>Save a finding</h3></div>
+            <blockquote>“At 00:06, the package is at the center of the workbench.”</blockquote>
+            <p>A researcher-saved observation, linked to its source. Keep interpretations and open questions separate, then export the finding with its evidence.</p>
+            <p class="welcome-evidence-limit">This sample uses static synthetic scenes. It does not establish continuous movement or model accuracy.</p>
+          </li>
+        </ol>
+        <footer class="welcome-footer">
+          <p>Designed for desktop UX recording review.</p>
+          <p>Demo: 18-second synthetic video · No model calls.<br />Recording upload and playback are available. Audio transcription is unavailable.</p>
+        </footer>
+      </section>
     </section>
     <input id="file-input" type="file" accept="video/*" hidden />
     <div class="agent-shell workbench-shell review-desk canvas-first fieldnotes inspector-collapsed" inert>

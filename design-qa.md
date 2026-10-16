@@ -1,3 +1,62 @@
+# Landing redesign QA — October 17, 2026
+
+final result: passed
+
+## Target and evidence
+
+Selected target: the third displayed image in the October 17 landing ideation set, `/Users/zip/.codex/generated_images/01a1456f-6908-7612-af76-92d8053b646a/exec-69b41fc8-ec56-43d3-b43a-ace1ae36edcd.png` (1434 × 1097).
+
+Implementation: http://127.0.0.1:8879/#start, the existing application in fixture mode, using separate temporary storage. Browser viewport and final screenshot: 1440 × 1104 CSS/image pixels, DPR 1. The source is scaled by less than 1%, preserving aspect ratio and padding the remaining pixels for the combined comparison. Both views show the landing at its initial scroll position. The conceptual basketball content is deliberately replaced by actual public synthetic-demo content; no pixel-fidelity claim is made for the inner application screenshot.
+
+Current local evidence is under `.ctrlf-video-eval/landing/` (ignored):
+
+- `first.png` and `comparison-first.jpg`: first implementation and combined source/implementation comparison.
+- `revised.png` and `comparison-revised.jpg`: corrected headline and hero image geometry.
+- `final-desktop.png` and `comparison-final.jpg`: final implementation and aspect-preserving combined comparison, inspected together.
+- `proof.png`: scrolled evidence chain, timestamp, source limitations and footer.
+- `desktop-1024.png`: 1024 × 800 desktop layout; no horizontal overflow; both primary controls remain visible and enabled.
+- `upload.png`: completed local upload/preflight with analysis unavailable and no model dispatch.
+
+The full comparison resolves the hero layout, headline wrapping, product proportions and evidence section; separate cropped comparison was unnecessary for this landing. The product screenshot itself was inspected at its original 1280 × 800 size and its full-size link was verified in the browser.
+
+## Intentional content and accessibility choices
+
+- Keep the chosen deep teal hero, large flat product image, warm paper proof section, Instrument Sans and licensed Phosphor icons. No generated design image is used as a source frame or product screenshot.
+- The hero uses `static/landing/workspace-demo.png`, captured from the actual local fixture UI. The question, pinned 00:06 frame and researcher-saved finding are real UI objects. The source image below is the existing `static/demo/frames/6.jpg`.
+- Synthetic source and preset-answer labels remain in the product image and adjacent copy. The page discloses the approved-session requirement, unavailable transcription and limits of the static synthetic scenes. It makes no measured accuracy or productivity claims.
+- Replace the concept's unavailable Support link with working Evidence navigation. Keep the existing API docs destination and label it precisely. The full-size screenshot uses direct navigation and browser Back.
+- Use dark text on the coral primary button for contrast, amber keyboard outlines on teal, labeled navigation and decorative empty-alt icons. Respect reduced motion. This is not a full accessibility certification.
+- Additional source-limit and footer copy remains scrollable below the reference's frame; persistent controls are not clipped. Mobile remains out of scope.
+
+## Comparison history
+
+| Finding | Severity | Fix | Final evidence |
+| --- | --- | --- | --- |
+| Main headline wrapped to three lines instead of two at 1440px; hero image began lower than the target | P2 | Adjust the headline scale, align the real product image to the top and recapture it at 1280 × 800 without stretching | `comparison-final.jpg`: two-line headline, image begins near 102px and teal stage ends at 718px |
+| A new-tab image link did not produce a verifiable image view in the in-app browser | P2 | Use direct same-tab image navigation | Browser showed `workspace-demo.png (1280×800)`; Back returned to the landing |
+
+No remaining actionable P0/P1/P2 issue was found in the final comparison. P3: some inner screenshot text naturally needs the full-size view on a narrow desktop. The live app retains its existing Focus/zoom controls.
+
+## Interaction and checks
+
+Verified in the in-app browser:
+
+- Primary demo button opens the labeled six-path library; Track positions loads three preset questions without model calls.
+- Secondary upload opens the file chooser. Uploading the repository's public synthetic MP4 completed local preflight and showed playback with analysis blocked. No private recording was used.
+- Original frame replay at 00:06, pinning evidence and saving a researcher observation produced the actual hero screenshot.
+- Evidence navigation reveals the source-linked example and limitations. Full-size product image opens, and browser Back restores the landing.
+- `/#start` opens the entry even with a restored investigation; Open workspace returns to that investigation, and reloading the direct link shows the entry again.
+- 1440 × 1104, 1280 × 720 and 1024 × 800 desktop views were inspected. Temporary viewport overrides were reset before handoff.
+- Browser warning/error logs were empty after the final interactions.
+
+Validation: frontend build and content hashes passed; 113 frontend regressions passed; 20 existing gateway/demo-route regressions passed; lint, format, schema-export and whitespace checks passed. No new live model quality, UX study value, billing, deployment or mobile acceptance is claimed. No push, deployment, model approval or budget change was performed.
+
+Pre-push verification: the complete local backend suite passed with 229 tests and one Linux-only isolation skip on macOS. Linux isolation remains required by CI before deployment.
+
+The local fixture preview remains running and open for review. Earlier workspace QA is retained below as historical evidence.
+
+---
+
 # Coral Fieldnotes desktop design QA
 
 ## Research entry follow-up, October 16

@@ -8,7 +8,7 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 The **Evidence canvas** is the main workspace. Questions, source frames and findings remain connected as you investigate a recording.
 
-First-time visitors see a UX recording review entry page with **Upload a UX recording** as the primary action and **Explore synthetic demo** as an optional path. Existing recordings, research context and drafts restore directly. The CtrlF Video rail button reopens the start page; **Demo library** is also available directly in the workspace header.
+First-time visitors see a product entry page with a real workspace screenshot and a source-linked question → frame → finding example. **Explore synthetic demo** is the primary action; **Upload a recording** uses the existing upload/preflight path. The screenshot, video and preset answers are explicitly labeled synthetic and do not establish model quality or UX-study value. Existing recordings, research context and drafts restore directly. The CtrlF Video rail button reopens the start page; `/#start` opens it directly while preserving the restored investigation. **Demo library** is also available directly in the workspace header.
 
 - **Agent chat:** ask a question or follow up on a selected result in the docked right panel. Replay supporting thumbnails or pin a frame to the canvas. Minimize the panel to make room; drafts survive reopening and refresh.
 - **Source player:** replay a cited timestamp in the dark teal bottom dock, alongside the current question's supporting frames. Expand it to inspect detail, or hide it while organizing the canvas.

@@ -988,7 +988,7 @@ window.CtrlFVideoSessionUI = {
     $("welcome-demos").disabled = !demo?.scenarios?.length;
     $("welcome-resume").hidden = welcome;
     $("welcome-notice").hidden = true;
-    showWelcome(welcome);
+    showWelcome(welcome || window.location?.hash === "#start");
   },
   entryFailed() {
     $("welcome-retry").hidden = false;
