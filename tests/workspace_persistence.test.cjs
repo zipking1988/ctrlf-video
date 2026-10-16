@@ -438,7 +438,7 @@ test("explicit finding save confirms only durable writes and preserves conflict 
   const h = await harness(), { saveFinding } = await findingActions, messages = [];
   h.store.annotate("Durable finding edit");
   await saveFinding(h.window.CtrlFVideoPersistence, message => messages.push(message));
-  assert.equal(messages.at(-1), "Finding saved locally.");
+  assert.equal(messages.at(-1), "Finding saved to workspace.");
   assert.equal(h.desks.get("desk-A").state.note, "Durable finding edit");
   assert.equal(await h.window.CtrlFVideoPersistence.flush(), true);
 

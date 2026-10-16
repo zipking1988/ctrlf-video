@@ -1,6 +1,6 @@
 # CtrlF Video — Remaining Work
 
-Updated: 2026-10-14. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
+Updated: 2026-10-16. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
 
 ## First-use-case validation
 
@@ -29,9 +29,14 @@ Updated: 2026-10-14. This is the current acceptance backlog, consolidated from o
 
 ## Deployment and recovery
 
-- [ ] Build and inspect the locked container; verify Linux decoding/file/network isolation and resource bounds without disabling protection.
-- [ ] Obtain explicit GCP project/resource/region/spending/shutdown authorization before provisioning.
-- [ ] Validate Cloud Run ingress plus one durable GCE workspace, private token/HTTPS, upload/Range and session/CSRF behavior.
+- [x] Create `ctrlfvideo` with project-scoped cost alerts and the user-authorized temporary test window.
+- [x] Deploy the separate Cloud Run frontend and native durable GCE backend in fixture mode; verify cloud upload/playback, finding restoration, private TLS and native Linux file/network isolation.
+- [x] Verify one live Gemini 3.1 Flash-Lite observation on a public synthetic JPEG; keep full video-pipeline acceptance open.
+- [x] Build both locked container targets; use the native backend until container decoder isolation is accepted.
+- [x] Obtain explicit GCP project/resource/region/spending/shutdown authorization for the initial test window.
+- [x] Validate Cloud Run ingress plus one durable GCE workspace, private token/HTTPS, cloud upload/playback and session/CSRF/Range integration tests.
+- [x] Download a consistent initial local backup; verify its checksum, both SQLite databases, source media and private configuration.
+- [ ] Verify containerized Linux decoding/file/network isolation and resource bounds without disabling protection before using that deployment target.
 - [ ] Validate disk encryption, expiry/deletion, restart recovery, consistent backups and restoration without resurrecting deleted media.
 - [ ] Test bounded concurrent query/ingestion workloads, cancellation/deletion races and capacity release on the target host.
 

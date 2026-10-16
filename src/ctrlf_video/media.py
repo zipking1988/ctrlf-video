@@ -37,9 +37,11 @@ def sandbox_command(directory: Path, args: list[str]):
             '(allow file-write* (literal "/dev/null") (subpath ' + json.dumps(str(directory)) + "))"
         )
         return ["/usr/bin/sandbox-exec", "-p", profile, *args]
-    if platform.system() == "Linux" and shutil.which("bwrap"):
-        command = ["bwrap", "--unshare-all", "--die-with-parent", "--new-session"]
-        for path in ("/usr", "/lib", "/lib64", "/bin"):
+    if platform.system() == "Linux" and (bwrap := shutil.which("bwrap")):
+        command = [bwrap, "--unshare-all", "--die-with-parent", "--new-session"]
+        # Debian FFmpeg dependencies resolve BLAS/LAPACK through alternatives.
+        # Expose only these read-only runtime resolvers, never the whole /etc.
+        for path in ("/usr", "/lib", "/lib64", "/bin", "/etc/alternatives", "/etc/ld.so.cache"):
             if Path(path).exists():
                 command += ["--ro-bind", path, path]
         return command + [

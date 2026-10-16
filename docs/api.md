@@ -50,6 +50,6 @@ Pending/unknown controls use `kind=query_control`, have no final `status`, and d
 
 Owned runtime status uses `Cache-Control: no-store`, reveals credential presence rather than values/endpoint URLs, and makes zero model requests. `dispatch_prerequisites_met` is local eligibility, not live quality/cost/deployment proof. `live_verified` remains false.
 
-`/`, `/demo/catalog`, `/demo/video` and demo frames serve the labeled synthetic workspace. `/health` reports settings/tools/open acceptance and recorded dispatch counts. `/docs/errors` offers brief recovery guidance. The separate stateless gateway's `/gateway/health` reports ingress liveness without probing the backend.
+`/`, `/demo/catalog`, `/demo/video` and demo frames serve the labeled synthetic workspace. `/health` reports settings/tools/open acceptance and recorded dispatch counts. `/docs/errors` offers brief recovery guidance. The stateless gateway's `/gateway/health` reports ingress liveness without probing the backend. With `CTRLF_COMPONENT=frontend`, it also serves `/` and `/static/` directly; all API/demo/media operations still reach the backend through the same public origin.
 
 See [runtime](WORKSPACE_RUNTIME.md), [errors](errors.md) and [ARCHITECTURE](../ARCHITECTURE.md).

@@ -1,7 +1,12 @@
-"""Local ASGI proxy verification. No cloud resources, DNS, TLS or paid requests."""
+"""Local ASGI/private-CA TLS verification. No cloud resources or model requests."""
 
 import os
+import shutil
+import ssl
+import subprocess
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import httpx
 import pytest
@@ -27,12 +32,15 @@ def configure(monkeypatch, tmp_path):
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("serve_frontend", [False, True])
 async def test_gateway_preserves_secure_cookie_csrf_origin_and_private_range_media(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path, serve_frontend
 ):
     configure(monkeypatch, tmp_path)
     backend = create_app(Settings())
-    gateway = create_gateway(transport=httpx.ASGITransport(app=backend))
+    gateway = create_gateway(
+        transport=httpx.ASGITransport(app=backend), serve_frontend=serve_frontend
+    )
     async with gateway.router.lifespan_context(gateway):
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=gateway), base_url="https://public.example"
@@ -175,6 +183,9 @@ def test_container_refuses_ephemeral_workspace_and_uses_one_process(monkeypatch)
     assert "ctrlf_video.gateway:create_gateway" in server_command(
         {"CTRLF_COMPONENT": "gateway", "CTRLF_REQUIRE_DATA_MOUNT": "1"}
     )
+    assert "ctrlf_video.gateway:create_frontend" in server_command(
+        {"CTRLF_COMPONENT": "frontend", "CTRLF_REQUIRE_DATA_MOUNT": "1", "K_SERVICE": "ui"}
+    )
 
 
 def test_direct_factory_also_refuses_cloud_run_workspace_before_creating_data(
@@ -223,3 +234,109 @@ async def test_gateway_streams_binary_upload_and_rejects_declared_and_streamed_l
             assert result.status_code == 413
             assert result.json()["detail"] == "gateway_upload_limit_30_mib"
     assert len(calls) == 1
+
+
+@pytest.mark.anyio
+async def test_frontend_serves_ui_without_backend_but_never_fakes_api_results(
+    monkeypatch, tmp_path
+):
+    configure(monkeypatch, tmp_path)
+    calls = []
+
+    def unavailable(request):
+        calls.append(request)
+        raise httpx.ConnectError("backend offline")
+
+    app = create_gateway(transport=httpx.MockTransport(unavailable), serve_frontend=True)
+    async with app.router.lifespan_context(app):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="https://public.example"
+        ) as client:
+            page = await client.get("/")
+            assert page.status_code == 200 and "Evidence canvas" in page.text
+            assert page.headers["cache-control"] == "no-store"
+            assert TOKEN not in page.text and "backend.example" not in page.text
+            assert "set-cookie" not in page.headers
+            script = await client.get("/static/workspace.js")
+            assert script.status_code == 200 and "CtrlFVideoPersistence" in script.text
+            assert (await client.get("/static/not-a-file.js")).status_code == 404
+            assert (await client.get("/gateway/health")).json()["component"] == "frontend_gateway"
+            assert not calls
+            failed = await client.get("/api/session")
+            assert failed.status_code == 502
+            assert failed.json() == {"detail": "workspace_backend_unavailable"}
+            assert len(calls) == 1
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.anyio
+async def test_private_backend_ca_still_requires_trusted_certificate_and_matching_hostname(
+    monkeypatch, tmp_path
+):
+    if not shutil.which("openssl"):
+        pytest.skip("openssl required for local TLS integration")
+    cert, key = tmp_path / "cert.pem", tmp_path / "key.pem"
+    subprocess.run(
+        [
+            "openssl",
+            "req",
+            "-x509",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-days",
+            "1",
+            "-subj",
+            "/CN=localhost",
+            "-addext",
+            "subjectAltName=DNS:localhost",
+            "-keyout",
+            str(key),
+            "-out",
+            str(cert),
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            assert self.headers["x-ctrlf-gateway-token"] == TOKEN
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"owned-backend")
+
+        def log_message(self, *args):
+            pass
+
+    backend = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    tls.load_cert_chain(cert, key)
+    backend.socket = tls.wrap_socket(backend.socket, server_side=True)
+    worker = threading.Thread(target=backend.serve_forever, daemon=True)
+    worker.start()
+    try:
+        configure(monkeypatch, tmp_path)
+        for trusted, hostname, expected in [
+            (True, "localhost", 200),
+            (False, "localhost", 502),
+            (True, "127.0.0.1", 502),
+        ]:
+            monkeypatch.setenv("CTRLF_BACKEND_ORIGIN", f"https://{hostname}:{backend.server_port}")
+            if trusted:
+                monkeypatch.setenv("CTRLF_BACKEND_CA_FILE", str(cert))
+            else:
+                monkeypatch.delenv("CTRLF_BACKEND_CA_FILE", raising=False)
+            app = create_gateway(serve_frontend=True)
+            async with app.router.lifespan_context(app):
+                async with httpx.AsyncClient(
+                    transport=httpx.ASGITransport(app=app), base_url="https://public.example"
+                ) as client:
+                    result = await client.get("/api/session")
+                    assert result.status_code == expected
+                    if expected == 200:
+                        assert result.content == b"owned-backend"
+    finally:
+        backend.shutdown()
+        backend.server_close()
+        worker.join(timeout=2)

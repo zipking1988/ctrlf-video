@@ -8,7 +8,11 @@ On 2026-10-14 the user requested a complete rename and a Gemini-only cleanup of 
 
 The private repository and local import commit were authorized. On 2026-10-14 the user explicitly authorized code review, fixes, an English README update and pushing the reviewed work to private `main`, superseding the earlier unpushed-import hold. Future pushes still require explicit authorization. Do not change visibility or publish source without explicit authorization. See [hackathon.md](hackathon.md) and [provenance](docs/provenance.md); event requirements are not permission to publish or deploy.
 
-Default `fixture` mode has labeled synthetic answers and makes no model requests. Upload, preflight, playback, investigations and exports work locally. Gemini integration is mock-tested; live model quality, calibrated costs and GCP deployment remain unverified. Do not claim complete MVP or GO.
+Default `fixture` mode has labeled synthetic answers and makes no model requests. Upload, preflight, playback, investigations and exports work locally. The initial split GCP deployment and one separate live synthetic-image observation probe are verified; complete live video analysis, model quality and calibrated operating costs remain unverified. Do not claim complete MVP or GO.
+
+On 2026-10-16 the user authorized a separate `ctrlfvideo` GCP project and split frontend/backend deployment, with JPY 3,000 total through October 19, 2026, 23:59 JST, including non-credit charges. Model calibration, verified finite per-call bounds and source consent still apply. Continued hosting after that window needs a new budget. The user authorized backing up test videos/investigations locally and then removing temporary cloud resources at cutoff. Verify a consistent local backup before deleting the cloud data; keep the original separate workspace untouched.
+
+On 2026-10-16 the user also explicitly authorized review, fixes and pushing these deployment changes to private `main`. This does not authorize source publication or automatic deployments on future pushes.
 
 ## Read before changing behavior
 
@@ -58,7 +62,7 @@ Run relevant existing regressions for behavioral changes, especially ownership, 
 - **Ownership:** session cookie, CSRF/Origin and owner/expiry checks protect every private object. Preserve SQLite revision CAS, video generations and request idempotency. Validate context anchors. Cancellation/deletion prevents late publication and releases capacity.
 - **Async UI:** recheck investigation identity/navigation epoch after awaits. Capture submission context, preserve newly typed drafts, drain old-desk edits before restoring another desk, and do not let advancing playback keep save draining indefinitely.
 - **Budgets:** every model request passes through atomic owner/deployment reservations. Unknown/dispatched attempts are not automatically resent or refunded. Completed cached work is not charged again at admission; zero-new-call resumes still need active approvals. Configuration/checkpoints/frame names stay generation-specific.
-- **Media/resources:** retain upload/storage/decoder/time/window/sampling limits and process isolation. One API/worker process per workspace. macOS isolation is locally verified; Linux deployment needs proof.
+- **Media/resources:** retain upload/storage/decoder/time/window/sampling limits and process isolation. One API/worker process per workspace. macOS and the native GCE backend passed bounded isolation checks; containerized Linux decoding still needs separate proof.
 - **Gemini:** only bounded locally decoded JPEGs may reach Google's fixed Gemini API origin, with trusted `allow_google_media` consent. Original video stays on the backend; text stages send no media. No external-media fetching, Files API uploads, automatic retries or ASR. Reject unsupported audio questions.
 - **Authorization:** do not enable live calls, install spending approvals, provision resources or raise budgets without explicit finite numeric spending/calibration authorization. Private pushes do not grant those permissions.
 

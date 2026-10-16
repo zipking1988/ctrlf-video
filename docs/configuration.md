@@ -33,9 +33,10 @@ Use `CTRLF_VIDEO_COARSE_FRAMES=8 make preflight` or `CTRLF_VIDEO_CONFIG=/absolut
 | `CTRLF_DATA_DIR` | Private storage; default `.ctrlf-video-data/` |
 | `CTRLF_RUNTIME_FILE` | Trusted private Gemini runtime JSON |
 | `CTRLF_PUBLIC_ORIGIN` | Reviewed public HTTPS origin |
-| `CTRLF_COMPONENT` | `workspace` default or stateless `gateway` |
+| `CTRLF_COMPONENT` | `workspace` default, stateless `gateway`, or `frontend` UI/gateway |
 | `CTRLF_BACKEND_ORIGIN` | Separate HTTPS durable workspace origin for gateway |
 | `CTRLF_GATEWAY_TOKEN` | Private 32–256 printable-ASCII token shared by gateway/backend |
+| `CTRLF_BACKEND_CA_FILE` | Optional reviewed PEM CA file for a private HTTPS backend; certificate and hostname verification remain enabled |
 | `CTRLF_REQUIRE_DATA_MOUNT` | `1` requires explicit workspace volume mount; container default |
 | `PORT` | Container port, integer 1–65535; default 8080 |
 | `GEMINI_API_KEY` | Backend-only credential referenced by model endpoint `key_env` |

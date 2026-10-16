@@ -1,6 +1,6 @@
 # CtrlF Video — Runtime and Workflow
 
-Updated: 2026-10-14. Gemini-only implementation; live calls and cloud deployment are unverified. Default `fixture` sends no model requests.
+Updated: 2026-10-16. Gemini-only implementation. The initial split GCP deployment runs in fixture mode; one separate live synthetic-image probe passed. The complete live video pipeline, quality and calibrated operating costs remain unverified. See [deployment status](deployment.md). Default `fixture` sends no model requests.
 
 ## Local workflow
 

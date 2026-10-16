@@ -5,12 +5,15 @@ The backend must be explicitly configured; there is no fixture fallback.
 """
 
 import os
+import ssl
 from contextlib import asynccontextmanager
+from pathlib import Path
 from urllib.parse import urlparse
 
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.background import BackgroundTask
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
@@ -84,12 +87,16 @@ def filtered_headers(headers, *, request=False):
     ]
 
 
-def create_gateway(*, transport=None):
+def create_gateway(*, transport=None, serve_frontend=False):
     public = https_origin(os.environ.get("CTRLF_PUBLIC_ORIGIN"))
     backend = https_origin(os.environ.get("CTRLF_BACKEND_ORIGIN"))
     if public == backend:
         raise RuntimeError("Gateway backend must differ from the public origin")
     token = gateway_token(os.environ.get("CTRLF_GATEWAY_TOKEN"))
+    ca_file = os.environ.get("CTRLF_BACKEND_CA_FILE")
+    # Private VPC backends may use a reviewed private CA. Certificate and hostname
+    # validation remain mandatory; never accept verify=False or a browser bypass.
+    tls = ssl.create_default_context(cafile=ca_file) if ca_file else True
 
     @asynccontextmanager
     async def lifespan(app):
@@ -97,6 +104,7 @@ def create_gateway(*, transport=None):
             transport=transport,
             follow_redirects=False,
             trust_env=False,
+            verify=tls,
             timeout=httpx.Timeout(connect=10, read=300, write=180, pool=10),
             limits=httpx.Limits(max_connections=32, max_keepalive_connections=16),
         ) as client:
@@ -106,10 +114,18 @@ def create_gateway(*, transport=None):
     app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=[urlparse(public).hostname])
 
+    if serve_frontend:
+        static = Path(__file__).parent / "static"
+        app.mount("/static", StaticFiles(directory=static), name="frontend-static")
+
+        @app.get("/", include_in_schema=False)
+        def index():
+            return FileResponse(static / "index.html", headers={"Cache-Control": "no-store"})
+
     @app.get("/gateway/health")
     def health():
         return {
-            "component": "stateless_gateway",
+            "component": "frontend_gateway" if serve_frontend else "stateless_gateway",
             "backend_verified": False,
             "model_requests_sent": 0,
         }
@@ -171,3 +187,8 @@ def create_gateway(*, transport=None):
         return result
 
     return app
+
+
+def create_frontend():
+    """Serve the committed UI locally; forward API/media through the same origin."""
+    return create_gateway(serve_frontend=True)

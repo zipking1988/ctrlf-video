@@ -44,7 +44,7 @@ Choose footage with manually known answers. Do not prewrite results for an uploa
 | Persistence | SQLite investigations, notes, layout, drafts and player position implemented | Session-owned storage; no account-based cross-device collaboration |
 | Exports | Markdown, JSON and offline HTML investigation reports implemented | Exports retain source references and unresolved items |
 | Gemini pipeline | Native REST adapters for descriptions, embeddings, relevance selection, planning, visual review and synthesis implemented | Mock transports verified integration; no live Gemini acceptance result |
-| Cloud deployment | Cloud Run gateway and one durable GCE backend topology prepared | No GCP resources or deployed URL; container/Linux/cloud validation pending |
+| Cloud deployment | Initial Cloud Run frontend and native durable GCE backend deployed in fixture mode | Upload/playback/persistence and native Linux isolation checked; full live-video acceptance and longer judge hosting pending |
 
 The default mode is **fixture**: explicitly labeled synthetic answers, no model requests. Uploaded videos can be preflighted and played, but cannot receive fixture answers. See [README](README.md), [current Gemini runtime](docs/WORKSPACE_RUNTIME.md) and [deployment preparation](docs/deployment.md).
 
@@ -91,4 +91,4 @@ CtrlF Video was imported into a separate private repository on 2026-10-14 from a
 
 Fresh-project eligibility needs organizer clarification because the original route targeted another event. See [source provenance](docs/provenance.md). Obsolete planning/review documents were removed from this checkout; committed history remains recoverable through Git.
 
-Registration/team eligibility, a public source release, live Gemini verification, GCP deployment, an English PDF deck and a video under three minutes remain submission requirements to verify or complete. The repository remains private and pushes remain on hold. This document authorizes no publication, spending, model calls or provisioning. See [hackathon.md](hackathon.md) for the rule summary and readiness checklist.
+Registration/team eligibility, public source release, full live Gemini video verification, continued deployed judge access, the prescribed English PDF deck and the current dashboard video requirements remain to verify or complete. The initial fixture deployment and one live synthetic-image probe do not complete those requirements; see the current README and deployment record. The repository remains private. The reviewed main push was authorized and completed on October 14; review, fixes and a private main push for the deployment changes were explicitly authorized on October 16. This document authorizes no publication, spending, model calls or provisioning. See [hackathon.md](hackathon.md) for the rule summary and readiness checklist.

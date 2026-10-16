@@ -14,7 +14,7 @@ export async function saveFinding(persistence, setMessage) {
     const saved = await persistence.flush();
     if (!persistence.isCurrent(context)) return;
     setMessage(saved === true
-      ? "Finding saved locally."
+      ? "Finding saved to workspace."
       : "Not saved. Check the save indicator for a conflict or unavailable service before leaving this page.");
   } catch {
     if (!persistence.isCurrent(context)) return;

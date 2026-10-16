@@ -1,6 +1,6 @@
 # CtrlF Video — Architecture and Contracts
 
-Updated: 2026-10-14. This is the current technical contract for the Gemini-only edition. The cleanup removes obsolete provider plans; it does not weaken evidence, ownership, resource or budget protections. Implementation status does not waive a requirement.
+Updated: 2026-10-16. This is the current technical contract for the Gemini-only edition. The cleanup removes obsolete provider plans; it does not weaken evidence, ownership, resource or budget protections. Implementation status does not waive a requirement.
 
 ## System
 
@@ -74,13 +74,13 @@ One model attempt runs at a time, with up to 16 bounded waiters and 1:1 query/in
 
 ## Media and deployment resources
 
-Uploads: 500 MiB/file, 10 sources and 1 GiB per owner, 4 GiB across the service, 180-second upload timeout. Cloud Run gateway bodies are separately limited to 30 MiB. Keep decoder protocol/format restrictions, file/network isolation, CPU/memory/output bounds and streaming frame extraction. macOS isolation is locally verified; Linux namespace/bubblewrap behavior must be proven on the deployment host.
+Uploads: 500 MiB/file, 10 sources and 1 GiB per owner, 4 GiB across the service, 180-second upload timeout. Cloud Run gateway bodies are separately limited to 30 MiB. Keep decoder protocol/format restrictions, file/network isolation, CPU/memory/output bounds and streaming frame extraction. macOS isolation and bounded native GCE decoding/file/network isolation are verified; the containerized Linux target and broader resource acceptance remain open.
 
-Run one API/worker process per local SQLite workspace. Never autoscale that workspace or use multiple Uvicorn workers. Prepared deployment: stateless Cloud Run ingress -> one GCE backend with a durable local block filesystem -> Gemini. Cloud Run ephemeral storage and NFS/GCS mounts are not substitutes for SQLite WAL durability/locking. Workspace startup refuses Cloud Run's `K_SERVICE`. The gateway uses HTTPS and a private token while preserving session/CSRF/ownership checks. See [deployment](docs/deployment.md).
+Run one API/worker process per local SQLite workspace. Never autoscale that workspace or use multiple Uvicorn workers. The initial fixture deployment uses stateless Cloud Run UI/ingress -> one native GCE backend with a durable local block filesystem; live Gemini video analysis remains gated. Cloud Run ephemeral storage and NFS/GCS mounts are not substitutes for SQLite WAL durability/locking. Workspace startup refuses Cloud Run's `K_SERVICE`. The gateway uses HTTPS and a private token while preserving session/CSRF/ownership checks. See [deployment](docs/deployment.md).
 
 ## Acceptance remaining
 
-Live model permissions/revisions, real visual evidence quality, unknown/cancellation behavior, calibrated costs/provider cutoff, one-hour performance, concurrent workloads, Linux isolation, deployed HTTPS/storage and backup restoration remain open. Original target values remain unmeasured: Recall@5 >=80%, complete event coverage at IoU>=0.5 >=70%, schema >=99%, evidence support >=90%, one-hour indexing <=30 minutes, query P95 <=15 seconds. Retain failure/missing denominators and completion rates.
+Full-pipeline live model permissions/revisions, real visual evidence quality, unknown/cancellation behavior, calibrated costs/provider cutoff, one-hour performance, concurrent workloads, container isolation, broader deployed recovery and backup restoration remain open. Initial fixture HTTPS/storage checks, native Linux isolation checks and backup integrity verification do not complete those gates. Original target values remain unmeasured: Recall@5 >=80%, complete event coverage at IoU>=0.5 >=70%, schema >=99%, evidence support >=90%, one-hour indexing <=30 minutes, query P95 <=15 seconds. Retain failure/missing denominators and completion rates.
 
 Development dataset commitment: >=10 videos/30 questions. Independent frozen report goal: >=30 videos/100 questions. Required visual comparisons include hybrid retrieval versus vector-only and visual review versus no review. Audio/ASR experiments cannot run in this edition; the existing four-category offline diagnostic gate includes speech and must remain NOT_ACCEPTED until its scope is explicitly revised or supported. Never claim full acceptance from fixtures or a short demo.
 

@@ -18,7 +18,7 @@ All application labels and synthetic demo content are English. Researcher-entere
 
 ## Current status
 
-Local upload, media preflight, private playback, persistent investigations, canvas controls and report exports are implemented. Gemini ingestion and querying have mock-transport coverage. Live Gemini quality, latency, cost and GCP deployment remain unverified.
+Local upload, media preflight, private playback, persistent investigations, canvas controls and report exports are implemented. Gemini ingestion and querying have mock-transport coverage. An initial GCP deployment and a bounded live Gemini image-understanding probe are verified; the complete live video-analysis pipeline, quality, latency and billing reconciliation remain pending.
 
 **Default mode: `fixture`.** It makes no model requests and labels its preset answers and source video as synthetic. Uploaded footage can be checked and played in fixture mode, but cannot receive demo answers. Saving uses revision checks; a conflict is shown for recovery instead of overwriting another window's edits.
 
@@ -26,9 +26,25 @@ The first product use case remains UX research. The sports video is a technical 
 
 This edition is Gemini-only. The original implementation's separate workspace/repository remains preserved. [Provenance](docs/provenance.md) records the source lineage and unresolved hackathon eligibility. The repository is private; publication and deployment require separate authorization.
 
+## Initial cloud test
+
+Open [CtrlF Video on Google Cloud](https://ctrlfvideo-frontend-655757141159.asia-northeast1.run.app/).
+The Cloud Run frontend and durable Tokyo GCE backend are separate components with
+one browser origin. The cloud service currently runs the **labeled synthetic
+fixture**; uploaded footage supports preflight/playback, with model analysis blocked.
+A separate live Gemini 3.1 Flash-Lite call on one public synthetic frame validated
+image dispatch and response handling, not video retrieval or UX research quality.
+
+The authorized test ceiling is JPY 3,000 through **October 19, 2026, 23:59 JST**.
+A local backup/cleanup automation is scheduled for 23:15 JST; the VM also has a
+provider-side stop time at 23:59 JST. Automation requires the local host to be
+available. The data disk must be preserved if backup verification fails, which
+can leave residual storage charges. Continued judge access needs a longer hosting
+window and a new budget. See [deployment status](docs/deployment.md).
+
 ## Local setup
 
-Requirements: Python 3.13, `uv`, `make`, FFmpeg and ffprobe. Node.js 20+ is needed for frontend development; serving uses the committed build. macOS media isolation is locally verified; Linux deployment isolation still needs proof.
+Requirements: Python 3.13, `uv`, `make`, FFmpeg and ffprobe. Node.js 20+ is needed for frontend development; serving uses the committed build. macOS media isolation is locally verified. The current native GCE backend passed Linux decoding, file-isolation and network-isolation checks; containerized backend isolation still needs separate proof.
 
 ```sh
 make setup
@@ -62,6 +78,20 @@ CTRLF_VIDEO_CONFIG=/absolute/path/config.toml make preflight
 There are no aliases for the previous package, environment names, browser globals or cookie. The package is `ctrlf_video`, settings use `CTRLF_VIDEO_*`, runtime/infrastructure use `CTRLF_*`, and frontend globals use `CtrlFVideo*`. Restart the local server and reload the browser after this rename. New default storage and cookie names start a separate session; existing private data is not automatically copied, deleted or re-owned.
 
 ## Development
+
+The cloud frontend and backend can be packaged separately: `docker build --target
+frontend -t ctrlfvideo-frontend .` and `docker build --target backend -t
+ctrlfvideo-backend .`. The frontend serves the committed UI and proxies API/media
+requests under the same public origin; the backend retains one worker and durable
+SQLite/media storage. See [deployment setup](docs/deployment.md) for configuration,
+the authorized test window and remaining cloud verification.
+
+**CI/CD is not configured.** GitHub has no repository workflow, and Cloud Build
+and Cloud Deploy are disabled in the test project. Pushing to `main` updates the
+private source repository; it does not deploy either service. The frontend is
+released manually by immutable image digest, and the single backend is updated
+manually under systemd with its durable data preserved. See the
+[release process](docs/deployment.md#release-process-and-cicd).
 
 ```sh
 make test          # backend contracts and Gemini mock transports

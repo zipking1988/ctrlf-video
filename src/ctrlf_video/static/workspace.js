@@ -38,7 +38,7 @@
     const desk = current;
     status("Saving…");
     saving = api(`/api/investigations/${desk.id}`, "PUT", {revision:desk.revision,state:JSON.parse(encoded)})
-      .then(result => { desk.revision=result.revision; lastSaved=encoded; lastSavedEdits=edits; status("Saved locally","saved"); })
+      .then(result => { desk.revision=result.revision; lastSaved=encoded; lastSavedEdits=edits; status("Saved to workspace","saved"); })
       .catch(error => { conflict=error.status===409; status(conflict ? "Changed in another window · reopen to recover" : "Save failed · click to retry", "error"); throw error; })
       .finally(() => { saving=null; });
     await saving;
@@ -136,7 +136,7 @@
     const active=()=>owns(deskId,epoch) && token===libraryEpoch;
     await flush(); if (!active()) return; libraryNotice("");
     $("library-title").textContent=kind === "videos" ? "Sources" : "Investigations";
-    $("library-intro").textContent=kind === "videos" ? "Each source keeps its own questions and evidence. Upload for preflight, then analyze within approved budgets." : `Investigations are saved on this local service, retained for ${session.ttl_hours} hours by default. Resume or start an investigation.`;
+    $("library-intro").textContent=kind === "videos" ? "Each source keeps its own questions and evidence. Upload for preflight, then analyze within approved budgets." : `Investigations are saved in this workspace, retained for ${session.ttl_hours} hours by default. Resume or start an investigation.`;
     $("library-add").textContent=kind === "videos" ? "Upload video" : "New investigation";
     $("library-add").onclick=()=>{
       if(kind === "videos") {$("workspace-library").close();$("file-input").click();}

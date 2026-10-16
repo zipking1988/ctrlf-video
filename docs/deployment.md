@@ -1,9 +1,40 @@
 # Google Cloud deployment preparation
 
-Prepared 2026-10-11; **not deployed**. The user has no GCP setup yet and explicitly
-requested no GCP startup. No project, billing link, API enablement, secret, image
-push, VM, disk, network, Cloud Run service or model call has been created.
-The files below are inert preparation, not spending approval.
+Updated 2026-10-16. The user authorized the `ctrlfvideo` GCP project and an initial
+deployment/Gemini-validation ceiling of **JPY 3,000 through October 19, 2026,
+23:59 JST**, including charges not covered by credits. The project, billing link,
+required APIs, scoped budget alert and Tokyo VPC/subnet have been created.
+The deployed native GCE backend has passed bounded Linux decode and namespace-isolation checks. This does not establish live Gemini video quality or containerized backend isolation.
+Templates remain non-operational until their placeholders are deliberately supplied.
+
+## Separate frontend and backend
+
+The frontend is independently packaged with `docker build --target frontend`.
+It starts `CTRLF_COMPONENT=frontend`, serves the committed HTML and `/static/`
+assets, and forwards all API, demo and media requests to the durable backend.
+The browser uses one public origin: no broad CORS, cross-site session cookies or
+browser-visible gateway/model credentials are introduced. HTML uses `no-store`
+so a new frontend revision does not reuse an obsolete shell. A backend outage
+leaves the UI available but API requests return an explicit 502; there is no
+substitute demo response for failed operations.
+
+The backend remains one stateful API/worker process. The default Docker target
+(`--target backend`) includes FFmpeg and bubblewrap; the frontend target does not.
+The legacy proxy-only `CTRLF_COMPONENT=gateway` entry point also remains available.
+Use [frontend.service.example.yaml](../deploy/gcp/frontend.service.example.yaml)
+for the UI service. The current frontend uses an immutable image digest. The current backend runs a locked native Python environment under systemd so its decoder can use unprivileged Linux namespaces without weakening container protection. Both Docker targets built successfully on GCE. The backend container decoder isolation must still be verified independently before using that target for uploads.
+
+For a private VPC backend, `CTRLF_BACKEND_CA_FILE` can load a reviewed private CA
+certificate. The certificate must match the backend hostname/IP; verification is
+never disabled. The public browser still uses Cloud Run's normal HTTPS endpoint.
+Only the public CA certificate goes to the frontend; backend TLS private keys stay
+on the backend. TLS regression coverage rejects unknown CAs and mismatched names.
+
+The initial test window is shorter than the hackathon evaluation period. Continued
+judge access needs a separately agreed hosting window. Budget alerts are not a hard
+spending cutoff; bound resources/model attempts and arrange shutdown/backup before
+the approved deadline. Credit eligibility remains unconfirmed; do not count the
+App Builder balance as general-purpose hosting or direct Gemini API funding.
 
 ## Preserve the existing workspace runtime
 
@@ -19,12 +50,12 @@ requires same-host shared memory.
 Preparation therefore keeps the workspace unchanged behind a stateless ingress:
 
 ```text
-Browser ─HTTPS─> Cloud Run gateway ─HTTPS + private shared token─>
+Browser ─HTTPS─> Cloud Run frontend/gateway ─HTTPS + private shared token─>
   one Google Compute Engine backend ─> local persistent disk + isolated decoder
                                   └─> Google Gemini API (approved calls only)
 ```
 
-This is a proposed GCP topology, not deployed-platform or competition eligibility
+This is the selected GCP topology, not deployed-platform or competition eligibility
 proof. The prototype is served through Cloud Run and its workload remains on
 Google Cloud. Verify the event's acceptance of this split topology before
 submission; do not claim a fully serverless workspace. A future Cloud Run-only
@@ -34,7 +65,8 @@ equivalent CAS, ownership, generation and atomic budget behavior.
 ## Prepared files
 
 - [Dockerfile](../Dockerfile): Python 3.13, frozen `uv.lock`, committed frontend,
-  FFmpeg/ffprobe and bubblewrap, nonroot UID 10001; no Node or GPU requirement.
+  separate frontend/backend targets, nonroot UID 10001; no Node or GPU requirement.
+  The backend target additionally installs FFmpeg/ffprobe and bubblewrap.
   Workspace startup requires an explicit `CTRLF_DATA_DIR` volume mount by default
   (`CTRLF_REQUIRE_DATA_MOUNT=1`); a mounted volume still needs durability validation.
 - [.dockerignore](../.dockerignore): an allowlist excluding private media,
@@ -48,15 +80,14 @@ equivalent CAS, ownership, generation and atomic budget behavior.
   Cloud Run ingress template with placeholder image/origins/secret. Its replica,
   memory and CPU values are review candidates, not approved cloud spending.
 
-The local Docker daemon was unavailable during preparation. Container image
-build, Linux decoder execution and cloud TLS/network behavior are not verified.
+The frontend image was built on the amd64 GCE host and deployed by digest. Native backend Linux decoding and namespace file/network restrictions passed on that host. The public HTTPS frontend reached the private backend using its reviewed CA and preserved private media/session behavior. The backend container has not been accepted for isolated decoding.
 The local Python/ASGI tests exercise the gateway and real workspace together.
 
 ## Configuration boundaries
 
 | Component | Required configuration |
 | --- | --- |
-| Gateway | `CTRLF_COMPONENT=gateway`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, `PORT` |
+| Frontend | `CTRLF_COMPONENT=frontend`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, optional `CTRLF_BACKEND_CA_FILE`, `PORT` |
 | Workspace | `CTRLF_COMPONENT=workspace`, same `CTRLF_PUBLIC_ORIGIN` and private `CTRLF_GATEWAY_TOKEN`, persistent `CTRLF_DATA_DIR`, trusted `CTRLF_RUNTIME_FILE`, backend-only `GEMINI_API_KEY`, `CTRLF_VIDEO_MODE=real` only after prerequisites |
 
 Both origins must be exact HTTPS origins without credentials, path, query or
@@ -113,8 +144,76 @@ attempts. Revoke approvals to prevent subsequent model dispatch; independently
 stop/delete cloud resources under the authorized shutdown plan to stop hosting
 costs. Application timeout/cancellation cannot prove supplier-side stopped billing.
 
-No deploy script or CI auto-deployment has been installed. At present there is no
-deployed live URL and no live Gemini acceptance result.
+## Verified initial deployment — October 16, 2026
+
+- Project: `ctrlfvideo` (`655757141159`), region `asia-northeast1`.
+- URL: https://ctrlfvideo-frontend-655757141159.asia-northeast1.run.app/
+- Frontend: Cloud Run `ctrlfvideo-frontend`, zero minimum/one maximum instance,
+  1 vCPU, 512 MiB, concurrency 32; private VPC egress to `10.80.0.10:443`.
+- Backend: one `e2-medium` Debian 12 VM `ctrlfvideo-backend`, native Python 3.13
+  and locked dependencies under `ctrlfvideo-backend.service`, 20 GiB boot disk,
+  10 GiB mounted data disk. API listens behind nginx TLS; ingress is limited to
+  the frontend subnet and IAP SSH. The backend service identity can write only
+  this project's image repository; the frontend can read only its token/CA secrets.
+- Current model mode: `fixture`, no active cloud model approvals. The restricted
+  Gemini key remains in private local operator storage and is not in the cloud
+  application environment, image, browser bundle or Git.
+- Separate live probe: Gemini 3.1 Flash-Lite returned a validated observation on
+  one public synthetic JPEG (1,157 input / 38 output tokens). A 2.5 Flash probe
+  returned 404; an instrumented text probe observed a response but did not complete
+  local validation. Reservations remain charged; no unknown request was replayed.
+  Probe budgets were revoked. These probes do not accept the full video pipeline.
+- Checks: 169 local backend tests passed with one Linux-only skip; all 16 focused
+  gateway/TLS/media tests passed on Linux; 100 frontend regressions passed. Browser
+  verified synthetic question/evidence, editable finding save/restore and an
+  uploaded synthetic file's preflight and private playback. No real UX value claim.
+- An initial consistent backup was downloaded locally on October 16 after stopping
+  backend writes. Its SHA-256 matched, both copied SQLite databases passed integrity
+  checks, and the uploaded source media and private configuration were present.
+- A provider-side VM stop is set for `2026-10-19T14:59:00Z` (23:59 JST). Local
+  automation `ctrlf-video-backup-and-shutdown` starts at 23:15 JST to stop writes,
+  download and verify a consistent private backup, then remove temporary resources.
+  It requires an available local host. If backup fails, keep the only data copy
+  and report residual storage costs rather than deleting unverified private data.
+- One project-scoped JPY 3,000 budget alert excludes credits and notifies at
+  50%, 80% and 95%. It is an alert, not a hard supplier cutoff. Credit coverage
+  and final billing remain unverified. Do not continue hosting past the approved
+  window without a new budget.
+
+Private deployment scripts, model-catalog/usage evidence, revoked and current
+credential records, source archives and cleanup inventory are in ignored
+`.ctrlf-video-eval/cloud-split/`. Never print their secret contents or commit them.
+The Cloud Run UI now says “Saved to workspace” rather than implying device storage.
+The user authorized reviewing and pushing these deployment changes to private
+`main` on October 16. No public source release is authorized.
+
+## Release process and CI/CD
+
+As checked on October 16, neither service has automatic CI/CD. There is no
+GitHub Actions workflow; Cloud Build and Cloud Deploy APIs are disabled in
+`ctrlfvideo`. The current frontend was deployed with `gcloud`. A push to `main`
+changes source control only and does not redeploy the frontend or backend.
+
+Current releases are manual:
+
+1. Run backend tests, lint/schema checks, frontend tests and the frontend build.
+   Verify generated assets and the reviewed commit; keep secrets/private data
+   outside the build context.
+2. Build the frontend target, push to the project's private Artifact Registry and
+   deploy the immutable digest to the existing Cloud Run service. Preserve its
+   private VPC, pinned secrets, CA verification and resource limits. Check public
+   liveness plus actual backend/session access before sending traffic.
+3. For a backend update, stop new traffic and the single backend process, create
+   and verify a consistent backup, install the reviewed source with frozen
+   dependencies, then restart systemd. Verify the native Linux decoder, private
+   media access and investigation restoration. Preserve the same durable data
+   and attempt ledger; do not start a second writer or replay paid requests.
+
+A future pipeline should run these checks before releasing each component.
+Frontend deployment can replace a stateless revision; backend deployment needs
+serialized maintenance, backup and recovery checks. Cloud deployment credentials,
+triggers and any hosting beyond the temporary window still need explicit scope
+and must not be inferred from permission to push source.
 
 ## Primary references
 

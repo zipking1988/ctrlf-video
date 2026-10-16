@@ -989,14 +989,14 @@ window.CtrlFVideoSessionUI = {
       $("attached-source-name").textContent = video.name;
       $("mode-label").textContent = "Uploaded source";
       $("video-state").textContent = localMode ? "Uploaded" : "Index ready";
-      $("video-state").title = "Private source · saved on local service";
+      $("video-state").title = "Private source · saved in this workspace";
       $("empty-eyebrow").textContent = "Uploaded source";
       $("canvas-hint").textContent = localMode ? "Source saved · questions available after analysis" : "Drag the background to pan · Ctrl / ⌘ + Scroll to zoom";
       $("composer-mode-text").textContent = video.job?.state === "ready" ? "Model analysis · evidence questions" : "Uploaded source · awaiting analysis";
       $("source-thumbnail").hidden = !video.metadata?.preview?.length;
       if (video.metadata?.preview?.[0]) $("source-thumbnail").src = video.metadata.preview[0].uri;
-      $("demo-notice-text").textContent = "Source saved on the local service. Model analysis requires configured services and approved budgets.";
-      $("local-note").textContent = "Uploaded to the local service. Each source has its own investigation and evidence.";
+      $("demo-notice-text").textContent = "Source saved in this workspace. Model analysis requires configured services and approved budgets.";
+      $("local-note").textContent = "Uploaded to this workspace. Each source has its own investigation and evidence.";
       $("restore-demo").hidden = false;
       $("suggestions").hidden = true;
       $("empty-state").querySelector("h1").textContent = localMode ? "Source saved; awaiting analysis." : "Investigate this recording.";

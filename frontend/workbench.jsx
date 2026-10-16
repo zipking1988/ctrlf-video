@@ -176,7 +176,7 @@ function WorkspaceNavigation() {
             {icon("arrow-right")}
           </a>
           <div className="menu-footnote">
-            Saved locally<small>Retained for 24 hours by default</small>
+            Saved to workspace<small>Retained for 24 hours by default</small>
           </div>
         </section>
       )}
@@ -888,7 +888,7 @@ function Inspector() {
               maxLength={1200}
             />
             <p className="session-footnote">
-              Your title, findings and notes save locally as you edit.
+              Your title, findings and notes save to this workspace as you edit.
             </p>
             <button className="export-button" onClick={exportNotes}>
               Export report {icon("arrow-right")}
