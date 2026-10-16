@@ -21,8 +21,11 @@ Updated: 2026-10-16. This is the current acceptance backlog, consolidated from o
 
 ## Live Gemini acceptance
 
-- [ ] Verify account-accessible models/revisions, JSON/image behavior, embedding input bounds and supported languages.
-- [ ] Obtain finite numeric calibration/execution approval; record conservative per-role cost bounds, validity and supplier cutoff controls.
+- [x] Verify account-accessible generation/embedding IDs and revisions, live JSON/image dispatch and both embedding task types.
+- [ ] Validate over-limit embedding inputs and a representative multilingual dataset against the real provider.
+- [x] Record the explicit JPY 3,000 authorization, JPY 600 shared model sublimit, conservative per-role maximum costs, finite attempts/validity and existing resource cutoffs.
+- [x] Run one uploaded synthetic clip through real ingestion, retrieval, visual verification, synthesis, editable finding saving and refresh after a real-mode rollback.
+- [ ] Resolve observed spatial wording errors (the first live answer called a left-of-center box centered); preserve source-linked human corrections.
 - [ ] Run authorized ingestion -> question -> follow-up -> actual source evidence -> findings/export -> refresh/restore.
 - [ ] Verify uncertain/negative questions, unsupported audio, malformed responses and cancellation against real provider behavior.
 - [ ] Reconcile provider usage/billing with reserved/completed/unknown attempts, including failure and crash cases.
@@ -31,7 +34,7 @@ Updated: 2026-10-16. This is the current acceptance backlog, consolidated from o
 
 - [x] Create `ctrlfvideo` with project-scoped cost alerts and the user-authorized temporary test window.
 - [x] Deploy the separate Cloud Run frontend and native durable GCE backend in fixture mode; verify cloud upload/playback, finding restoration, private TLS and native Linux file/network isolation.
-- [x] Verify one live Gemini 3.1 Flash-Lite observation on a public synthetic JPEG; keep full video-pipeline acceptance open.
+- [x] Verify one live Gemini 3.1 Flash-Lite observation on a public synthetic JPEG; keep broad video quality and UX acceptance open.
 - [x] Build both locked container targets; use the native backend until container decoder isolation is accepted.
 - [x] Obtain explicit GCP project/resource/region/spending/shutdown authorization for the initial test window.
 - [x] Validate Cloud Run ingress plus one durable GCE workspace, private token/HTTPS, cloud upload/playback and session/CSRF/Range integration tests.

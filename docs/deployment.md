@@ -198,9 +198,10 @@ costs. Application timeout/cancellation cannot prove supplier-side stopped billi
   10 GiB mounted data disk. API listens behind nginx TLS; ingress is limited to
   the frontend subnet and IAP SSH. The backend service identity can write only
   this project's image repository; the frontend can read only its token/CA secrets.
-- Current model mode: `fixture`, no active cloud model approvals. The restricted
-  Gemini key remains in private local operator storage and is not in the cloud
-  application environment, image, browser bundle or Git.
+- At initial deployment the model mode was `fixture`, with no cloud model approvals.
+  Later on October 16 the user authorized limited real Gemini testing; the key is
+  now solely in the private backend environment. See [live test limits](LIVE_GEMINI_TEST.md).
+  It remains absent from frontend configuration, images, browser bundles and Git.
 - Separate live probe: Gemini 3.1 Flash-Lite returned a validated observation on
   one public synthetic JPEG (1,157 input / 38 output tokens). A 2.5 Flash probe
   returned 404; an instrumented text probe observed a response but did not complete
@@ -273,7 +274,7 @@ frontend image and uses its digest. On the backend,
    outside the checkout, restores to a private scratch copy, verifies every file's
    SHA-256 and runs integrity checks on both restored SQLite databases. Insufficient
    free space or a failed restore rejects the release before switching code.
-4. Atomically switches the code symlink, starts one backend, and checks fixture
+4. Atomically switches the code symlink, starts one backend, and checks the operator-configured model mode without dispatching models,
    health and the retained owned investigation. The backend remains in maintenance
    until the frontend revision is ready. The frontend gets all traffic, the backend
    finalizes, and public UI/session/backend checks must pass.
@@ -352,3 +353,13 @@ evidence, not a verified remaining balance or live model-quality result.
 - [Cloud Run NFS locking limitation](https://cloud.google.com/run/docs/configuring/services/nfs-volume-mounts)
 - [Cloud Run request/response limits](https://cloud.google.com/run/quotas)
 - [SQLite WAL same-host requirement](https://www.sqlite.org/wal.html)
+
+## Limited real Gemini operation — October 16
+
+The user subsequently requested real uploaded-video analysis within the same JPY 3,000 total. A JPY 600 shared model sublimit, 40 total model attempts and six primary indexing calls were installed for the deployment and one explicitly identified active browser session. There is no public automatic enrollment. The operator verified a consistent backup before switching the backend to `real`, and set the root-owned expected mode and workflow `CTRLF_EXPECTED_MODE` to `real`. The public custom-domain gateway remains unchanged; credentials stay on the backend.
+
+Two live embedding probes, real ingestion of an uploaded 18-second synthetic clip, and a complete evidence query succeeded. A finding was edited and saved through the public UI. Model spatial wording still needed human correction, so broad model/UX quality acceptance remains open. All nine requests used the same new allowance; JPY 214 was conservatively reserved, leaving JPY 386 of that model allowance at verification time. These are ledger reservations, not invoice charges or a verified remaining GCP balance. See [operating limits and evidence](LIVE_GEMINI_TEST.md).
+
+CI [38884904791](https://github.com/zipking1988/ctrlf-video/actions/runs/38884904791) passed 215 Linux backend tests and 100 frontend tests, then deployed both components from commit `e67468f`. Offline deployment health checks explicitly preserve the operator-selected mode and make no model requests. Model expiry is October 19 at 22:00 JST, ahead of the existing maintenance/backup/removal schedule. No hosting extension, extra service, larger instance or increased total budget was introduced.
+
+A subsequent managed drill under real mode verified backup/candidate health/rollback while preserving every live budget and attempt row and the private runtime. No paid call was added. The real-mode backup was downloaded privately and independently restored/verified locally, including runtime configuration and both SQLite databases. A browser refresh restored the real source-linked finding and playable private source.

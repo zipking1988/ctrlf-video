@@ -37,7 +37,7 @@ Only `https://generativelanguage.googleapis.com/v1beta` is accepted. Trusted run
 
 Vision sends bounded locally decoded inline JPEGs with actual frame IDs/timestamps. The original video remains in private storage. Embeddings, relevance selection, planning and synthesis send text only. No remote media URLs, Files API, audio uploads, SDK retries or cross-provider fallback exist.
 
-Each generation call is capped at 4,096 output tokens, 128 images, 19 MiB serialized request and 4 MiB streamed response. Incomplete/blocked/invalid provider envelopes become unknown dispatched attempts with retained charges. HTTP clients disable redirects and environment proxies. Model media, quoted text and previous responses are treated as untrusted evidence, never instructions.
+Each generation call is capped at 4,096 output tokens, 128 images, 19 MiB serialized request and 4 MiB streamed response. Combined system/user text is additionally limited to 64 KiB in both raw and NFKC-normalized UTF-8 form before reservation or network dispatch; this includes retrieval documents, prior context and repairs. Incomplete/blocked/invalid provider envelopes become unknown dispatched attempts with retained charges. HTTP clients disable redirects and environment proxies. Model media, quoted text and previous responses are treated as untrusted evidence, never instructions.
 
 ## Evidence contract
 

@@ -18,7 +18,7 @@ All application labels and synthetic demo content are English. Researcher-entere
 
 ## Current status
 
-Local upload, media preflight, private playback, persistent investigations, canvas controls and report exports are implemented. Gemini ingestion and querying have mock-transport coverage. An initial GCP deployment and a bounded live Gemini image-understanding probe are verified; the complete live video-analysis pipeline, quality, latency and billing reconciliation remain pending.
+Local upload, media preflight, private playback, persistent investigations, canvas controls and report exports are implemented. Gemini ingestion and querying have mock-transport coverage. The GCP deployment now supports limited real Gemini testing for an explicitly approved browser session. One uploaded 18-second synthetic clip completed live ingestion, retrieval, visual verification, answer synthesis and editable finding saving. Broad model quality, real UX-recording validation, latency targets and billing reconciliation remain pending.
 
 **Default mode: `fixture`.** It makes no model requests and labels its preset answers and source video as synthetic. Uploaded footage can be checked and played in fixture mode, but cannot receive demo answers. Saving uses revision checks; a conflict is shown for recovery instead of overwriting another window's edits.
 
@@ -33,10 +33,16 @@ Google-managed HTTPS certificate; HTTP redirects to HTTPS. Browser checks verifi
 source playback, edited findings and restoration after refresh. Twenty live API
 checks also passed, including private video Range delivery and owner/CSRF checks.
 The Cloud Run frontend and durable Tokyo GCE backend are separate components with
-one browser origin. The cloud service currently runs the **labeled synthetic
-fixture**; uploaded footage supports preflight/playback, with model analysis blocked.
-A separate live Gemini 3.1 Flash-Lite call on one public synthetic frame validated
-image dispatch and response handling, not video retrieval or UX research quality.
+one browser origin. The cloud backend now runs **real Gemini** for the approved
+test session; the demo library retains its explicitly labeled preset answers.
+
+To test your own authorized recording, refresh the existing browser session,
+choose **Workspace menu → Upload video**, then **Sources → Start analysis**.
+Begin with a 30–120 second clip. Open the indexed source and ask a visual question.
+Google receives sampled JPEGs and retrieval text; the original video stays on the
+backend, and audio is not transcribed. The shared **JPY 600 model allowance is
+part of the JPY 3,000 total**, including calibration and smoke tests. Other browser
+sessions are not automatically funded. See [live test limits](docs/LIVE_GEMINI_TEST.md).
 
 The authorized test ceiling is JPY 3,000 through **October 19, 2026, 23:59 JST**.
 A local backup/cleanup automation is scheduled for 23:15 JST; the VM also has a

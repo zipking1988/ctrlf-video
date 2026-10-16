@@ -8,7 +8,7 @@ On 2026-10-14 the user requested a complete rename and a Gemini-only cleanup of 
 
 The private repository and local import commit were authorized. On 2026-10-14 the user explicitly authorized code review, fixes, an English README update and pushing the reviewed work to private `main`, superseding the earlier unpushed-import hold. Future pushes still require explicit authorization. Do not change visibility or publish source without explicit authorization. See [hackathon.md](hackathon.md) and [provenance](docs/provenance.md); event requirements are not permission to publish or deploy.
 
-Default `fixture` mode has labeled synthetic answers and makes no model requests. Upload, preflight, playback, investigations and exports work locally. The initial split GCP deployment and one separate live synthetic-image observation probe are verified; complete live video analysis, model quality and calibrated operating costs remain unverified. Do not claim complete MVP or GO.
+Default `fixture` mode has labeled synthetic answers and makes no model requests. Upload, preflight, playback, investigations and exports work locally. The split GCP deployment and a limited real Gemini pipeline on one uploaded synthetic clip are verified; broad model quality, actual UX recording value and settled operating costs remain unverified. Do not claim complete MVP or GO.
 
 On 2026-10-16 the user authorized a separate `ctrlfvideo` GCP project and split frontend/backend deployment, with JPY 3,000 total through October 19, 2026, 23:59 JST, including non-credit charges. Model calibration, verified finite per-call bounds and source consent still apply. Continued hosting after that window needs a new budget. The user authorized backing up test videos/investigations locally and then removing temporary cloud resources at cutoff. Verify a consistent local backup before deleting the cloud data; keep the original separate workspace untouched.
 
@@ -26,6 +26,8 @@ quota or an amount derived from the monetary budget. It was revised to 24 total
 attempts on October 16, retaining the four consumed attempts and every existing
 resource/time/model restriction. Do not describe release counts as billing credit
 or claim a verified remaining balance when billing data is unavailable.
+
+The user subsequently explicitly requested real Gemini uploads on ctrlfvideo.com within the same JPY 3,000 total. This supersedes the earlier paid-call hold for this limited test. The operator allocated a shared JPY 600 maximum, 40 model attempts and six primary calls to matching deployment/session ledgers, including calibration and smoke tests. No public automatic enrollment, budget resets or extra allowance is authorized. Model validity ends October 19 at 22:00 JST ahead of cleanup. Keep the key backend-only and preserve all reservations across deployments/rollback; see [live test limits](docs/LIVE_GEMINI_TEST.md). Billing remains unreconciled.
 
 ## Read before changing behavior
 
