@@ -1,0 +1,88 @@
+name: Test and deploy CtrlF Video
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      rollback_drill:
+        description: Verify a failed backend release recovers before deployment
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ctrlfvideo-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: '0.10.12'
+          python-version: '3.13.12'
+          enable-cache: false
+      - name: Install isolated media dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg bubblewrap
+      - name: Test frontend and verify committed assets
+        run: |
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git diff --exit-code -- src/ctrlf_video/static
+      - name: Check and test backend, Linux isolation and deployment recovery
+        run: |
+          uv sync --frozen
+          make check
+          make test
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: gcp-test
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Enforce authorized window before builds or credentials
+        run: python3 -c 'import time; assert time.time() < 1792414800, "Deployment window closed"'
+      - name: Build frontend from tested committed assets
+        run: docker build --target frontend -t "asia-northeast1-docker.pkg.dev/ctrlfvideo/ctrlfvideo/frontend:ci-${GITHUB_SHA}-${GITHUB_RUN_ID}" .
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: projects/655757141159/locations/global/workloadIdentityPools/ctrlfvideo-github/providers/main
+          service_account: ctrlfvideo-deployer@ctrlfvideo.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+        with:
+          version: '574.0.0'
+      - name: Push private image and deploy both components
+        env:
+          ROLLBACK_DRILL: ${{ inputs.rollback_drill || 'false' }}
+        run: |
+          gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
+          image="asia-northeast1-docker.pkg.dev/ctrlfvideo/ctrlfvideo/frontend:ci-${GITHUB_SHA}-${GITHUB_RUN_ID}"
+          docker push "$image"
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$image")"
+          export FRONTEND_IMAGE="$digest"
+          python3 deploy/gcp/deploy.py

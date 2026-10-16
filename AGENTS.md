@@ -14,6 +14,14 @@ On 2026-10-16 the user authorized a separate `ctrlfvideo` GCP project and split 
 
 On 2026-10-16 the user also explicitly authorized review, fixes and pushing these deployment changes to private `main`. This does not authorize source publication or automatic deployments on future pushes.
 
+Later on October 16 the user explicitly authorized CI/CD for both components,
+tests before deployment, and verified backend backup/rollback within the same
+JPY 3,000 total and October 19 cutoff. The private main workflow and its deployment
+pushes are authorized for that temporary window. Use keyless main-only federation;
+do not create service-account keys, enable paid model calls, add build servers or
+extend hosting. Preserve the release manager's finite allowance and earlier
+admission cutoff. Final cleanup shares its lock and permanently disables releases.
+
 ## Read before changing behavior
 
 Read [README](README.md), [ARCHITECTURE](ARCHITECTURE.md), [DESIGN](DESIGN.md), [runtime](docs/WORKSPACE_RUNTIME.md), [API](docs/api.md), [configuration](docs/configuration.md), [errors](docs/errors.md) and [TODOS](TODOS.md).

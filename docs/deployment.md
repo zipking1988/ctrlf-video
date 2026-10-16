@@ -189,31 +189,79 @@ The user authorized reviewing and pushing these deployment changes to private
 
 ## Release process and CI/CD
 
-As checked on October 16, neither service has automatic CI/CD. There is no
-GitHub Actions workflow; Cloud Build and Cloud Deploy APIs are disabled in
-`ctrlfvideo`. The current frontend was deployed with `gcloud`. A push to `main`
-changes source control only and does not redeploy the frontend or backend.
+The user subsequently authorized CI/CD for both components under the same total
+JPY 3,000 test ceiling. [GitHub Actions](../.github/workflows/ci-cd.yml) runs tests
+on pull requests and main code pushes. Only the successful main workflow can
+enter the `gcp-test` environment and obtain deployment credentials. Markdown-only
+main pushes skip it. No Cloud Build, Cloud Deploy, second VM, paid-model dispatch
+or persistent GitHub runner is introduced. Hosted Linux jobs have finite timeouts,
+no uploaded private artifacts and no paid cache configuration.
 
-Current releases are manual:
+Workload Identity Federation checks immutable repository/owner IDs, private
+visibility, main ref and the exact workflow ref. The deployment service account
+has temporary access to this image repository, frontend and backend SSH through
+IAP/OS Login, plus only required project metadata/operation reads. All cloud role
+bindings expire October 19 at 23:00 JST. There are no service-account keys or
+Gemini credentials in GitHub. The OS Login user has only the reviewed release
+command in sudoers; the runtime identity and original workspace remain separate.
 
-1. Run backend tests, lint/schema checks, frontend tests and the frontend build.
-   Verify generated assets and the reviewed commit; keep secrets/private data
-   outside the build context.
-2. Build the frontend target, push to the project's private Artifact Registry and
-   deploy the immutable digest to the existing Cloud Run service. Preserve its
-   private VPC, pinned secrets, CA verification and resource limits. Check public
-   liveness plus actual backend/session access before sending traffic.
-3. For a backend update, stop new traffic and the single backend process, create
-   and verify a consistent backup, install the reviewed source with frozen
-   dependencies, then restart systemd. Verify the native Linux decoder, private
-   media access and investigation restoration. Preserve the same durable data
-   and attempt ledger; do not start a second writer or replay paid requests.
+The workflow first runs Node frontend tests/build/hash checks, frozen Python
+lint/schema/tests and real Linux media isolation. It then builds/pushes the
+frontend image and uses its digest. On the backend,
+[the release manager](../deploy/gcp/backend_release.py):
 
-A future pipeline should run these checks before releasing each component.
-Frontend deployment can replace a stateless revision; backend deployment needs
-serialized maintenance, backup and recovery checks. Cloud deployment credentials,
-triggers and any hosting beyond the temporary window still need explicit scope
-and must not be inferred from permission to push source.
+1. Reserves one of four release attempts in root-owned durable state, stages a
+   separate immutable source directory and installs frozen dependencies. It runs
+   backend tests as the unprivileged service user on the actual deployment host.
+2. Rejects changes to `workspace.py`, `attempts.py`, `schema.py`, `api.py` or
+   `routes.py`. These temporary automatic releases cannot perform migrations or
+   incompatible API changes; new frontend/previous backend versions keep the same
+   public contract if a hosted runner disappears between components.
+3. Creates a fresh owned investigation, enables maintenance at private nginx and
+   stops the single backend writer. It archives `/data` plus private configuration
+   outside the checkout, restores to a private scratch copy, verifies every file's
+   SHA-256 and runs integrity checks on both restored SQLite databases. Insufficient
+   free space or a failed restore rejects the release before switching code.
+4. Atomically switches the code symlink, starts one backend, and checks fixture
+   health and the retained owned investigation. The backend remains in maintenance
+   until the frontend revision is ready. The frontend gets all traffic, the backend
+   finalizes, and public UI/session/backend checks must pass.
+5. On failure, restores the previous code and previous frontend traffic. It never
+   rewinds the live data or financial ledger, resurrects deleted sources, re-owns
+   sessions or replays model attempts. Backups remain private recovery copies.
+
+A managed systemd release unit survives SSH loss, recovers on failure/timeout,
+and a minute watchdog rolls back an abandoned pending release after ten minutes.
+A boot unit restores the previous code before starting an interrupted backend.
+Terminal-state maintenance markers are reconciled too. Failed recovery keeps
+maintenance and reports operator attention rather than claiming success.
+
+New workflow releases close October 19 at **22:00 JST**; the backend independently
+rechecks its **22:45 JST** cutoff before switching/finalizing. IAM expires at
+23:00. Final cleanup at 23:15 creates `/etc/ctrlfvideo/deploy-disabled`, stops the
+watchdog, and holds `/run/lock/ctrlfvideo-release.lock` while stopping writes and
+making the final consistent backup. No deployment may restart the backend after
+that marker. A four-attempt allowance includes the forced-failure drill and normal
+release; exhaustion requires explicit operator review under the existing budget.
+Billing reports can lag or fail; the budget alert is not a hard supplier cap.
+
+Recovery entry points on the VM (trusted operator only):
+
+```sh
+sudo /usr/local/sbin/ctrlfvideo-release recover
+sudo /usr/local/sbin/ctrlfvideo-release rollback FULL_PENDING_OR_COMMITTED_SHA
+```
+
+`recover` handles interrupted/unfinalized work. `rollback` requires the matching
+release and open deployment window. Do not restore live databases from a backup
+as an automatic rollback. Disaster data restoration needs a separately reviewed
+reconciliation of newer/deleted data and reserved model attempts. Installation is
+in [bootstrap_release.py](../deploy/gcp/bootstrap_release.py); release-control or
+persistence/API changes need a reviewed operator update, not self-modification.
+
+The first hosted deployment/forced-failure drill is pending verification at the
+time this workflow is introduced. Local fault-injection and native installation
+backup/restore checks are separate evidence, not a completed hosted release.
 
 ## Primary references
 

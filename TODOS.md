@@ -36,6 +36,8 @@ Updated: 2026-10-16. This is the current acceptance backlog, consolidated from o
 - [x] Obtain explicit GCP project/resource/region/spending/shutdown authorization for the initial test window.
 - [x] Validate Cloud Run ingress plus one durable GCE workspace, private token/HTTPS, cloud upload/playback and session/CSRF/Range integration tests.
 - [x] Download a consistent initial local backup; verify its checksum, both SQLite databases, source media and private configuration.
+- [x] Implement test-gated CI/CD, finite main-only deployment access, backend backup/restore checks and failure rollback regressions.
+- [ ] Record the first hosted pipeline and live forced-failure rollback drill results.
 - [ ] Verify containerized Linux decoding/file/network isolation and resource bounds without disabling protection before using that deployment target.
 - [ ] Validate disk encryption, expiry/deletion, restart recovery, consistent backups and restoration without resurrecting deleted media.
 - [ ] Test bounded concurrent query/ingestion workloads, cancellation/deletion races and capacity release on the target host.

@@ -86,12 +86,20 @@ requests under the same public origin; the backend retains one worker and durabl
 SQLite/media storage. See [deployment setup](docs/deployment.md) for configuration,
 the authorized test window and remaining cloud verification.
 
-**CI/CD is not configured.** GitHub has no repository workflow, and Cloud Build
-and Cloud Deploy are disabled in the test project. Pushing to `main` updates the
-private source repository; it does not deploy either service. The frontend is
-released manually by immutable image digest, and the single backend is updated
-manually under systemd with its durable data preserved. See the
-[release process](docs/deployment.md#release-process-and-cicd).
+**CI/CD:** [the GitHub workflow](.github/workflows/ci-cd.yml) tests frontend,
+backend, generated assets, schema and Linux isolation before deployment. Main
+code pushes deploy the Cloud Run frontend by immutable image digest and the
+single native backend through a consistent backup, isolated restore check and
+owned-investigation check. Pull requests run tests without cloud credentials;
+Markdown-only main pushes skip the pipeline. Credentials are short-lived and
+restricted to this private repository's main workflow.
+
+This temporary setup permits four backend release attempts, including the initial
+rollback drill. New releases close **October 19 at 22:00 JST**, leaving recovery
+time before cleanup. Automatic releases reject database/ledger/API contract
+changes; those need a reviewed migration. A rollback restores code and keeps the
+current workspace and model ledger. See the
+[release and recovery guide](docs/deployment.md#release-process-and-cicd).
 
 ```sh
 make test          # backend contracts and Gemini mock transports
