@@ -16,12 +16,12 @@
     />
     <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
-    <link rel="stylesheet" href="/static/fieldnotes.css?v=e124c6758924" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=db41c0c9e55f" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
-    <script src="/static/investigation-canvas.js?v=0472b3cc8e9f" defer></script>
+    <script src="/static/investigation-canvas.js?v=7b3a7fdc7962" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=ed151f859e0d" defer></script>
-    <script src="/static/workbench.js?v=3b309852091a" defer></script>
+    <script src="/static/workbench.js?v=2254756ad8fb" defer></script>
     <script src="/static/workspace.js?v=0a6b48f341ab" defer></script>
     <script src="/static/app.js?v=f5934c91be66" defer></script>
   </head>
@@ -410,7 +410,7 @@
       <section class="composer-area" aria-label="Ask about the recording">
         <form id="question-form">
           <div class="composer-context">
-            <label id="composer-label" for="question">Ask CtrlF Video</label
+            <label id="composer-label" for="question">Question</label
             ><button
               id="clear-context"
               class="text-button"
@@ -420,14 +420,16 @@
               New question
             </button>
           </div>
+          <span id="composer-parent" class="sr-only"></span>
           <textarea
             id="question"
             rows="2"
             maxlength="1000"
             placeholder="What would you like to find in this video?"
-            aria-describedby="question-help"
+            aria-describedby="composer-parent question-help composer-keyboard-hint"
           ></textarea>
           <div class="composer-tools">
+            <span id="composer-keyboard-hint" class="composer-keyboard-hint" title="Shift + Enter starts a new line">Enter to ask</span>
             <button
               id="attach-local"
               class="icon-button"

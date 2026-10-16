@@ -1,3 +1,19 @@
+# Question composer refinement — October 17, 2026
+
+final result: passed for the scoped local interface
+
+Scope: the user annotated `form#question-form` as ugly. Retain Review, source playback, saved answers and model admission behavior; refine the question control without introducing another overall design direction. Product Design context preflight found no saved preferences or references. The annotated live composer is the visual source, with the requested refinement as an intentional deviation.
+
+Evidence in ignored `.ctrlf-video-eval/composer-refinement/`: `01-source-focused.jpg` is the live, empty focused NBA composer; `05-final-empty.jpg` is the final local empty focused composer; `06-final-draft.jpg` shows the stable enabled action; `07-final-wide.jpg` and `08-final-unavailable.jpg` show the existing local NBA source without analysis. `comparison-full.jpg` and the focused `comparison-composer.jpg` were inspected together. Source/current comparison inputs are both 896 × 988 CSS/image pixels; DOM DPR 2 does not require additional scaling for these screenshot API outputs. Full comparison is 1792 × 1020 with a 32px label strip; the native-scale composer comparison is 770 × 244. Wide check is 1440 × 1024. The comparison uses local preset data for no-cost input interaction checks; source title, answer and disclosure differ from live NBA data. This is not replacement evidence for NBA model quality. The local preview was restored to the NBA source afterward.
+
+Required fidelity surfaces: **Typography** retains Instrument Sans, with 16px input, a compact 11px context label and 13px action. **Spacing/layout** removes the nested textarea outline, expands input width from 261px to 343px at the matched viewport and moves Ask into a footer row; the form intentionally grows from 133px to 168px. Both desktop widths have no horizontal overflow. **Colors** use the existing teal with a pale sage surface; the first placeholder contrast was insufficient and was corrected to approximately 4.7:1. Enabled white-on-teal text is approximately 6.7:1; disabled action has a separate muted treatment. Focus is visible on the outer form. **Images** preserve actual native source playback and all existing frames; no generated asset was introduced. **Copy** replaces the truncated parent sentence with Follow-up, retains its full question as tooltip and accessible description, and keeps preset, sampling, audio and analysis-state disclosures accurate. Disabled inputs hide the Enter shortcut.
+
+Interaction checks: typing enables the dark teal action; Shift+Enter adds a line and Enter submits the existing preset flow. New question clears the parent description and restores Question while preserving a typed draft. Existing follow-up anchoring regression checks the new label and full parent. Uploaded NBA playback reaches readyState 4, the unavailable composer stays disabled and the keyboard hint stays hidden. Browser warning/error logs were empty. Final viewport override was reset. Mobile is outside scope.
+
+Validation: 122 frontend regressions, frontend build, Ruff lint/format, contract checks, static asset hashes and whitespace checks passed. No backend/model behavior changed and no new model calls, index rebuilds or budget changes occurred. This refinement remains local, uncommitted and undeployed. The separately authorized allowance adjustment still awaits Google reauthentication and a fresh ledger audit.
+
+---
+
 # Code review and private-main release preparation — October 17, 2026
 
 Scope: the user explicitly requested review, fixes and a push to private main. Reviewed the complete pending authored diff, surrounding navigation/persistence/canvas callers and test bodies using the review checklist. A separate native adversarial reviewer reviewed authored code and callers, excluding the generated bundle and reviewing tests/fixtures in summary mode. No outside-provider review was invoked.

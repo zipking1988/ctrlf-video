@@ -867,7 +867,9 @@
       selected = id;
       callbacks.select(record.query.response, record.history);
       const scope = records.get(record.query.sourceTurn)?.query || record.query;
-      $("composer-label").textContent = `Follow up: ${scope.question}`;
+      $("composer-label").textContent = "Follow-up";
+      $("composer-label").title = scope.question;
+      $("composer-parent").textContent = `Following question: ${scope.question}`;
       $("clear-context").hidden = false;
       for (const [key, value] of records)
         value.select.setAttribute("aria-pressed", String(key === id));
@@ -877,7 +879,9 @@
     function clearScope() {
       selected = null; selectedIds.clear();
       detailFocus = null;
-      $("composer-label").textContent = "Ask about this recording";
+      $("composer-label").textContent = "Question";
+      $("composer-label").title = "";
+      $("composer-parent").textContent = "";
       $("clear-context").hidden = true;
       for (const record of records.values()) {
         record.turn.classList.remove("selected");

@@ -316,7 +316,7 @@ function AgentConversation() {
 function QuestionHelp() {
   const state = useDesk();
   const demo = !state.sourceInfo?.id || state.sourceInfo.id === "demo_parcel";
-  return <p className="question-help">{state.local ? "Questions are unavailable until analysis is ready. Open Sources to check status." : demo ? "Synthetic demo · preset answers only · no model calls." : "Answers use sampled frames. Replay citations to check them. Audio questions are unavailable."}</p>;
+  return <p className="question-help">{state.local ? "Analysis required. Check status in Sources." : demo ? "Preset demo · No model calls." : "Sampled frames · Check cited moments · No audio transcription."}</p>;
 }
 function SourceReviewHelp() {
   const state = useDesk();

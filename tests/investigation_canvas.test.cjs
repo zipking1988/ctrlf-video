@@ -402,7 +402,7 @@ test('Shift removing a nonprimary selection keeps follow-up anchored to the rema
  const records=new Map(['A','B'].map(id=>[id,{query:{id,question:id,response:{id}},select:{setAttribute(){}}}]));
  const ctx=vm.createContext({records,selectedIds,$,model:{expandPath(){}},detailFocus:null,selected:null,callbacks:{select(){}},draw(){},clearScope(){}});
  vm.runInContext(chooser,ctx);vm.runInContext("choose('A');choose('B',false,true);choose('A',false,true)",ctx);
- assert.equal(ctx.selected,'B');assert.equal(elements.get('composer-label').textContent,'Follow up: B');assert.deepEqual([...selectedIds],['B']);
+ assert.equal(ctx.selected,'B');assert.equal(elements.get('composer-label').textContent,'Follow-up');assert.equal(elements.get('composer-label').title,'B');assert.equal(elements.get('composer-parent').textContent,'Following question: B');assert.deepEqual([...selectedIds],['B']);
 });
 
 
