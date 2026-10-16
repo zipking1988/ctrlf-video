@@ -2,7 +2,46 @@
 
 Updated October 17, 2026. The user authorized real uploaded-video testing within the existing **JPY 3,000 aggregate cloud/model ceiling**, ending October 19 at 23:59 JST. This does not increase that ceiling or extend hosting. Real mode is active for the approved browser session. One uploaded 18-second synthetic clip completed ingestion, retrieval, visual verification, synthesis and editable finding saving. This is technical validation, not broad accuracy or UX acceptance.
 
-## Test workflow
+Current spending state: the October 17 one-question test below is complete and
+all model grants are revoked. Existing answers and source playback remain usable;
+new model work is not currently funded.
+
+## October 17 one-question authorization and result
+
+The user explicitly authorized at most **JPY 45 from the existing JPY 300 buffer**
+for **one new question on the existing NBA source**. The aggregate ceiling stays
+JPY 3,000; the cumulative model ceiling becomes JPY 1,245, infrastructure reserve
+stays JPY 1,500 and buffer becomes JPY 255. Both October 19 deadlines remain unchanged.
+
+A fresh audit confirmed v2 still reserved JPY 614 of JPY 761. Its unused JPY 147 was
+revoked and transferred with the authorized JPY 45 into a new JPY 192, seven-call,
+**zero-primary-call** query-only grant, `live_jpy1245_onequery_20261017_v3`.
+The unchanged v2 index was allowed for query-only reuse. No anonymous approval,
+index rebuild, cap reset, credential change or automatic model retry occurred.
+Consistent before/after backups were restored and checked using the existing
+project Python 3.13 runtime. Failed operator checks before activation made no
+model requests and left historical financial records unchanged.
+
+Request `2917c52b49e043678ff75bfb1cf5b03c` asked for a readable quarter/game-clock
+graphic in the first ten seconds, without supplying expected values or prior
+answer context. Real Gemini returned `partial`, no errors, one reviewed segment
+and a cited decoded frame at **00:00:01.001**: **3rd quarter, 5:55 remaining**.
+Human inspection of the actual cited JPEG confirmed `3RD QTR` and `5:55`.
+The original player was moved to 3.107094 seconds; clicking the new citation
+returned that same private source to 1.000999 seconds, paused, readyState 4.
+The point citation is verified; the response's broad event bounds (0–70.1701
+seconds) are review-window bounds, not a validated duration of that clock state.
+The sampled-coverage disclosure and earlier person-matching failures still apply.
+
+Five completed model calls reserved **JPY 109**; all 34 prior cloud attempt rows,
+source bytes, index manifest and generation were retained. Cumulative model
+reservations are **JPY 1,162**, including JPY 225 calibration, JPY 214 v1 and
+JPY 614 v2. The remaining JPY 83 of the one-query grant was revoked; all grants
+are now inactive. These are conservative reservations, not settled invoice
+charges or proof of the remaining aggregate cloud balance. Private result JSON,
+ledger audit, cited-frame and browser replay screenshots remain ignored locally.
+
+## Workflow for a separately approved funded test
 
 1. Keep the currently authorized browser session. Open [CtrlF Video](https://ctrlfvideo.com/), refresh, and open **Workspace menu → Model setup** to check prerequisites.
 2. Choose **Upload video**. Start with a 30–120 second recording you are authorized to process. Upload runs local media preflight, without a model request.
@@ -13,8 +52,8 @@ The synthetic demo continues to use labeled preset answers. For real analysis, s
 
 ## Operating limits
 
-- The **JPY 1,200 cumulative model reservation pool is part of the JPY 3,000 total**. It includes JPY 225 in the separate historical calibration ledger (including unknown calls) and JPY 214 already reserved in cloud v1. The replacement v2 grant has JPY 761 available, shared by deployment and the same explicitly approved session; the old unused JPY 386 is revoked, not added. This is an operator allocation, not a GCP quota or JPY 1,200 per visitor/reset.
-- The replacement grant limits new model attempts to 48 and initial visual indexing calls to eight; its JPY 761 money cap normally binds first. Atomic owner/deployment reservations enforce the first exhausted limit. Existing v1 usage is retained. There is no public automatic budget enrollment. About three additional single-window short clips plus one question each fit the current conservative bounds; multi-window footage and follow-ups consume more.
+- The original October 16 **JPY 1,200 cumulative model reservation pool was part of the JPY 3,000 total**; the explicitly authorized one-question adjustment above supersedes that allocation. It includes JPY 225 in the separate historical calibration ledger (including unknown calls) and JPY 214 already reserved in cloud v1. The replacement v2 grant originally allocated JPY 761, shared by deployment and the same explicitly approved session; the old unused JPY 386 is revoked, not added. This is an operator allocation, not a GCP quota or JPY 1,200 per visitor/reset.
+- The now-revoked October 16 replacement grant limited new model attempts to 48 and initial visual indexing calls to eight; its JPY 761 money cap normally binds first. Atomic owner/deployment reservations enforce the first exhausted limit. Existing v1 usage is retained. There is no public automatic budget enrollment. At that allocation, about three additional single-window clips and one question each fit the conservative bounds; no such remaining funding is implied after the later tests and revocations.
 - Generation uses `gemini-3.1-flash-lite` (verified revision `3.1-flash-lite-05-2026`); text retrieval uses `gemini-embedding-001` (revision `001`). Credentials stay solely in the private backend environment.
 - Every vision call reserves JPY 75; text/relevance calls reserve JPY 8; each embedding batch reserves JPY 10. These are conservative maximum-cost reservations, **not measured invoice charges**. A question requires several calls. Admission may stop a question while a small unusable balance remains.
 - Generation text is limited to 64 KiB before/after Unicode normalization; output including thinking is limited to 4,096 tokens. Inline requests remain under 19 MiB, with at most 128 decoded JPEGs. Embedding batches contain at most 100 texts and reject over-length input rather than silently truncating it.

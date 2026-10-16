@@ -276,6 +276,29 @@ function Outline() {
     </section>
   );
 }
+function QuestionHistory({ records, selectedId }) {
+  const history = useRef(null);
+  const index = records.findIndex(record => record.id === selectedId);
+  const select = id => {
+    if (!id) return;
+    ui()?.select(id);
+    history.current.open = false;
+    history.current.querySelector("summary").focus();
+  };
+  return <nav className="agent-history" aria-label="Question navigation">
+    <button type="button" className="question-step previous" aria-label="Previous question" disabled={index <= 0} onClick={() => select(records[index - 1]?.id)}>{icon("arrow-right")}</button>
+    <details className="question-history" ref={history}>
+      <summary><span>Question {index + 1} of {records.length}</span><span className="history-toggle">History {icon("list")}</span></summary>
+      <ol aria-label="Saved questions">{records.map((record, number) => <li key={record.id}>
+        <button type="button" aria-current={record.id === selectedId ? "true" : undefined} onClick={() => select(record.id)}>
+          <span className="history-number">{String(number + 1).padStart(2, "0")}</span>
+          <span className="history-copy"><span>{record.query.question}</span><small>{record.query.mode === "real" ? labels[record.query.response.status] : record.query.response.status === "ok" ? "Preset answer" : `Preset · ${labels[record.query.response.status]}`}</small></span>
+        </button>
+      </li>)}</ol>
+    </details>
+    <button type="button" className="question-step" aria-label="Next question" disabled={index >= records.length - 1} onClick={() => select(records[index + 1]?.id)}>{icon("arrow-right")}</button>
+  </nav>;
+}
 function AgentConversation() {
   const state = useDesk();
   const selected = state.records.find(record => record.id === state.selectedId);
@@ -291,7 +314,7 @@ function AgentConversation() {
   const response = query.response;
   const frames = [...new Map(response.events.flatMap(event => event.evidence).map(frame => [frame.uri, frame])).values()];
   return <section className="agent-conversation" aria-label="Agent conversation">
-    {state.records.length > 1 && <label className="agent-history">Conversation<select aria-label="Conversation question" value={selected.id} onChange={event => ui()?.select(event.target.value)}>{state.records.map((record, index) => <option key={record.id} value={record.id}>{index + 1}. {record.query.question}</option>)}</select></label>}
+    {state.records.length > 1 && <QuestionHistory records={state.records} selectedId={selected.id} />}
     <div className="agent-user"><span className="speaker-label">Your question</span><p>{query.question}</p></div>
     <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>Answer</strong><small>{query.mode === "real" ? "From sampled source frames" : "Synthetic demo · preset answer"}</small></div></div>
     <div className="agent-assistant">

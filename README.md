@@ -44,13 +44,17 @@ The Cloud Run frontend and durable Tokyo GCE backend are separate components wit
 one browser origin. The cloud backend now runs **real Gemini** for the approved
 test session; the demo library retains its explicitly labeled preset answers.
 
-To test your own authorized recording, refresh the existing browser session,
-choose **Workspace menu → Upload video**, then **Sources → Start analysis**.
-Begin with a 30–120 second clip. Open the indexed source and ask a visual question.
-Google receives sampled JPEGs and retrieval text; the original video stays on the
-backend, and audio is not transcribed. The cumulative **JPY 1,200 model reservation pool is
-part of the JPY 3,000 total**, including calibration and smoke tests. Other browser
-sessions are not automatically funded. See [live test limits](docs/LIVE_GEMINI_TEST.md).
+The October 17 one-question NBA test completed with a real answer and a verified
+source-frame replay. Its finite grant is now closed; saved answers, playback and
+exports remain available. New model work requires a separately funded approval.
+
+For a funded test, upload an authorized recording and use **Sources → Start analysis**,
+then ask a visual question. Google receives sampled JPEGs and retrieval text; the
+original video stays on the backend, and audio is not transcribed. The cumulative
+**JPY 1,245 model reservation ceiling is part of the JPY 3,000 total**, including
+historical calibration and attempts. The user approved at most JPY 45 from the
+existing buffer for this one question. Other browser sessions are not automatically
+funded. See [live test limits](docs/LIVE_GEMINI_TEST.md).
 
 The authorized test ceiling is JPY 3,000 through **October 19, 2026, 23:59 JST**.
 A local backup/cleanup automation is scheduled for 23:15 JST; the VM also has a

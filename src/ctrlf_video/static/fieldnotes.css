@@ -384,8 +384,22 @@
 .fieldnotes.canvas-first.review-desk .agent-result-actions .text-button { font-size: 12px; }
 .fieldnotes.canvas-first.review-desk .agent-welcome h2 { font-size: 24px; line-height: 1.25; letter-spacing: -.7px; margin: 28px 0 14px; }
 .fieldnotes.canvas-first.review-desk .agent-welcome .outline-button { margin-top: 14px; }
-.fieldnotes.canvas-first.review-desk .agent-history { font-size: 11px; margin-bottom: 18px; }
-.fieldnotes.canvas-first.review-desk .agent-history select { font-size: 12px; }
+.fieldnotes.canvas-first.review-desk .agent-history { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: start; gap: 8px; font-size: 13px; margin-bottom: 20px; }
+.question-step { display: grid; place-items: center; width: 40px; min-height: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; }
+.question-step .icon, .history-toggle .icon { width: 16px; height: 16px; }
+.question-step.previous .icon { transform: rotate(180deg); }
+.question-step:disabled { opacity: .4; }
+.question-step:hover:not(:disabled), .question-history > summary:hover { background: #f4f6f0; }
+.question-history { min-width: 0; }
+.question-history > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--text); cursor: pointer; list-style: none; }
+.question-history > summary::-webkit-details-marker { display: none; }
+.history-toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; }
+.question-history ol { display: flex; flex-direction: column; gap: 4px; list-style: none; margin: 8px 0 0; padding: 0; }
+.question-history li button { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 6px; text-align: left; white-space: normal; overflow-wrap: anywhere; background: transparent; color: var(--text); font-size: 13px; line-height: 1.5; }
+.question-history li button:hover { background: #f4f6f0; }
+.question-history li button[aria-current="true"] { border-color: #ced8cf; background: #eaf1eb; }
+.history-number, .history-copy small { color: var(--muted); font-size: 11px; }
+.history-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .fieldnotes.canvas-first.review-desk .composer-area { position: relative; margin: 0; padding: 20px 24px 24px; background: #fffefa; border-top: 1px solid var(--line); }
 .fieldnotes.canvas-first.review-desk .composer-area form { grid-template-columns: minmax(0, 1fr) 40px; gap: 10px; padding: 12px; border: 1px solid var(--control-border); border-radius: 10px; background: var(--surface); }
 .fieldnotes.canvas-first.review-desk .composer-context { font-size: 11px; }
@@ -518,7 +532,8 @@
 .review-source-help h2 { font-size: 18px; font-weight: 650; line-height: 1.4; }
 .review-source-help p { font-size: 14px; line-height: 1.65; color: var(--muted); margin: 10px 0 16px; }
 .review-source-help button { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; max-width: 100%; }
-.fieldnotes.canvas-first.review-desk.review-first .agent-chat { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 56px auto auto minmax(0, 1fr); grid-template-areas: "heading" "composer" "context" "answer"; border-left: 1px solid var(--line); }
+.fieldnotes.canvas-first.review-desk.review-first .agent-chat { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 56px max-content max-content max-content; grid-template-areas: "heading" "composer" "context" "answer"; align-content: start; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; border-left: 1px solid var(--line); }
+.fieldnotes.canvas-first.review-desk.review-first .agent-chat:focus-visible { outline-offset: -3px; }
 .fieldnotes.canvas-first.review-desk.review-first.chat-collapsed .agent-chat { display: none; }
 .fieldnotes.canvas-first.review-desk.review-first .agent-chat-heading { grid-area: heading; min-height: 0; height: 56px; margin: 0 24px; gap: 16px; }
 .fieldnotes.canvas-first.review-desk.review-first .agent-chat-heading > span { font-size: 18px; color: var(--text); border: 0; }
@@ -546,7 +561,8 @@
 .question-help { font-size: 11px; color: var(--muted); line-height: 1.55; margin-top: 10px; }
 @media (prefers-reduced-motion: reduce) { .fieldnotes.canvas-first.review-desk.review-first .composer-area form { transition: none; } }
 .fieldnotes.canvas-first.review-desk.review-first #research-task { grid-area: context; }
-.fieldnotes.canvas-first.review-desk.review-first #agent-conversation-root { grid-area: answer; min-height: 0; overflow-y: auto; padding: 22px 24px; }
+.fieldnotes.canvas-first.review-desk.review-first .research-context[open] > .research-brief { position: static; max-height: none; overflow: visible; margin: 0; padding: 6px 0 18px; border: 0; border-radius: 0; box-shadow: none; }
+.fieldnotes.canvas-first.review-desk.review-first #agent-conversation-root { grid-area: answer; min-height: auto; overflow: visible; padding: 22px 24px; }
 .fieldnotes.canvas-first.review-desk.review-first .agent-welcome h2 { margin-top: 0; font-size: 23px; }
 .fieldnotes.canvas-first.review-desk.review-first .agent-welcome .partner-identity { display: none; }
 .fieldnotes.canvas-first.review-desk.review-first .agent-user { margin-bottom: 20px; }
@@ -568,6 +584,6 @@
   .fieldnotes.canvas-first.review-desk.review-first .review-intro h1 { font-size: 24px; }
   .fieldnotes.canvas-first.review-desk.review-first .source-dock { padding: 20px; }
   .fieldnotes.canvas-first.review-desk.review-first .agent-chat-heading { margin-left: 20px; margin-right: 20px; }
-  .fieldnotes.canvas-first.review-desk.review-first .composer-area, .fieldnotes.canvas-first.review-desk.review-first #agent-conversation-root { padding-left: 20px; padding-right: 20px; }
+  .fieldnotes.canvas-first.review-desk.review-first .composer-area, .fieldnotes.canvas-first.review-desk.review-first #research-task, .fieldnotes.canvas-first.review-desk.review-first #agent-conversation-root { padding-left: 20px; padding-right: 20px; }
 }
 @media (max-width: 850px) { .fieldnotes.canvas-first.review-desk.review-first.workbench-shell { display: none; } }

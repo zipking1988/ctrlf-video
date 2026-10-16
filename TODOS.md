@@ -1,12 +1,12 @@
 # CtrlF Video — Remaining Work
 
-Updated: 2026-10-16. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
+Updated: 2026-10-17. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
 
 ## First-use-case validation
 
 - [x] Begin the authorized [UX recording spec](SPEC.md); keep the sports video as a technical development sample only.
 - [x] Implement saved task briefs, immutable submitted context, purpose labels and structured findings in reports.
-- [ ] Obtain a playable local sports source; YouTube download returned 403. Follow [sample protocol](docs/SPORTS_SAMPLE.md).
+- [x] Obtain and verify a playable local sports source; the uploaded NBA clip is a technical sample, not UX validation. See [live test evidence](docs/LIVE_GEMINI_TEST.md).
 - [ ] Obtain the actual UX recording and participant task; manually annotate visible events before model testing.
 - [ ] Verify short-lived interface states and small text under current sampling bounds before deciding the rebuild scope.
 - [ ] Measure source-grounded findings and researcher review time separately from technical sample performance.
@@ -23,7 +23,7 @@ Updated: 2026-10-16. This is the current acceptance backlog, consolidated from o
 
 - [x] Verify account-accessible generation/embedding IDs and revisions, live JSON/image dispatch and both embedding task types.
 - [ ] Validate over-limit embedding inputs and a representative multilingual dataset against the real provider.
-- [x] Record the explicit JPY 3,000 authorization, JPY 1,200 cumulative model pool (historical reservations retained, replacement grant JPY 761), conservative per-role maximum costs, finite attempts/validity and existing resource cutoffs.
+- [x] Record the explicit JPY 3,000 authorization, later JPY 1,245 cumulative model ceiling, retained historical reservations and finite per-role/attempt/time bounds. The October 17 one-question grant is complete and all model grants are revoked; see [live test limits](docs/LIVE_GEMINI_TEST.md).
 - [x] Run one uploaded synthetic clip through real ingestion, retrieval, visual verification, synthesis, editable finding saving and refresh after a real-mode rollback.
 - [ ] Resolve observed spatial wording errors (the first live answer called a left-of-center box centered); preserve source-linked human corrections.
 - [ ] Run authorized ingestion -> question -> follow-up -> actual source evidence -> findings/export -> refresh/restore.
