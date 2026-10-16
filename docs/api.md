@@ -4,7 +4,7 @@ Updated: 2026-10-14. The FastAPI `/docs` and `/openapi.json` expose concrete inp
 
 ## Ownership and HTTP operations
 
-`GET /api/session` initializes the `ctrlf_session` HttpOnly/SameSite=Strict cookie and returns the CSRF token. Writes require `X-CTRLF-CSRF` and valid Origin. Every private source/frame/job/query/investigation checks owner and expiry. The public synthetic `demo_parcel` media is the only exception.
+`GET /api/session` initializes the `ctrlf_session` HttpOnly/SameSite=Strict cookie and returns the CSRF token. Writes require `X-CTRLF-CSRF` and valid Origin. Every private source/frame/job/query/investigation checks owner and expiry. The public synthetic `demo_parcel` media is the exception within those media routes. The separately selected [recorded-test copy](JUDGE_WALKTHROUGH.md) is served under `/static/judge/`, with no private-media endpoint or anonymous analysis approval. Its versioned public asset map resolves sanitized answer references to the public static JPEG.
 
 | Operation | Purpose |
 | --- | --- |

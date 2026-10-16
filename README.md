@@ -8,7 +8,9 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 The default **Review** view places the video on the left and a visible question box on the right. Ask a visual question, then click a cited timestamp to check the original footage. **Canvas** is the optional spatial view for organizing questions, source frames and findings. `/#review` opens the workspace directly.
 
-First-time visitors see a product entry page with a real workspace screenshot and a source-linked question → frame → finding example. **Explore synthetic demo** is available above and below the example; **Upload a recording** uses the existing upload/preflight path. The screenshot, video and preset answers are explicitly labeled synthetic and do not establish model quality or UX-study value. Existing recordings, research context and drafts restore directly. The CtrlF Video rail button reopens the start page; `/#start` opens it directly, and `/#evidence-chain` opens its How it works section, while preserving the restored investigation. **Demo library** is also available directly in the workspace header.
+First-time visitors see **Explore real test results**, linking to the [recorded-test walkthrough](https://ctrlfvideo.com/static/judge/index.html). No sign-in or model approval is needed to replay its public source, write a browser-local finding and download a report. It uses a saved real Gemini result, not a new request or a fixture answer. Six development attempts, including failures, are disclosed. See [judge access](docs/JUDGE_WALKTHROUGH.md) for provenance, public-media permission and scope.
+
+The existing workspace screenshot and source-linked question → frame → finding example remain explicitly synthetic. **Explore synthetic demo** is available above and below that example; **Upload a recording** uses the existing upload/preflight path. Synthetic answers do not establish model quality or UX-study value. Existing private recordings, research context and drafts restore directly. The CtrlF Video rail button reopens the start page; `/#start` opens it directly, and `/#evidence-chain` opens its How it works section, while preserving the restored investigation. **Demo library** is also available directly in the workspace header.
 
 **How it works** explains the approved Gemini path: searchable descriptions of sampled frames → retrieval of candidate moments → visual review → source-timestamp replay and a researcher-saved finding. The implementation uses Gemini rather than a custom-trained model, and sampling can miss brief events.
 
@@ -43,6 +45,11 @@ checks also passed, including private video Range delivery and owner/CSRF checks
 The Cloud Run frontend and durable Tokyo GCE backend are separate components with
 one browser origin. The cloud backend now runs **real Gemini** for the approved
 test session; the demo library retains its explicitly labeled preset answers.
+
+The public recorded-test walkthrough uses a deliberately selected media/result
+copy, independent of private source/session expiry. Each visitor's finding stays
+in their own browser; it does not modify the original investigation. Private
+source access, session ownership and model budgets retain their existing guards.
 
 The October 17 one-question NBA test completed with a real answer and a verified
 source-frame replay. Its finite grant is now closed; saved answers, playback and

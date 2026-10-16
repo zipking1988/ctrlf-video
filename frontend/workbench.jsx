@@ -159,6 +159,10 @@ function WorkspaceNavigation() {
               Demo library<small>Explore six synthetic demo paths</small>
             </span>
           </button>
+          <a className="workspace-menu-item" href="/static/judge/index.html">
+            {icon("play")}
+            <span>Real test walkthrough<small>Replay recorded Gemini evidence and export your finding</small></span>
+          </a>
           <button
             className="workspace-menu-item"
             onClick={() => run(() => ui()?.openLocal())}

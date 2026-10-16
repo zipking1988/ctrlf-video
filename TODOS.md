@@ -48,6 +48,8 @@ Updated: 2026-10-17. This is the current acceptance backlog, consolidated from o
 
 ## Quality, performance and UX
 
+- [x] Implement a recorded real-test walkthrough for anonymous visitors: public source replay, browser-local findings and shared-renderer report exports, with the user's confirmed basketball demonstration permission. Independent judge access lasts only while the existing deployment runs; hosting beyond October 19 remains unapproved. See [judge walkthrough](docs/JUDGE_WALKTHROUGH.md).
+
 - [ ] Freeze reviewed annotations and instrument actual retrieval/model/result traces; retain missing/failed cases and human evidence reviews.
 - [ ] Complete development-set commitment (>=10 videos/30 questions); disclose actual independent report-set size (goal >=30/100).
 - [ ] Measure Recall@5 >=80%, full event coverage at IoU>=0.5 >=70%, schema >=99% and evidence support >=90%; targets remain unmeasured.

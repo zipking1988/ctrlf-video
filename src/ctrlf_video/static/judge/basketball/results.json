@@ -1,0 +1,122 @@
+{
+  "version": "basketball-20261017-v1",
+  "title": "Basketball technical sample",
+  "source": {
+    "id": "judge_basketball_20261017",
+    "name": "Basketball technical sample.mp4",
+    "duration_seconds": 70.203467,
+    "url": "/static/judge/basketball/source.mp4",
+    "original_sha256": "dfc0d9d33bcd62d2e8b3b8451f30ca4577c8ae79e83faf11b936d3f53a2a3374",
+    "public_video_sha256": "0c9424e1dd66f0f9823831e4b2ed22b7f81362740667212c8d65bcf2183e9a2a",
+    "source_url": "https://www.youtube.com/watch?v=WZwbp2nNFhY"
+  },
+  "provenance": {
+    "kind": "recorded_gemini",
+    "recorded_date": "2026-10-17",
+    "model": "Gemini 3.1 Flash-Lite",
+    "new_model_requests": 0,
+    "disclosure": "Saved real Gemini result on a sports technical sample. No new analysis runs in this walkthrough. This is not UX validation or an accuracy benchmark.",
+    "public_copy": "Public aliases replace private source/request/frame identifiers. Answer text, status, event bounds and source timestamps are retained. The public JPEG was decoded again from the same original source at the cited 1.001s; the video was remuxed without re-encoding. Answer media references keep the schema 0.1 format; public_assets resolves these aliases to the public JPEG, without exposing a private media endpoint.",
+    "media_permission": "User confirmed permission for public judge demonstration on 2026-10-17."
+  },
+  "query": {
+    "id": "recorded-scoreboard",
+    "turn_id": "task-1",
+    "parent_turn_id": null,
+    "question": "Within the first 10 seconds, find a readable broadcast score graphic. What team names and scores does it show? Cite one supporting source frame and its timestamp.",
+    "task_brief": "Technical video retrieval test on a sports broadcast. Locate visible moments, cite actual source frames and timestamps, and disclose any sampling uncertainty. This is not a UX study.",
+    "study_type": "technical_sample",
+    "mode": "real",
+    "retained_by_finding": false,
+    "response": {
+      "schema_version": "0.1",
+      "status": "partial",
+      "timebase": "video_absolute_seconds",
+      "answer": "The broadcast score graphic displays the Milwaukee Bucks with 51 points and the Atlanta Hawks with 56 points, as observed at the 00:00:01.001 timestamp.",
+      "events": [
+        {
+          "video_id": "judge_basketball_20261017",
+          "start": 0,
+          "end": 70.1701,
+          "start_hms": "00:00:00",
+          "end_hms": "00:01:10.17",
+          "action": "The broadcast score graphic shows the Milwaukee Bucks with 51 points and the Atlanta Hawks with 56 points.",
+          "summary": "The broadcast score graphic shows the Milwaukee Bucks with 51 points and the Atlanta Hawks with 56 points.",
+          "support_level": "medium",
+          "evidence": [
+            {
+              "t": 1.001,
+              "t_hms": "00:00:01.001",
+              "frame_id": "judge_basketball_20261017_scoreboard_1_001",
+              "uri": "/media/judge_basketball_20261017/frames/scoreboard-1-001.jpg",
+              "caption": "The broadcast score graphic shows the Milwaukee Bucks with 51 points and the Atlanta Hawks with 56 points.",
+              "asr": null
+            }
+          ]
+        }
+      ],
+      "unresolved": [
+        "Only candidate segments were reviewed, not every frame of the full video."
+      ],
+      "followups": [],
+      "trace": {
+        "visible": {
+          "channels": [
+            "visual_vector"
+          ],
+          "segments_reviewed": 1,
+          "evidence_segments": 1
+        },
+        "debug": null
+      },
+      "errors": []
+    }
+  },
+  "reviewed_finding": {
+    "title": "Scoreboard verified · 00:01.001",
+    "observation": "At source time 00:00:01.001, the broadcast graphic visibly shows MILWAUKEE 51 and ATLANTA 56. The real Gemini answer, decoded evidence frame and source-player seek agree. Manually checked against original 1280×720 playback.",
+    "interpretation": "",
+    "openQuestions": "Only selected segments were reviewed, so the answer remains partial. Earlier failed requests and the previous incorrect 0-second summary remain in this investigation. This sample validates the technical question-to-evidence flow, not broad model accuracy or UX research value."
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "task": "Close-up",
+      "model_status": "error",
+      "review": "No valid evidence; planning failed."
+    },
+    {
+      "attempt": 2,
+      "task": "Close-up",
+      "model_status": "ok",
+      "review": "Human review accepted the 47.047s frame, rejected 65s / 66s matches. The summary preferred a false match."
+    },
+    {
+      "attempt": 3,
+      "task": "Scoreboard",
+      "model_status": "error",
+      "review": "No valid evidence; planning failed."
+    },
+    {
+      "attempt": 4,
+      "task": "Scoreboard",
+      "model_status": "partial",
+      "review": "Scores matched; prose said 0s while the cited frame was at 1.001s."
+    },
+    {
+      "attempt": 5,
+      "task": "Scoreboard",
+      "model_status": "partial",
+      "review": "Milwaukee 51 / Atlanta 56 at 1.001s. Cited frame and original playback checked."
+    },
+    {
+      "attempt": 6,
+      "task": "Quarter / game clock",
+      "model_status": "partial",
+      "review": "3rd quarter / 5:55 at 1.001s. Cited frame and original playback checked."
+    }
+  ],
+  "public_assets": {
+    "judge_basketball_20261017_scoreboard_1_001": "/static/judge/basketball/frames/scoreboard-1-001.jpg"
+  }
+}

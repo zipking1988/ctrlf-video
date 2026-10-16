@@ -37,3 +37,12 @@ for (const file of [
   );
 }
 await writeFile(base + "index.html", html);
+let judgeHtml = await readFile(base + "judge/index.html", "utf8");
+for (const file of ["investigation-report.js", "judge/model.js", "judge/app.js", "judge/styles.css"]) {
+  const hash = createHash("sha256").update(await readFile(base + file)).digest("hex").slice(0, 12);
+  judgeHtml = judgeHtml.replace(
+    new RegExp("/static/" + file.replaceAll(".", "\\.") + "(?:\\?v=[a-f0-9]+)?", "g"),
+    `/static/${file}?v=${hash}`,
+  );
+}
+await writeFile(base + "judge/index.html", judgeHtml);

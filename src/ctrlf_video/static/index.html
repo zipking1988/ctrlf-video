@@ -20,8 +20,8 @@
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
     <script src="/static/investigation-canvas.js?v=7b3a7fdc7962" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
-    <script src="/static/investigation-report.js?v=ed151f859e0d" defer></script>
-    <script src="/static/workbench.js?v=386232c1a31f" defer></script>
+    <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
+    <script src="/static/workbench.js?v=1724561b6841" defer></script>
     <script src="/static/workspace.js?v=0a6b48f341ab" defer></script>
     <script src="/static/app.js?v=f5934c91be66" defer></script>
   </head>
@@ -37,6 +37,7 @@
           <a href="/" class="welcome-brand">CtrlF Video<span>Ctrl+F for video</span></a>
           <nav class="welcome-nav" aria-label="Product navigation">
             <button id="welcome-resume" type="button" hidden>Open workspace</button>
+            <a href="/static/judge/index.html">Real test results</a>
             <a href="#evidence-chain">How it works</a>
             <a href="/docs">API docs</a>
           </nav>
@@ -47,10 +48,11 @@
             <h1 id="welcome-title" tabindex="-1">Turn a UX recording into findings you can verify.</h1>
             <p>Ask visual questions, replay timestamped evidence and export source-linked findings.</p>
             <div class="welcome-actions">
-              <button id="welcome-demos" class="welcome-primary" type="button" disabled>Explore synthetic demo <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></button>
+              <a href="/static/judge/index.html" class="welcome-primary">Explore real test results <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></a>
+              <button id="welcome-demos" class="welcome-secondary" type="button" disabled>Explore synthetic demo <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></button>
               <button id="welcome-upload" class="welcome-secondary" type="button" disabled><img src="/static/icons/folder-open.svg" width="20" height="20" alt="" /> Upload a recording</button>
             </div>
-            <p class="welcome-access">One recording per investigation.<br />Synthetic demo uses preset answers.<br />Gemini analysis requires an approved session.</p>
+            <p class="welcome-access">Real test walkthrough uses saved Gemini results.<br />Synthetic demo uses preset answers.<br />New analysis requires an approved session.</p>
             <p id="welcome-notice" role="status">Connecting to your workspace…</p>
             <button id="welcome-retry" class="text-button" type="button" hidden>Reload to reconnect</button>
             <p class="welcome-stack">Built with Gemini · Deployed on Google Cloud</p>
