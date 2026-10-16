@@ -39,7 +39,22 @@ jobs:
       - name: Install isolated media dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends ffmpeg bubblewrap
+          sudo apt-get install -y --no-install-recommends ffmpeg bubblewrap apparmor
+          # Ubuntu restricts capabilities in unprivileged namespaces. Load the
+          # package's binary-specific policy; keep the global restriction enabled.
+          found=false
+          for profile in /etc/apparmor.d/*bwrap*; do
+            if [ -f "$profile" ]; then
+              sudo apparmor_parser -r "$profile"
+              found=true
+            fi
+          done
+          if [ "$found" = false ]; then
+            printf '%s\n' 'abi <abi/4.0>,' 'include <tunables/global>' \
+              'profile ctrlf-ci-bwrap /usr/bin/bwrap flags=(unconfined) {' \
+              '  userns,' '}' | sudo tee /etc/apparmor.d/ctrlf-ci-bwrap >/dev/null
+            sudo apparmor_parser -r /etc/apparmor.d/ctrlf-ci-bwrap
+          fi
       - name: Test frontend and verify committed assets
         run: |
           npm ci --ignore-scripts
