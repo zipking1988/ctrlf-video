@@ -89,6 +89,7 @@ def filtered_headers(headers, *, request=False):
 
 def create_gateway(*, transport=None, serve_frontend=False):
     public = https_origin(os.environ.get("CTRLF_PUBLIC_ORIGIN"))
+    upstream_public = https_origin(os.environ.get("CTRLF_BACKEND_PUBLIC_ORIGIN", public))
     backend = https_origin(os.environ.get("CTRLF_BACKEND_ORIGIN"))
     if public == backend:
         raise RuntimeError("Gateway backend must differ from the public origin")
@@ -134,6 +135,9 @@ def create_gateway(*, transport=None, serve_frontend=False):
         "/{path:path}", methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     )
     async def proxy(request: Request, path: str):
+        origin = request.headers.get("origin")
+        if request.method not in {"GET", "HEAD", "OPTIONS"} and origin and origin != public:
+            return JSONResponse({"detail": "origin_rejected"}, status_code=403)
         try:
             size = int(request.headers.get("content-length", "0"))
             if size < 0:
@@ -147,8 +151,14 @@ def create_gateway(*, transport=None, serve_frontend=False):
             raw_path += b"?" + request.scope["query_string"]
         target = httpx.URL(backend).copy_with(raw_path=raw_path)
         headers = filtered_headers(request.headers, request=True)
+        if origin == public:
+            # A custom frontend origin can share the existing durable backend.
+            # Rewrite only the exactly validated browser origin; CSRF and private
+            # ownership checks still run at the backend's configured origin.
+            headers = [(key, value) for key, value in headers if key.lower() != b"origin"]
+            headers.append((b"origin", upstream_public.encode()))
         headers += [
-            (b"host", urlparse(public).netloc.encode()),
+            (b"host", urlparse(upstream_public).netloc.encode()),
             (TOKEN_HEADER.encode(), token.encode()),
             (b"x-forwarded-proto", b"https"),
         ]
@@ -183,7 +193,23 @@ def create_gateway(*, transport=None, serve_frontend=False):
             chunks(), status_code=response.status_code, background=BackgroundTask(response.aclose)
         )
         # Keep duplicate Set-Cookie headers and the original encoding/content length.
-        result.raw_headers = filtered_headers(response.headers)
+        result.raw_headers = []
+        for key, value in filtered_headers(response.headers):
+            if key.lower() == b"location":
+                location = urlparse(value.decode("latin-1"))
+                if (
+                    location.scheme in {"http", "https"}
+                    and location.netloc == urlparse(upstream_public).netloc
+                ):
+                    # Native backend HTTP slash redirects must stay on the
+                    # browser's HTTPS origin, without translating foreign hosts.
+                    frontend = urlparse(public)
+                    value = (
+                        location._replace(scheme=frontend.scheme, netloc=frontend.netloc)
+                        .geturl()
+                        .encode("latin-1")
+                    )
+            result.raw_headers.append((key, value))
         return result
 
     return app

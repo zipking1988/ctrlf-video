@@ -132,6 +132,80 @@ async def test_gateway_has_no_storage_replaces_spoofed_headers_and_preserves_coo
 
 
 @pytest.mark.anyio
+async def test_custom_frontend_origin_preserves_backend_origin_csrf_and_owner_checks(
+    monkeypatch, tmp_path
+):
+    configure(monkeypatch, tmp_path)
+    backend = create_app(Settings())
+    # Separate processes have separate configuration. Capture the frontend's
+    # configuration, then restore the backend environment for real ASGI requests.
+    with monkeypatch.context() as frontend_env:
+        frontend_env.setenv("CTRLF_PUBLIC_ORIGIN", "https://ctrlfvideo.com")
+        frontend_env.setenv("CTRLF_BACKEND_PUBLIC_ORIGIN", "https://public.example")
+        gateway = create_gateway(transport=httpx.ASGITransport(app=backend), serve_frontend=True)
+    async with gateway.router.lifespan_context(gateway):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=gateway), base_url="https://ctrlfvideo.com"
+        ) as client:
+            session = await client.get("/api/session")
+            assert session.status_code == 200 and "Secure" in session.headers["set-cookie"]
+            headers = {"origin": "https://ctrlfvideo.com", "x-ctrlf-csrf": session.json()["csrf"]}
+            desk = await client.post("/api/investigations", json={}, headers=headers)
+            assert desk.status_code == 201, desk.text
+            redirect = await client.get("/api/investigations/")
+            assert redirect.status_code == 307
+            assert redirect.headers["location"] == "https://ctrlfvideo.com/api/investigations"
+            rejected = await client.post(
+                "/api/investigations",
+                json={},
+                headers={**headers, "origin": "https://foreign.example"},
+            )
+            assert rejected.status_code == 403 and rejected.json()["detail"] == "origin_rejected"
+            assert (
+                await client.post(
+                    "/api/investigations", json={}, headers={"origin": headers["origin"]}
+                )
+            ).status_code == 403
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=gateway), base_url="https://ctrlfvideo.com"
+            ) as foreign:
+                await foreign.get("/api/session")
+                assert (
+                    await foreign.get("/api/investigations/" + desk.json()["id"])
+                ).status_code == 404
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "location,expected",
+    [
+        ("http://public.example/api?q=1#item", "https://ctrlfvideo.com/api?q=1#item"),
+        ("https://public.example.evil.example/api", "https://public.example.evil.example/api"),
+        ("/api", "/api"),
+    ],
+)
+async def test_custom_origin_redirects_translate_only_the_trusted_backend_authority(
+    monkeypatch, tmp_path, location, expected
+):
+    configure(monkeypatch, tmp_path)
+    monkeypatch.setenv("CTRLF_PUBLIC_ORIGIN", "https://ctrlfvideo.com")
+    monkeypatch.setenv("CTRLF_BACKEND_PUBLIC_ORIGIN", "https://public.example")
+    gateway = create_gateway(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                307, headers={"location": location}, stream=httpx.ByteStream(b"")
+            )
+        )
+    )
+    async with gateway.router.lifespan_context(gateway):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=gateway), base_url="https://ctrlfvideo.com"
+        ) as client:
+            result = await client.get("/api/test")
+            assert result.headers["location"] == expected
+
+
+@pytest.mark.anyio
 async def test_gateway_failure_is_explicit_and_does_not_retry(monkeypatch, tmp_path):
     configure(monkeypatch, tmp_path)
     calls = []

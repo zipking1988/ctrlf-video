@@ -88,20 +88,22 @@ The local Python/ASGI tests exercise the gateway and real workspace together.
 ### Custom domain preparation (October 16)
 
 `ctrlfvideo.com` is delegated to the public Cloud DNS zone `ctrlfvideo-com` in
-this temporary project. Existing root A/MX/SPF records were retained during the
-nameserver change. The domain is **not yet bound to the application**: Google
-requires account ownership verification before creating the Cloud Run mapping.
-The owner account's Search Console verification form failed to open, and its
-existing CLI credentials lack Site Verification API scopes. No ownership bypass,
-new OAuth grant, custom-domain certificate or successful HTTPS test is claimed.
+this temporary project. Google ownership verification passed using the user's
+TXT record alongside the retained SPF. The Cloud Run mapping exists and its
+returned A/AAAA records replace the previous parking address; managed certificate
+issuance is pending at this preparation stage. No successful custom-domain HTTPS
+test is claimed until the live certificate and application checks pass.
 
-After obtaining the account's DNS TXT verification record, append it alongside
-the existing SPF record, complete Google verification, create the mapping and
-apply exactly the returned A/AAAA records. Wait for the managed certificate to
-be ready before changing the application's canonical origin. Back up private
-configuration and use maintenance plus the release lock while switching the
-backend `CTRLF_PUBLIC_ORIGIN` and frontend environment to the same HTTPS origin.
-Keep the current data/ledger and enforce host, session and CSRF checks.
+The frontend can use `CTRLF_PUBLIC_ORIGIN=https://ctrlfvideo.com` while the
+durable backend retains its existing canonical origin. Set gateway-only
+`CTRLF_BACKEND_PUBLIC_ORIGIN` to that backend canonical origin (the default is
+the frontend public origin). The gateway rejects foreign browser Origins on
+unsafe methods and translates only an exactly matched frontend Origin to the
+trusted backend canonical origin. It rebuilds Host, preserves the backend's
+CSRF/session/ownership checks, and rewrites redirects only for that same canonical
+authority to the frontend HTTPS origin. Relative/foreign redirect hosts remain
+unchanged. No backend configuration switch, data copy or ownership transfer is
+needed for the domain change; retained frontend revisions provide rollback.
 
 The publisher reads `CTRLF_PUBLIC_ORIGIN` from the existing Cloud Run service
 instead of assuming the default hostname. Only the existing run.app origin and
@@ -114,7 +116,7 @@ domain does not extend the hosting authorization.
 
 | Component | Required configuration |
 | --- | --- |
-| Frontend | `CTRLF_COMPONENT=frontend`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, optional `CTRLF_BACKEND_CA_FILE`, `PORT` |
+| Frontend | `CTRLF_COMPONENT=frontend`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, optional `CTRLF_BACKEND_PUBLIC_ORIGIN`, optional `CTRLF_BACKEND_CA_FILE`, `PORT` |
 | Workspace | `CTRLF_COMPONENT=workspace`, same `CTRLF_PUBLIC_ORIGIN` and private `CTRLF_GATEWAY_TOKEN`, persistent `CTRLF_DATA_DIR`, trusted `CTRLF_RUNTIME_FILE`, backend-only `GEMINI_API_KEY`, `CTRLF_VIDEO_MODE=real` only after prerequisites |
 
 Both origins must be exact HTTPS origins without credentials, path, query or

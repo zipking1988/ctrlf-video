@@ -35,6 +35,7 @@ Use `CTRLF_VIDEO_COARSE_FRAMES=8 make preflight` or `CTRLF_VIDEO_CONFIG=/absolut
 | `CTRLF_PUBLIC_ORIGIN` | Reviewed public HTTPS origin |
 | `CTRLF_COMPONENT` | `workspace` default, stateless `gateway`, or `frontend` UI/gateway |
 | `CTRLF_BACKEND_ORIGIN` | Separate HTTPS durable workspace origin for gateway |
+| `CTRLF_BACKEND_PUBLIC_ORIGIN` | Gateway-only optional canonical HTTPS origin expected by the backend; defaults to `CTRLF_PUBLIC_ORIGIN`. Allows a custom frontend domain without changing durable backend configuration. |
 | `CTRLF_GATEWAY_TOKEN` | Private 32–256 printable-ASCII token shared by gateway/backend |
 | `CTRLF_BACKEND_CA_FILE` | Optional reviewed PEM CA file for a private HTTPS backend; certificate and hostname verification remain enabled |
 | `CTRLF_REQUIRE_DATA_MOUNT` | `1` requires explicit workspace volume mount; container default |
