@@ -35,6 +35,8 @@ An empty relevance-selection list falls back to the highest hybrid candidates up
 
 Planning requests use Gemini's structured output with a required `inspect` array of integers, and explicitly separate window selection from answering the user's question. Server-side validation still rejects missing fields, noninteger/out-of-range indices and more than three selections before any visual review. A valid JSON answer to the research question is not accepted as a plan or as evidence. The optional schema is included in the existing request fingerprint and bounded syntax repair; ingest requests are unchanged.
 
+Synthesis receives the validated source frame IDs with their decoded `t` and `t_hms`, alongside each observation. Review-window `start`/`end` remain separate and are not frame timestamps. This preserves the precise source time across the visual-review-to-summary boundary; it does not establish model semantic correctness.
+
 ## Gemini transmission and dispatch
 
 Only `https://generativelanguage.googleapis.com/v1beta` is accepted. Trusted runtime configuration must explicitly set `allow_google_media=true`, supply fixed verified models/revisions, backend key references, conservative per-role cost bounds and valid calibration/cutoff references.

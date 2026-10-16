@@ -186,6 +186,73 @@ async def test_empty_relevance_selection_still_requires_bounded_visual_verificat
 
 
 @pytest.mark.anyio
+async def test_synthesis_receives_decoded_frame_times_instead_of_only_review_window_bounds(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("TEST_GEMINI_KEY", "test-secret")
+    calls, cited, summaries = [], [], []
+    normal = handler(calls)
+
+    def respond(request):
+        payload = json.loads(request.content)
+        if request.url.path.endswith(":generateContent"):
+            parts = payload["contents"][0]["parts"]
+            text = parts[0]["text"]
+            if any("inlineData" in part for part in parts) and not text.startswith("Describe"):
+                frame = [json.loads(p["text"]) for p in parts[1:] if "text" in p][2]
+                cited.append(frame)
+                calls.append((request, payload))
+                return response(
+                    {
+                        "observations": [
+                            {"frame_ids": [frame["frame_id"]], "statement": "A box is visible."}
+                        ],
+                        "unresolved": [],
+                    }
+                )
+            if not any("inlineData" in part for part in parts):
+                prompt = json.loads(text)
+                if "observations" in prompt:
+                    calls.append((request, payload))
+                    summaries.append(prompt)
+                    evidence = prompt["observations"][0].get("evidence", [])
+                    timestamp = evidence[0]["t"] if evidence else prompt["observations"][0]["start"]
+                    return response(
+                        {
+                            "answer": f"A box is visible at {timestamp} seconds.",
+                            "followups": [],
+                            "unresolved": [],
+                        }
+                    )
+        return normal(request)
+
+    app, client, video, desk = await setup_real(
+        tmp_path, monkeypatch, calls, runtime_factory=configuration, response_handler=respond
+    )
+    try:
+        result = await client.post(
+            "/api/chat",
+            json={
+                "investigation_id": desk["id"],
+                "request_id": "req_exact_frame_times",
+                "generation": 0,
+                "question": "When is the box visible?",
+            },
+        )
+        assert result.status_code == 200, result.text
+        answer = Answer.model_validate(result.json()["response"])
+        frame = answer.events[0].evidence[0]
+        assert frame.t > answer.events[0].start
+        assert frame.t == cited[0]["t"]
+        assert f"at {frame.t} seconds" in answer.answer
+        evidence = summaries[0]["observations"][0]["evidence"]
+        assert evidence == [{"frame_id": frame.frame_id, "t": frame.t, "t_hms": frame.t_hms}]
+        assert (await client.get(frame.uri)).status_code == 200
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.anyio
 async def test_gemini_upload_index_followup_evidence_ownership_and_idempotency(
     tmp_path, monkeypatch
 ):
