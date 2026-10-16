@@ -31,6 +31,8 @@ Publication requires complete visual segments, vectors and existing evidence fil
 
 Queries bind context to an owned, current video/generation and verified prior answer. Combine BM25 and vector rankings, then use Gemini to select relevant candidate descriptions. This is relevance selection, not a dedicated reranker with calibrated scores. Text planning selects at most three visual review windows. All initial/expanded/retried visual review attempts share the three-attempt limit; at most one syntax repair is allowed. Provider/model/revision changes invalidate query reuse. Budget rollover can explicitly allow ready indices from at most eight predecessor budget versions through trusted `query_index_budget_versions`; all new query admission and attempts use the current approved owner/deployment grant. Original manifests, ingest checkpoints and financial history remain unchanged. Ingest resume still requires an exact frozen configuration match; the query compatibility list cannot resume or replay ingestion.
 
+An empty relevance-selection list falls back to the highest hybrid candidates up to `rerank_k`, before the existing three-window visual-review limit. Sparse descriptions cannot establish visual absence. Invalid relevance or planning indices still fail validation; the fallback does not add model retries or bypass budget admission.
+
 ## Gemini transmission and dispatch
 
 Only `https://generativelanguage.googleapis.com/v1beta` is accepted. Trusted runtime configuration must explicitly set `allow_google_media=true`, supply fixed verified models/revisions, backend key references, conservative per-role cost bounds and valid calibration/cutoff references.

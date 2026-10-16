@@ -781,6 +781,10 @@ class Agent:
             set(indices)
         ) != len(indices):
             raise AgentError("invalid_rerank")
+        # Sparse descriptions can miss a visible moment. An empty relevance
+        # selection is not visual absence; retain bounded hybrid candidates.
+        if not indices:
+            indices = list(range(min(self.settings.rerank_k, len(candidates))))
         selected = [segments[candidates[i]] for i in dict.fromkeys(indices)][
             : self.settings.rerank_k
         ]

@@ -111,6 +111,70 @@ def handler(calls, *, fake_frame=False):
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("visible_match", [True, False])
+async def test_empty_relevance_selection_still_requires_bounded_visual_verification(
+    tmp_path, monkeypatch, visible_match
+):
+    monkeypatch.setenv("TEST_GEMINI_KEY", "test-secret")
+    calls, plans = [], []
+    normal = handler(calls)
+
+    def respond(request):
+        payload = json.loads(request.content)
+        if request.url.path.endswith(":generateContent"):
+            parts = payload["contents"][0]["parts"]
+            prompt = parts[0]["text"]
+            if not any("inlineData" in p for p in parts):
+                prompt = json.loads(prompt)
+                if "documents" in prompt:
+                    calls.append((request, payload))
+                    return response({"results": []})
+                if "candidates" in prompt:
+                    calls.append((request, payload))
+                    plans.append(prompt)
+                    # Reproduce the valid plan returned by the live NBA query.
+                    return response({"inspect": [0]})
+            elif not visible_match and not prompt.startswith("Describe"):
+                calls.append((request, payload))
+                return response({"observations": [], "unresolved": [], "no_match": True})
+        return normal(request)
+
+    app, client, video, desk = await setup_real(
+        tmp_path,
+        monkeypatch,
+        calls,
+        runtime_factory=configuration,
+        response_handler=respond,
+    )
+    try:
+        body = {
+            "investigation_id": desk["id"],
+            "request_id": "req_empty_relevance",
+            "generation": 0,
+            "question": "Find the visible object and cite a source frame.",
+        }
+        result = await client.post("/api/chat", json=body)
+        assert result.status_code == 200, result.text
+        answer = Answer.model_validate(result.json()["response"])
+        assert answer.status == ("ok" if visible_match else "no_result")
+        assert plans and 1 <= len(plans[0]["candidates"]) <= app.state.agent.settings.rerank_k
+        with app.state.agent.ledger._connect() as conn:
+            attempts = conn.execute("SELECT kind,state FROM attempts").fetchall()
+        assert sum(r["kind"] == "zoom" for r in attempts) == 1
+        assert len(attempts) == len(calls)
+        assert all(r["state"] == "completed" for r in attempts)
+        for event in answer.events:
+            assert event.video_id == video
+            for frame in event.evidence:
+                assert (await client.get(frame.uri)).status_code == 200
+        before = len(calls)
+        assert (await client.post("/api/chat", json=body)).json() == result.json()
+        assert len(calls) == before
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.anyio
 async def test_gemini_upload_index_followup_evidence_ownership_and_idempotency(
     tmp_path, monkeypatch
 ):
