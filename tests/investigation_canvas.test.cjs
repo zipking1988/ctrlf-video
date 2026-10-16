@@ -428,3 +428,48 @@ test('holding Shift before title drag preserves selection and still begins a fre
  handler({button:0,shiftKey:true,pointerId:1,clientX:10,clientY:20,preventDefault(){}});
  assert.deepEqual([...selectedIds],['A','B']);assert.equal(ctx.selected,'A');assert.equal(ctx.gesture.kind,'card');assert.deepEqual(Array.from(ctx.gesture.ids),['A','B']);
 });
+
+test('hidden review canvas preserves card geometry, manual positions and view until measured', () => {
+  const fs = require('node:fs'), vm = require('node:vm');
+  const source = fs.readFileSync(require.resolve('../src/ctrlf_video/static/investigation-canvas.js'), 'utf8');
+  const fit = source.slice(source.indexOf('    function fit() {'), source.indexOf('    function choose('));
+  const reveal = source.slice(source.indexOf('    function reveal('), source.indexOf('    viewport.addEventListener("pointerdown"'));
+  const model = createModel({docked:true});
+  model.add('first', null); model.move('first', 100, 200); model.pan(30, 50);
+  const before = model.snapshot();
+  const viewport = {clientWidth:0, clientHeight:0};
+  let measurements = 0;
+  const ctx = vm.createContext({model, viewport, detailFocus:null,
+    size:()=>({width:viewport.clientWidth, height:viewport.clientHeight}),
+    draw(){ measurements++; }, canvasFirst:true, docked:true, reviewDesk:true,
+    window:{CtrlFVideoWorkbench:{}},
+  });
+  vm.runInContext(fit + reveal, ctx);
+  vm.runInContext("fit(); reveal('first', true)", ctx);
+  assert.deepEqual(model.snapshot(), before);
+  assert.equal(measurements, 0);
+  model.add('second', 'first'); model.add('frame', 'second', {kind:'evidence'});
+  assertNoOverlap(model.visible());
+  viewport.clientWidth = 900; viewport.clientHeight = 600;
+  vm.runInContext('fit()', ctx);
+  assert.ok(measurements > 0);
+  assertNoOverlap(model.visible());
+  assert.equal(model.items.get('first').x, 100);
+  assert.equal(model.items.get('first').y, 200);
+});
+
+test('hidden canvas draw never replaces retained dimensions with zero DOM measurements', () => {
+  const fs = require('node:fs'), vm = require('node:vm');
+  const source = fs.readFileSync(require.resolve('../src/ctrlf_video/static/investigation-canvas.js'), 'utf8');
+  const draw = source.slice(source.indexOf('    function draw() {'), source.indexOf('    function drawMinimap('));
+  const model = createModel({docked:true}); model.add('first', null);
+  const item = model.items.get('first');
+  const before = {...item};
+  for (const [width,height] of [[0,0],[0,600],[900,0]]) {
+    const ctx = vm.createContext({model, viewport:{clientWidth:width,clientHeight:height}});
+    vm.runInContext(draw + '\ndraw();', ctx);
+    assert.deepEqual(item, before);
+  }
+  model.add('second', 'first');
+  assertNoOverlap(model.visible());
+});

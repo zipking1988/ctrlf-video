@@ -497,6 +497,8 @@
       });
     }
     function draw() {
+      // Review hides the canvas. Keep its last geometry until it is measurable.
+      if (!viewport.clientWidth || !viewport.clientHeight) return;
       for(const id of selectedIds)if(!model.items.has(id))selectedIds.delete(id);
       const { x, y, scale } = model.view;
       density = reviewDesk ? "overview" : densityFor(scale, density);
@@ -833,6 +835,7 @@
       callbacks.announce("All investigation paths expanded.");
     });
     function fit() {
+      if (!viewport.clientWidth || !viewport.clientHeight) return;
       detailFocus = null;
       draw();
       const s = size();
@@ -1176,6 +1179,7 @@
     function reveal(id, readable = false) {
       const item = model.items.get(id);
       if (!item) return;
+      if (!viewport.clientWidth || !viewport.clientHeight) return;
       if (readable) detailFocus = id;
       draw();
       if (window.CtrlFVideoWorkbench) {

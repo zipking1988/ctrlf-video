@@ -376,6 +376,11 @@
       else if(desks.length)await openDesk(desks[0].id);else await create(demo);
       store().subscribe(changed);
       window.addEventListener("ctrlf-video-canvas-changed",changed);
+      // Citation clicks and native playback controls can change time after pointerup.
+      // Save settled positions, without treating continuous playback as an edit.
+      ["seeked", "pause"].forEach(event => $("player").addEventListener(event, () => {
+        if (JSON.stringify(snapshot()) !== lastSaved) changed();
+      }));
       ["pointerup","keyup","wheel"].forEach(event=>document.addEventListener(event,()=>{if(JSON.stringify(snapshot())!==lastSaved)changed();},{passive:true}));
       document.addEventListener("visibilitychange",()=>{if(document.hidden)flush().catch(()=>{});});
       $("open-investigations").onclick=()=>library().catch(e=>ui().notify(e.message));

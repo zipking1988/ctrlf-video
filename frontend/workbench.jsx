@@ -95,6 +95,9 @@ function WorkspaceNavigation() {
             {state.records.length} questions · {state.pins.length} findings
           </p>
           <p className="menu-section-label">Workspace</p>
+          <button className="workspace-menu-item" onClick={() => run(() => ui()?.review())}>
+            {icon("play")}<span>Review video<small>Ask a question and replay cited moments</small></span>
+          </button>
           <button
             className="workspace-menu-item"
             onClick={() => run(() => ui()?.canvas())}
@@ -135,6 +138,9 @@ function WorkspaceNavigation() {
           </button>
           <button className="workspace-menu-item" onClick={() => run(() => document.getElementById("open-agent-setup").click())}>{icon("code")}<span>Model setup<small>Readiness and approved budgets</small></span></button>
           <p className="menu-section-label">Investigation actions</p>
+          <button className="workspace-menu-item" onClick={() => run(() => document.getElementById("export-report").click())}>
+            {icon("stack")}<span>Export report<small>Preview and download findings with sources</small></span>
+          </button>
           <button
             className="workspace-menu-item"
             onClick={() => run(() => ui()?.newTask())}
@@ -199,7 +205,7 @@ function ProjectTitle() {
         maxLength={80}
       />
       <span className="session-label">Autosaved</span>
-      <p className="project-caption">UX recording review · Questions, evidence and findings</p>
+      <p className="project-caption">Video questions with moments you can replay</p>
     </div>
   );
 }
@@ -273,12 +279,13 @@ function Outline() {
 function AgentConversation() {
   const state = useDesk();
   const selected = state.records.find(record => record.id === state.selectedId);
+  const needsSetup = state.sourceInfo?.job?.state === "awaiting_configuration";
   if (!selected) return <section className="agent-conversation agent-welcome">
     <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>CtrlF</strong><small>Your research partner</small></div></div>
-    <h2>What should we investigate?</h2>
-    <p>Ask about a moment in your recording. Review the source frames, then turn the evidence into a finding.</p>
+    <h2>{state.local ? "Watch now. Ask after analysis." : "What would you like to find?"}</h2>
+    <p>{state.local ? needsSetup ? "This workspace is not configured for analysis. Your video is saved and can be played; questions are unavailable here until analysis is enabled and completed." : "Your video is saved and ready to play. Questions become available after this recording has been analyzed." : "Ask about something visible in the video. The answer will include moments you can click to replay."}</p>
     <p className="agent-disclosure">{state.local ? "Playback only · this source is not ready for analysis." : state.sourceInfo?.id && state.sourceInfo.id !== "demo_parcel" ? "Uploaded source · Gemini reviews sampled frames. No audio transcription." : "Synthetic demo · preset answers, no model calls"}</p>
-    <button className="outline-button" onClick={() => document.getElementById("question").focus()}>Ask about the video {icon("arrow-right")}</button>
+    {state.local ? <button className="outline-button" onClick={() => ui()?.sources()}>Check analysis status {icon("arrow-right")}</button> : !state.sourceInfo?.id || state.sourceInfo.id === "demo_parcel" ? <button className="demo-question-button" onClick={() => ui()?.askDemoQuestion("When is the package at the center?")}>Try: When is the package at the center? {icon("arrow-right")}</button> : <button className="outline-button" onClick={() => document.getElementById("question").focus()}>Ask about this video {icon("arrow-right")}</button>}
   </section>;
   const {query} = selected;
   const response = query.response;
@@ -286,7 +293,7 @@ function AgentConversation() {
   return <section className="agent-conversation" aria-label="Agent conversation">
     {state.records.length > 1 && <label className="agent-history">Conversation<select aria-label="Conversation question" value={selected.id} onChange={event => ui()?.select(event.target.value)}>{state.records.map((record, index) => <option key={record.id} value={record.id}>{index + 1}. {record.query.question}</option>)}</select></label>}
     <div className="agent-user"><span className="speaker-label">Your question</span><p>{query.question}</p></div>
-    <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>CtrlF</strong><small>{query.mode === "real" ? "Answer from sampled source frames" : "Synthetic demo · preset answer"}</small></div></div>
+    <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>Answer</strong><small>{query.mode === "real" ? "From sampled source frames" : "Synthetic demo · preset answer"}</small></div></div>
     <div className="agent-assistant">
     <p className="agent-answer">{response.answer}</p>
     <p className="agent-disclosure">{query.mode === "real" ? labels[response.status] : "Synthetic demo · preset result"}</p>
@@ -294,17 +301,30 @@ function AgentConversation() {
       <p>{query.mode === "real" ? `${response.trace?.visible?.segments_reviewed ?? 0} segments reviewed. These frames support this answer; they do not establish what happened between samples.` : "This example uses preset answers and synthetic source frames. No model request was made."}</p>
       <button className="text-button" onClick={() => ui()?.openInspector("context")}>Inspect evidence details</button>
     </details>
-    {!!frames.length && <div className="agent-frames" aria-label="Supporting source frames">{frames.map(frame => {
-      const saved = state.pins.some(pin => pin.kind === "evidence" && pin.frame.uri === frame.uri && pin.frame.t === frame.t);
+    {!!frames.length && <div className="agent-frames" aria-label="Supporting source frames"><p className="replay-instruction">Click a timestamp to watch that moment.</p>{frames.map(frame => {
+      const saved = state.pins.find(pin => pin.kind === "evidence" && pin.frame.uri === frame.uri && pin.frame.t === frame.t);
       return <div className="agent-frame-row" key={frame.uri}>
-        <button className="agent-frame-replay" onClick={() => ui()?.seek(frame.t, query)} aria-label={`Replay agent frame ${clock(frame.t)}`}><img src={frame.uri} alt={frame.caption || "Source frame"} /><span><strong>{icon("play")}{clock(frame.t)}</strong><small>{frame.caption || "Replay source frame"}</small></span></button>
-        <button className="agent-frame-pin" aria-label={`${saved ? "Locate" : "Pin"} frame ${clock(frame.t)} on canvas`} disabled={!saved && state.pins.length >= 8} onClick={() => ui()?.saveEvidence(selected.id, query, frame)} title={saved ? "Locate on canvas" : "Pin frame to canvas"}>{icon(saved ? "stack" : "plus")}</button>
+        <button className="agent-frame-replay" onClick={() => ui()?.seek(frame.t, query)} aria-label={`Replay agent frame ${clock(frame.t)}`}><img src={frame.uri} alt={frame.caption || "Source frame"} /><span><strong>{icon("play")}{clock(frame.t)} · Watch this moment</strong><small>{frame.caption || "Replay source frame"}</small></span></button>
+        <button className="agent-frame-pin" aria-label={`${saved ? "Locate" : "Pin"} frame ${clock(frame.t)} on canvas`} disabled={!saved && state.pins.length >= 8} onClick={() => saved ? ui()?.focusFinding(saved.id) : ui()?.saveEvidence(selected.id, query, frame)} title={saved ? "Locate on canvas" : "Pin frame to canvas"}>{icon(saved ? "stack" : "plus")}</button>
       </div>;
     })}</div>}
     {!!response.unresolved.length && <section className="agent-unresolved" aria-label="What remains unknown"><h3>Still to verify</h3>{response.unresolved.map(text => <p key={text}>{text}</p>)}</section>}
     </div>
-    <div className="agent-result-actions">{["ok", "partial"].includes(response.status) && <button className="save-finding-action" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>{icon("stack")}Edit as finding</button>}<button className="text-button" disabled={state.local} onClick={() => ui()?.continueFrom(selected.id)}>Follow up {icon("arrow-right")}</button></div>
+    <details className="agent-result-actions"><summary>Save an observation or follow up</summary>{["ok", "partial"].includes(response.status) && <button className="save-finding-action" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>{icon("stack")}Write a finding</button>}<button className="text-button" disabled={state.local} onClick={() => ui()?.continueFrom(selected.id)}>Follow up on this answer {icon("arrow-right")}</button></details>
   </section>;
+}
+function QuestionHelp() {
+  const state = useDesk();
+  const demo = !state.sourceInfo?.id || state.sourceInfo.id === "demo_parcel";
+  return <p className="question-help">{state.local ? "Questions are unavailable until analysis is ready. Open Sources to check status." : demo ? "Synthetic demo · preset answers only · no model calls." : "Answers use sampled frames. Replay citations to check them. Audio questions are unavailable."}</p>;
+}
+function SourceReviewHelp() {
+  const state = useDesk();
+  const demo = !state.sourceInfo?.id || state.sourceInfo.id === "demo_parcel";
+  const answered = state.records.length > 0;
+  const title = state.local ? "Your video is ready to watch" : !answered ? demo ? "Try the package video" : "Find a moment in this recording" : "Check the answer in the video";
+  const explanation = state.local ? "You can play this recording now. The question panel explains when analysis is available; no demo answers will be used for your video." : demo && !answered ? "This 18-second synthetic clip shows a package in different positions. Ask when it is at the center, then click a cited moment to check." : !answered ? "Ask about something visible in this recording using the question box on the right. Then replay the returned timestamps to check the source." : "Click a timestamp on the right to jump to that moment. Play a few seconds before and after it to check what happened.";
+  return <section className="review-source-help"><h2>{title}</h2><p>{explanation}</p>{demo && !state.local ? answered ? <button className="outline-button" onClick={() => ui()?.newQuestion()}>Ask a new question {icon("arrow-right")}</button> : <button className="outline-button" onClick={() => ui()?.askDemoQuestion("When is the package at the center?")}>Try the example question {icon("arrow-right")}</button> : null}</section>;
 }
 function SourceEvidenceStrip() {
   const state = useDesk();
@@ -538,7 +558,7 @@ function Inspector() {
                 </button>
                 <button
                   className="text-button"
-                  onClick={() => ui()?.select(selected.id)}
+                  onClick={() => ui()?.locate(selected.id)}
                 >
                   Locate on canvas
                 </button>
@@ -1034,3 +1054,5 @@ createRoot(document.getElementById("composer-source")).render(<ComposerSource />
 
 createRoot(document.getElementById("agent-conversation-root")).render(<AgentConversation />);
 createRoot(document.getElementById("source-evidence-strip")).render(<SourceEvidenceStrip />);
+createRoot(document.getElementById("question-help")).render(<QuestionHelp />);
+createRoot(document.getElementById("review-source-help")).render(<SourceReviewHelp />);

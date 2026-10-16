@@ -30,10 +30,14 @@ function showWelcome(show, focus = false) {
 }
 
 $("welcome-upload").addEventListener("click", () => $("file-input").click());
-$("welcome-demos").addEventListener("click", () => {
-  showWelcome(false);
-  openDemoLibrary();
-});
+$("review-upload").addEventListener("click", () => $("file-input").click());
+const welcomeDemoButtons = [$("welcome-demos"), $("welcome-proof-demos")];
+for (const control of welcomeDemoButtons) {
+  control.addEventListener("click", () => {
+    showWelcome(false);
+    openDemoLibrary();
+  });
+}
 $("workspace-demos").addEventListener("click", openDemoLibrary);
 $("welcome-resume").addEventListener("click", () => showWelcome(false, true));
 $("open-welcome").addEventListener("click", () => {
@@ -529,6 +533,7 @@ async function startScenario(id) {
   $("demo-current").hidden = false;
   window.CtrlFVideoWorkbench?.setStudyType("technical_sample");
   window.CtrlFVideoWorkbench?.rename(`${scenario.title} investigation`);
+  setWorkspaceView("review");
   if (window.CtrlFVideoWorkbench && window.innerWidth < 1400) {
     $("zoom-reset").click();
     investigation.choose(turnIds[0]);
@@ -561,7 +566,7 @@ function renderScenarios() {
   $("open-demos").disabled = false;
   $("demo-library-empty").disabled = false;
   $("workspace-demos").disabled = false;
-  $("welcome-demos").disabled = !entryConnected;
+  for (const control of welcomeDemoButtons) control.disabled = !entryConnected;
 }
 $("open-demos").addEventListener("click", openDemoLibrary);
 $("demo-library-empty").addEventListener("click", openDemoLibrary);
@@ -589,7 +594,7 @@ function setLocalMode(enabled) {
   $("question").disabled = enabled;
   $("question").placeholder = enabled
     ? "This video is not indexed. Questions are unavailable."
-    : "Ask a follow-up or give the agent a task…";
+    : "What would you like to find in this video?";
   document.querySelectorAll("[data-query]").forEach((element) => {
     element.disabled = enabled || !demo;
   });
@@ -630,6 +635,22 @@ function setChatOpen(open, focus = false) {
   }
   if (focus) (open ? $("question") : $("agent-launcher")).focus();
 }
+function setWorkspaceView(view, focus = false) {
+  const review = view === "review";
+  const shell = document.querySelector(".agent-shell");
+  shell.classList.toggle("review-first", review);
+  $("rail-review").classList.toggle("active", review);
+  $("rail-canvas").classList.toggle("active", !review);
+  $("rail-review").setAttribute("aria-pressed", String(review));
+  $("rail-canvas").setAttribute("aria-pressed", String(!review));
+  if (review) {
+    setSourceExpanded(false);
+    setSourceOpen(true);
+    setChatOpen(true, focus && !$("question").disabled);
+  }
+}
+$("rail-review").addEventListener("click", () => setWorkspaceView("review", true));
+$("rail-canvas").addEventListener("click", () => setWorkspaceView("canvas"));
 function toggleInspector() {
   const shell = document.querySelector(".agent-shell");
   if (shell.classList.contains("inspector-collapsed")) {
@@ -637,6 +658,9 @@ function toggleInspector() {
   } else {
     shell.classList.add("inspector-collapsed");
     syncInspectorToggle();
+    if (shell.classList.contains("review-first")) {
+      setChatOpen(true);
+    }
     $(shell.classList.contains("fieldnotes") ? "rail-findings" : "toggle-inspector").focus();
   }
 }
@@ -752,6 +776,11 @@ function removeFinding(id) {
   if (source) investigation?.choose(source);
   announce("Removed from findings; you can save it again.");
 }
+function locateOnCanvas(id) {
+  setWorkspaceView("canvas");
+  investigation?.choose(id);
+  investigation?.reveal(id);
+}
 window.CtrlFVideoUI = {
   select: (id) => {
     investigation?.choose(id);
@@ -765,16 +794,26 @@ window.CtrlFVideoUI = {
     placeFinding(window.CtrlFVideoWorkbench?.pinFrame(id, query, frame)),
   saveConclusion: (id, query) =>
     placeFinding(window.CtrlFVideoWorkbench?.pinConclusion(id, query)),
-  focusFinding: (id) => {
-    investigation?.choose(id);
-    investigation?.reveal(id);
-  },
+  focusFinding: locateOnCanvas,
+  locate: locateOnCanvas,
   removeFinding,
   toggleInspector,
   demos: openDemoLibrary,
   openInspector,
   toggleSource: () => $("rail-source").click(),
   canvas: () => $("rail-canvas").click(),
+  review: () => setWorkspaceView("review", true),
+  sources: () => $("open-sources").click(),
+  newQuestion: () => {
+    setWorkspaceView("review", true);
+    $("clear-context").click();
+  },
+  askDemoQuestion: (question) => {
+    if (!activeVideo && !localMode) {
+      setWorkspaceView("review");
+      ask(question);
+    }
+  },
   openLocal: () => $("open-local").click(),
   newTask,
   continueFrom: (id) => {
@@ -985,10 +1024,14 @@ window.CtrlFVideoSessionUI = {
   entryReady(welcome) {
     entryConnected = true;
     $("welcome-upload").disabled = false;
-    $("welcome-demos").disabled = !demo?.scenarios?.length;
+    for (const control of welcomeDemoButtons) control.disabled = !demo?.scenarios?.length;
     $("welcome-resume").hidden = welcome;
     $("welcome-notice").hidden = true;
-    showWelcome(welcome || window.location?.hash === "#start");
+    const entryHash = window.location?.hash;
+    showWelcome(entryHash !== "#review" && (welcome || entryHash === "#start" || entryHash === "#evidence-chain"));
+    if (entryHash === "#evidence-chain") {
+      $("evidence-chain").scrollIntoView({ block: "start", behavior: "instant" });
+    }
   },
   entryFailed() {
     $("welcome-retry").hidden = false;
@@ -1021,6 +1064,7 @@ window.CtrlFVideoSessionUI = {
     updateSend();
   },
   applySource(video) {
+    setWorkspaceView("review");
     $("resume-query").hidden = true;
     activeVideo = video?.id === "demo_parcel" ? null : video;
     player.pause(); mediaReady = false; mediaFailed = false; pendingSeek = null;
@@ -1031,7 +1075,7 @@ window.CtrlFVideoSessionUI = {
       window.CtrlFVideoWorkbench.source(localMode);
       window.CtrlFVideoWorkbench.describe(video);
       $("question").disabled = localMode;
-      $("question").placeholder = localMode ? "Source analysis is incomplete." : "Ask a follow-up or give the agent a task…";
+      $("question").placeholder = localMode ? "Source analysis is incomplete." : "What would you like to find in this video?";
       $("video-heading").textContent = video.name;
       $("attached-source-name").textContent = video.name;
       $("mode-label").textContent = "Uploaded source";
@@ -1074,5 +1118,6 @@ window.CtrlFVideoSessionUI = {
       $("question").value = saved.ui.draft || ""; updateSend();
       if (saved.ui.playerTime > 0) { pendingSeek = saved.ui.playerTime; pendingSeekRestore = true; }
     }
+    setWorkspaceView("review");
   },
 };

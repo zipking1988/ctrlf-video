@@ -1,5 +1,7 @@
 # Desktop canvas tools and investigation reports
 
+The default **Review** view shows the recording beside the question composer and answer. Choose **Canvas** to organize evidence; drafts and playback position survive view switching. Explicit **Locate on canvas** actions open Canvas before revealing their target. Hidden Canvas rendering preserves its existing card geometry and manual positions.
+
 The canvas retains questions, evidence and conclusions as separate objects with their actual source/parent relationships. These controls organize the current investigation; they do not combine model context or run new analysis.
 
 ## Selection and layout
@@ -17,11 +19,11 @@ Layouts/groups are saved with the existing investigation revision and restore af
 
 Select a question and save its answer or supporting frame. The **Findings** tab exposes title, observed facts, interpretation and open questions directly. Use **Edit finding** to switch between saved items. Title and observed-fact changes also update the canvas; source answers and timestamps remain unchanged. **Save finding** confirms a durable save only after the local save queue has drained successfully. Revision conflicts remain visible for recovery. Supporting frames seek to their exact source timestamps; **Replay context** seeks two seconds before the first frame, clamped to the start, leaving playback paused.
 
-The research task and recording purpose are editable under **Research context** in the docked agent panel. Each submitted question retains the task context captured when it was sent. Supporting-frame thumbnails replay the source; their **Pin frame to canvas** buttons save independent evidence objects. A saved frame's button locates its existing object instead of duplicating it. The source dock also displays the current question's actual supporting frames, including uploaded-source frames when available.
+The research task and recording purpose are editable under **Research context** in the docked agent panel. Each submitted question retains the task context captured when it was sent. Supporting-frame thumbnails replay the source; their **Pin frame to canvas** buttons save independent evidence objects. A saved frame's button locates its existing object instead of duplicating it. In Canvas, the source dock also displays the current question's actual supporting frames, including uploaded-source frames when available. Review keeps the replay actions in the answer pane.
 
 ## Portable reports
 
-Open **Export report** in the header. The dialog shows a readable finding preview; expand **Full Markdown and source references** for the complete record. The dialog captures a fixed snapshot of retained questions, pinned discoveries, their preserved originating questions, notes and layout. Drafts are excluded. Repeated fixture request IDs still preserve separate conversation turns. The report is limited to the latest 12 questions plus pinned origins; it does not imply an exhaustive video search or complete investigation history.
+Open **Menu → Export report** (or the header action in Canvas). The dialog shows a readable finding preview; expand **Full Markdown and source references** for the complete record. The dialog captures a fixed snapshot of retained questions, pinned discoveries, their preserved originating questions, notes and layout. Drafts are excluded. Repeated fixture request IDs still preserve separate conversation turns. The report is limited to the latest 12 questions plus pinned origins; it does not imply an exhaustive video search or complete investigation history.
 
 - **Markdown:** readable questions, conclusions, exact source timestamps, evidence references, statuses and unresolved items.
 - **JSON:** report version 1.1, source provenance, questions/parent turns, findings, evidence IDs/timestamps/source-request and turn links, and canvas layout. This is an export contract, not an import/restore interface.

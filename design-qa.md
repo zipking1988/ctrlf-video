@@ -1,3 +1,151 @@
+# Code review and private-main release preparation — October 17, 2026
+
+Scope: the user explicitly requested review, fixes and a push to private main. Reviewed the complete pending authored diff, surrounding navigation/persistence/canvas callers and test bodies using the review checklist. A separate native adversarial reviewer reviewed authored code and callers, excluding the generated bundle and reviewing tests/fixtures in summary mode. No outside-provider review was invoked.
+
+Fixed findings:
+
+- P2: Review hides the Canvas viewport, but graph drawing measured zero-sized cards and layout operations mutated its hidden geometry. Skip drawing, fitting and revealing while the viewport has no extent; retain geometry and manual positions until Canvas is measurable. Added two regressions covering hidden dimensions, later insertion and visible fitting.
+- P2: explicit Locate actions could reveal a target inside the hidden Canvas. Saved-frame, question-details and finding Locate actions now open Canvas first; ordinary conversation selection stays in Review. Added a navigation regression.
+- P2: multi-selection controls were outside the hidden viewport and could remain over Review. Hide the Canvas batch toolbar in Review without clearing the selection.
+- Documentation: README and canvas/report instructions now describe Review as default, Canvas as optional and report export through the menu. Existing limited NBA evidence and real UX validation limits remain explicit.
+
+Fresh validation: 122 frontend tests passed; 229 backend tests passed and one Linux namespace integration test was skipped on macOS. `make check`, frontend build, ten asset hashes, local documentation links and whitespace checks passed. The final independent re-review returned no further concrete findings. Generated frontend output was rebuilt from authored JSX; third-party license content was unchanged.
+
+Browser evidence: `review-reviewed-final.jpg` in ignored `.ctrlf-video-eval/workspace-first-use/`. Pinning 00:06 then choosing Locate opened visible Canvas with actual nonzero card sizes. A new synthetic follow-up added while in Review remained separate from the existing question and evidence when returning to Canvas; measured rectangles did not overlap. A two-card selection exposed batch tools in Canvas, then Review hid them while keeping the question composer visible. Existing private media, local data and QA captures remain ignored. No new paid model calls or budget changes were made. Hosted CI/deployment outcome is reported separately after pushing.
+
+---
+
+# Review-first workspace — October 17, 2026
+
+final result: passed for the local preset workflow
+
+Scope: after the user rejected all three generated concepts as unclear, implement their agreed plain workflow directly: watch a recording, ask a question, replay cited moments. The existing application and explicit interaction requirements are the reference; none of the rejected images is a selected fidelity target. Backend/model behavior and the previous landing refinements are preserved.
+
+The audit found the primary question control collapsed into a launcher, oversized empty canvas space and small graph cards that obscured the purpose. Review now gives the recording and question/answer pane equal desktop weight, keeps the composer visible at the top and labels citation actions “Watch this moment.” Canvas, findings and exports remain accessible as secondary functions. Uploaded, unavailable-analysis and preset-demo states have distinct instructions. The demo shortcut cannot dispatch for an uploaded or local-only source. The existing finding/reference creation behavior remains unchanged; draft-finding semantics are outside this iteration.
+
+Screenshots in ignored `.ctrlf-video-eval/workspace-first-use/`: original `01-workspace-entry.jpg`; `review-empty-final.jpg`; `review-upload-final.jpg`; `review-final-896.jpg` (896 × 988); `review-final-wide.jpg` (1440 × 1024). The combined comparison `review-comparison.jpg` (1792 × 1020, with a 32px label strip) uses the same 896 × 988 CSS-sized screenshots; no additional DPR scaling is needed. The before/after comparison intentionally changes the information architecture, not merely visual styling. Typography uses the existing Instrument Sans; the primary instruction, source title, composer and answer have separate hierarchy. Spacing/layout keeps both main panes visible, with independent scrolling and no horizontal overflow at both tested desktop widths. Colors retain warm paper, teal navigation, coral actions and mint citations. Images are actual source frames with the native video player; no concept bitmap is presented as product evidence. Copy states the action, preset/no-call status, sampled-frame limitations and unavailable-analysis recovery. Mobile remains outside scope.
+
+Browser checks: manually submitted the center-package question and used the empty-state example; replaying 00:06 sought and paused the actual source at 6 seconds. View switching retained a draft and player position; closing the finding editor restored the composer. Sources restored the existing NBA upload and actual playback while keeping questions blocked without analysis. Menu → Export report opened the existing report dialog. A separate demo investigation was created without replacing existing investigations. During refresh verification, a citation seek did not trigger persistence after pointerup; settled seek/pause events now schedule the existing save, with a regression ensuring no repeated writes for an unchanged position. Continuous playback still does not cause draining saves. A browser reload then restored the source at exactly 6 seconds, paused with readyState 4; final browser warnings/errors were empty.
+
+Validation: 119 frontend tests, frontend build, Ruff lint/format and contract checks passed. No new Gemini calls, backend changes, budgets, commits, pushes or deployments. Synthetic workflow verification does not establish real UX research usefulness or model accuracy. Existing live person-matching limitations remain as recorded in the live-test document. Standalone downloaded HTML rendering remains unverified because the prior browser file-URL access was blocked.
+
+---
+
+# Final frontend workflow verification — October 17, 2026
+
+final result: passed
+
+Scope: close out the pending landing/frontend refinements and verify the existing local user journey. No additional frontend blocker was found in the checked path, so no new runtime/backend changes were needed. This pass does not claim real-model or UX research acceptance.
+
+Fresh checks: 114 frontend tests passed; `make check` passed Ruff lint, formatting for 60 files and contract export verification. `npm run build`, all 10 static asset hashes and `git diff --check` passed. The preceding scoped visual comparisons remain the source/implementation design evidence; no layout or copy changed in this verification pass.
+
+Browser workflow evidence (ignored `.ctrlf-video-eval/landing/`):
+
+- The user's later YouTube sample is `https://www.youtube.com/watch?v=WZwbp2nNFhY`. The existing local basketball file matches the previously recorded SHA-256 `dfc0d9d33bcd62d2e8b3b8451f30ca4577c8ae79e83faf11b936d3f53a2a3374`, duration 70.203467 seconds, 1280 × 720, 19,915,125 bytes. No new video download was needed. The earlier Maine/Villanova link was also confirmed as a separate 171-second source and was not used for this regression.
+- Upload/preflight completed in the existing local fixture preview. The player loaded the actual NBA footage, played, and paused at 6.859617 seconds with no media error. Recording purpose was set to Technical sample with a technical test objective. `final-upload-nba.jpg` records the preflight/blocked-analysis state; `final-nba-playback.jpg` records actual playback.
+- Start analysis and question submission stayed unavailable without model configuration. No preset answer was applied to the uploaded source. Source-library round-trip restored its technical purpose and paused playback independently of the synthetic desk.
+- The Track positions synthetic path loaded three preset questions. Clicking the 00:06 citation sought the paused original source to exactly 6 seconds. A source frame was pinned, then a finding was saved with observed facts and an unresolved question. `final-finding-saved.jpg` shows the source-linked finding editor and canvas. All content remains explicitly synthetic/technical.
+- Actual browser downloads of Markdown, JSON and HTML were copied to `final-workflow-report.md`, `.json` and `.html`. File checks confirmed three retained questions, two saved objects, three evidence frames from the correct source, the authored observation and unknown, and all three evidence images embedded in HTML. The application's report preview was inspected. Standalone file-URL rendering of the downloaded HTML was blocked by browser policy; no alternative browser/server workaround was attempted, so independent HTML rendering remains unverified in this pass.
+- Reload at `/#evidence-chain` showed the landing explanation as intended. Open workspace restored the synthetic finding, authored fields, supporting frames and paused source at 6 seconds. Switching back to the NBA investigation retained its independent state. No fixture result was substituted for it.
+
+Limits: no new Gemini calls, index rebuilds or allowance changes occurred. Earlier NBA live results include a verified scoreboard/source-timestamp flow and unresolved person-matching false positives, as retained in `docs/LIVE_GEMINI_TEST.md`; this local pass neither reruns nor upgrades that quality evidence. No real UX usability session is available yet. No source publication, commit, push or deployment was performed. Private/local media and exported test reports remain ignored.
+
+---
+
+# UX researcher positioning — October 17, 2026
+
+final result: passed
+
+Scope: adopt the agreed UX researcher and source-linked finding positioning in the existing hero, while preserving the single-recording implementation and product name. No cross-session feature or AskTape rename was implemented.
+
+Source capture: `.ctrlf-video-eval/landing/ux-position-before.jpg`; implementation capture: `ux-position-after.jpg` in the same directory. Both show the initial landing at 896 × 988 CSS/image pixels. Final DOM DPR is 2; the screenshot API provides CSS-sized output, so no additional density conversion was needed. Combined comparison `ux-position-comparison.jpg` (1792 × 1020, including a 32px label strip) was inspected together. Wide evidence: `ux-position-wide.jpg` at 1440 × 1104 CSS/image pixels. No focused crop was necessary because the copy, controls, labels and full product image are readable in the combined view.
+
+Fonts/typography: existing Instrument Sans and hierarchy remain; the new headline wraps legibly at both desktop widths. Spacing/layout: the compact intro, complete enlarged product screenshot and working controls remain visible at 896px, with no horizontal overflow at either tested width. At 1440px the three-line headline and additional source-limit disclosure naturally increase the hero height to approximately 751px; this is an accepted consequence of the requested positioning, not clipping. Colors/tokens: the existing teal/coral palette remains unchanged. Image quality: the actual labeled synthetic workspace image is unchanged and retains its aspect ratio. Copy: the hero addresses UX researchers, describes visual questions, timestamped replay and source-linked exports, and explicitly states one recording per investigation. Preset-demo and approved-session disclosures remain. Cross-session aggregation, dedicated OCR, PDF and share-link exports are not claimed.
+
+The first combined comparison found no actionable P0/P1/P2 issue and required no visual correction. Browser warning/error logs were empty. Temporary viewport overrides were reset and the hero remains open. This is not a full accessibility certification or evidence of actual UX research value.
+
+Validation: frontend build, 10 asset hashes, README/DESIGN local links and whitespace checks passed. This edit changes only HTML copy and documentation; the preceding 114 frontend behavioral tests remain the latest test run. No new model calls, commits, pushes or deployments occurred.
+
+---
+
+# How it works balance and color refinement — October 17, 2026
+
+final result: passed
+
+Scope: the user's annotation on `section#evidence-chain` described the section as imbalanced and too white. Preserve the landing, actual assets, evidence claims and interaction behavior while giving this section stronger visual weight and a more coherent composition.
+
+Visual target: the annotated existing section, captured locally as `.ctrlf-video-eval/landing/balance-before.jpg` (896 × 988), with the user's requested balance/color changes as intentional deviations. Implementation evidence: `balance-first.jpg`, `balance-final.jpg` (both 896 × 988) and `balance-wide.jpg` (1440 × 1104), all in the same ignored directory. Combined source/current comparison: `balance-comparison.jpg` (1792 × 1020, including a 32px label strip). Both inputs use the same 896 × 988 CSS viewport and CSS-sized screenshot output; the final DOM reported DPR 2. No extra pixel-density conversion was required. Both views show the landing's end, with naturally different scroll offsets from the revised section height. The full comparison is readable enough to assess typography, alignment, image and labels; no focused crop was needed.
+
+Findings and iteration:
+
+- P2 from annotation/audit: sparse cream columns made the image-heavy middle dominate the two text columns. Replace the open columns with a continuous coral/teal/mint strip on sage, with equal panel heights and explicit question/evidence/finding footers. Split the heading and intro and give the final invitation a dark teal band. `balance-first.jpg` records this first revision.
+- P2 in first revision: the explanatory paragraphs started at different heights because each column sized its own text row. Reserve matching paragraph rows at both desktop breakpoints. In `balance-final.jpg` all three paragraph tops measure 486.55px; at 1440px all measure 620.59px. The final combined comparison shows the aligned panel headings, body copy and footer labels with no remaining actionable P0/P1/P2 finding.
+
+Required fidelity surfaces: Instrument Sans remains, with larger step numbers, deliberate two-line section heading and readable quotes. The joined grid and matched rows balance layout rhythm; the split intro and darker invitation create clear section hierarchy. Sage, coral, teal and mint replace the near-white expanse while retaining ink text and light text on dark panels. The actual synthetic 00:06 source image is unchanged, uncropped and naturally scaled. Preset/no-call labels, approved-session requirement, original timestamps and sampling limitations remain explicit. The shortened example label and object footers introduce no accuracy or custom-training claim.
+
+Browser verification: no horizontal overflow at 896px or 1440px, no warning/error logs, and the final demo button opens the existing six-path preset library. No scenario replacement or model call was needed. The viewport override was reset and the local explanation was left open. This is not a full accessibility certification.
+
+Validation: frontend build, 10 asset hashes and whitespace checks passed. The preceding 114 frontend regressions passed for the shared interaction code; this refinement changes only HTML/CSS and does not require another behavioral suite. The work remains local and undeployed. No spending, cloud configuration or private-source changes occurred.
+
+---
+
+# How it works audit fixes — October 17, 2026
+
+final result: passed
+
+Scope: implement the user's approval of the latest Product Design audit: simplify the explanation, add an end-of-section demo action and repair direct entry through `/#evidence-chain`. This supersedes the earlier copy-only assessment below, which did not catch returning-session deep-link behavior or the missing final action.
+
+Source visual truth: `.ctrlf-video-eval/landing/audit-how/03-section-end.jpg` (896 × 988); implementation: `.ctrlf-video-eval/landing/how-refined.jpg` (896 × 988), both desktop at DPR 1. The combined comparison `.ctrlf-video-eval/landing/how-refined-comparison.jpg` is 1792 × 1020, showing both captures at native scale with a 32px label strip. Both show the end of the same landing, with different vertical offsets because the approved copy and new action change section height. This is an intentional copy/interaction refinement, not pixel-identical reproduction. No density normalization was needed. All section text, controls and imagery are readable in the combined input, so a focused crop was unnecessary. Wide-desktop evidence: `.ctrlf-video-eval/landing/how-refined-1440.jpg` (1440 × 1104 CSS/image pixels, DPR 1).
+
+Audit findings and completed fixes:
+
+- P2: the mechanism paragraph required reading technical retrieval terms before understanding the benefit. Lead with “Ask what happened. Find where it happened.”, explain avoiding manual scrubbing, shorten steps and keep the sampled-frame mechanism in step two. The combined post-fix comparison shows the simpler hierarchy.
+- P2: the section ended without a next action. Add Explore synthetic demo after the shared sampling limitation; it uses the hero action's existing library path and session/catalog gates. Browser verification opened the six-path library without loading a new scenario or making model calls.
+- P2: a returning session opening `/#evidence-chain` restored the workspace instead of showing the explanation (audit evidence `audit-how/04-direct-link.jpg`). Entry now shows and scrolls the landing after restoration. Reloading that exact URL displayed the complete explanation and its enabled final action; closing the demo library confirmed the existing Track positions investigation was retained. The new regression also confirms a normal returning root still bypasses the landing.
+
+Required fidelity surfaces: Instrument Sans, hierarchy and weights remain consistent; the new heading is legible at 896px and 1440px. Existing three-column spacing and source-image alignment remain, with the shared limitation and final action separated by clear rhythm and fine dividers. Teal, cream, coral and object-type colors remain unchanged; the final button has a teal keyboard focus outline on cream. The actual synthetic product and source images keep their original aspect ratios, sharpness, timestamps and labels. Copy retains the approved-session requirement, preset-answer labels, sampling limits and absence of model-accuracy claims. No custom-trained or exhaustive tracking claim was added.
+
+The combined comparison and wide capture found no remaining actionable P0/P1/P2 issue; no additional visual correction was needed. At 1440px the scroll container has no horizontal overflow. Browser warning/error logs were empty. Temporary viewport overrides were reset and the local explanation was left open. This is not a full accessibility certification or a model-quality evaluation.
+
+Validation: 114 frontend tests passed, including direct-link/restored-session and final-demo-action coverage; frontend build, asset hashes and whitespace checks passed. Backend behavior did not change. These changes and the earlier image/copy refinements remain local, uncommitted and undeployed. No model requests or cloud changes were made.
+
+---
+
+# How it works copy follow-up — October 17, 2026
+
+final result: passed
+
+The user requested an explanation of how the product finds relevant video moments. The landing now explains approved Gemini analysis, searchable visual descriptions of sampled frames, retrieval of candidate moments, visual review and source-timestamp replay before a researcher saves a finding. The description is grounded in `ARCHITECTURE.md` and `src/ctrlf_video/agent.py`. It claims neither custom model training nor exhaustive frame-by-frame tracking. Brief-event limitations and synthetic/preset example labels remain visible.
+
+Local evidence in `.ctrlf-video-eval/landing/`: `how-before.png`, `how-after.png`, `how-comparison.jpg` and `how-hero.png`. The before/after captures are both 896 × 988 CSS/image pixels at DPR 1 and were inspected together. Their vertical offsets differ because the expanded explanation changes the section height; this is a copy/legibility comparison, not a pixel-equality claim. No normalization or separate focused crop was necessary for the complete visible explanation.
+
+The comparison found no actionable P0/P1/P2 issue and needed no further visual iteration. At 896px the How it works heading, mechanism, synthetic example label and three steps remain readable without horizontal overflow; the enlarged product figure ends at 948.01px in the 988px initial viewport. At 1440px, a DOM geometry check confirmed the original 718px hero height and no horizontal overflow. The navigation reaches the existing evidence section. Browser warning/error logs were empty.
+
+The frontend rebuild, asset hashes, documentation links and whitespace checks passed. No JS/runtime logic changed in this follow-up, so existing behavioral tests were not repeated. This local refinement preserves the pending image-size change and is not committed, pushed or deployed. No model calls were made.
+
+---
+
+# Product image size follow-up — October 17, 2026
+
+final result: passed
+
+Scope: the user's browser annotation on `figure.welcome-product img` at https://ctrlfvideo.com/#start requested a larger product image in an 896 × 988 desktop window. This is a local CSS refinement of the selected third landing design, with the same image, copy, controls and colors.
+
+Evidence in `.ctrlf-video-eval/landing/`:
+
+- `image-size-before.png` and `image-size-after.png`: original and revised 896 × 988 CSS/image-pixel captures, DPR 1.
+- `image-size-comparison.jpg`: both captures together at their native scale, inspected as one comparison; no normalization required.
+- `image-size-1024.png`: 1024 × 800 desktop, larger image in a scrollable page.
+- `image-size-1440.png`: 1440 × 1104 desktop, original side-by-side layout retained.
+
+At widths up to 1100px, the image now uses its own full-width row below compact copy and controls. At 896px its measured width increased from 499.90px to 825.91px (approximately 65%); its figure ends at 925.51px and fits fully within the annotated 988px viewport. At 1024px the image is 944.19px wide with no horizontal overflow. Its natural aspect ratio and source labels remain intact; short windows scroll normally. Both actions stay visible above the image. At 1440px, the original two-column geometry remains, with the image at 884.69px wide.
+
+The combined comparison found no actionable P0/P1/P2 issue and required no further visual iteration. A separate focused crop was unnecessary because the full-size same-viewport comparison directly shows the annotated image and surrounding controls. No image replacement, generated evidence, app-workflow change or backend change was made.
+
+Validation: frontend build and content hashes, 113 existing frontend tests and whitespace checks passed. Browser warning/error logs were empty. No new backend suite was required for this CSS-only change. This refinement has not been committed, pushed or deployed; the earlier deployment is unchanged. Temporary viewport overrides were reset and the local preview was left open.
+
+---
+
 # Landing redesign QA — October 17, 2026
 
 final result: passed

@@ -204,6 +204,31 @@ test("entry connection failure exposes retry while preserving disabled upload", 
   assert.equal(h.get("welcome-notice").textContent, "Workspace unavailable");
 });
 
+test("explicit review entry opens the video and questions for a first visit", async () => {
+  const h = await harness();
+  h.run('window.location = { hash: "#review" }; window.CtrlFVideoSessionUI.entryReady(true)');
+  assert.equal(h.get("research-welcome").hidden, true);
+  assert.equal(h.shell.inert, false);
+});
+
+test("evidence deep link shows the landing after restoration and opens the demo from its final step", async () => {
+  const h = await harness();
+  let scrolled = 0;
+  h.get("evidence-chain").scrollIntoView = () => scrolled++;
+  h.run('window.location = { hash: "#evidence-chain" }; demo = { scenarios: [{ id: "first" }] }; window.CtrlFVideoSessionUI.entryReady(false)');
+  assert.equal(h.get("research-welcome").hidden, false);
+  assert.equal(h.get("welcome-resume").hidden, false);
+  assert.equal(h.shell.inert, true);
+  assert.equal(scrolled, 1);
+  assert.equal(h.get("welcome-proof-demos").disabled, false);
+  h.get("welcome-proof-demos").click();
+  assert.equal(h.get("research-welcome").hidden, true);
+  assert.equal(h.shell.inert, false);
+  assert.equal(h.get("demo-library").open, true);
+  h.run('window.location.hash = ""; window.CtrlFVideoSessionUI.entryReady(false)');
+  assert.equal(h.get("research-welcome").hidden, true);
+});
+
 test("cached metadata supports immediate seek; deferred metadata applies a queued seek", async () => {
   let h = await harness();
   h.run("seek(6)");
@@ -336,6 +361,62 @@ test("floating agent and finding editor preserve the draft and canvas view", asy
   assert.equal(h.shell.classList.contains("inspector-collapsed"), true);
   assert.equal(h.run("window.contextId"), "task-1");
   assert.equal(h.get("question").value, "Keep this unfinished question");
+});
+
+test("review view exposes video and questions without losing the draft or playback when switching views", async () => {
+  const h = await harness();
+  h.player.currentTime = 6;
+  h.get("question").value = "Keep this unfinished question";
+  h.shell.classList.add("chat-collapsed");
+  h.shell.classList.add("source-collapsed");
+  h.shell.classList.add("source-expanded");
+  h.get("rail-review").click();
+  assert.equal(h.shell.classList.contains("review-first"), true);
+  assert.equal(h.shell.classList.contains("chat-collapsed"), false);
+  assert.equal(h.shell.classList.contains("source-collapsed"), false);
+  assert.equal(h.shell.classList.contains("source-expanded"), false);
+  assert.equal(h.get("rail-review").getAttribute("aria-pressed"), "true");
+  h.get("rail-canvas").click();
+  assert.equal(h.shell.classList.contains("review-first"), false);
+  assert.equal(h.get("rail-canvas").getAttribute("aria-pressed"), "true");
+  h.get("rail-review").click();
+  assert.equal(h.player.currentTime, 6);
+  assert.equal(h.get("question").value, "Keep this unfinished question");
+});
+
+test("closing the finding editor in review returns to the visible question panel", async () => {
+  const h = await harness();
+  h.run("window.CtrlFVideoWorkbench = { showPanel() {} }");
+  h.get("rail-review").click();
+  h.run("openInspector('findings')");
+  assert.equal(h.shell.classList.contains("chat-collapsed"), true);
+  h.run("toggleInspector()");
+  assert.equal(h.shell.classList.contains("inspector-collapsed"), true);
+  assert.equal(h.shell.classList.contains("chat-collapsed"), false);
+});
+
+test("explicit locate actions open the canvas while conversation selection stays in review", async () => {
+  const h = await harness();
+  h.run('var visits = []; investigation = { choose(id) { visits.push(["choose", id]); }, reveal(id) { visits.push(["reveal", id]); } }');
+  h.get("rail-review").click();
+  h.run('window.CtrlFVideoUI.select("question-1")');
+  assert.equal(h.shell.classList.contains("review-first"), true);
+  for (const method of ["focusFinding", "locate"]) {
+    h.get("rail-review").click();
+    h.run(`window.CtrlFVideoUI.${method}("target")`);
+    assert.equal(h.shell.classList.contains("review-first"), false);
+    assert.equal(h.get("rail-canvas").getAttribute("aria-pressed"), "true");
+    assert.equal(h.run('JSON.stringify(visits.slice(-2))'), JSON.stringify([["choose", "target"], ["reveal", "target"]]));
+  }
+});
+
+test("example-question action cannot dispatch a preset or model request for an uploaded source", async () => {
+  const h = await harness();
+  h.run('window.CtrlFVideoPersistence = { ask() { throw Error("Do not dispatch an example for a private source"); } }; activeVideo = { id: "uploaded" }');
+  h.run('window.CtrlFVideoUI.askDemoQuestion("When is the package at the center?")');
+  h.run('activeVideo = null; localMode = true');
+  h.run('window.CtrlFVideoUI.askDemoQuestion("When is the package at the center?")');
+  assert.equal(h.get("messages").children.length, 0);
 });
 
 test("expanding and hiding the floating source retains playback and draft", async () => {

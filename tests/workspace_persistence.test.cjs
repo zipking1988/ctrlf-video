@@ -313,6 +313,22 @@ test("advancing playback time alone does not cause another draining save", async
   assert.equal(writes.length, 1); assert.ok(writes[0].body.state.ui.playerTime > 0);
 });
 
+test("settled citation seeks and pauses persist position without another edit", async () => {
+  const h = await harness();
+  const original = h.ui.snapshot;
+  let time = 0;
+  h.ui.snapshot = () => { const state = original(); return { ...state, ui: { ...state.ui, playerTime: time } }; };
+  await h.window.CtrlFVideoPersistence.flush();
+  for (const [event, position] of [["seeked", 6], ["pause", 10]]) {
+    time = position;
+    h.get("player").listeners[event].forEach(listener => listener());
+    await h.timer(500);
+    assert.equal(h.desks.get("desk-A").state.ui.playerTime, position);
+  }
+  h.get("player").listeners.pause.forEach(listener => listener());
+  assert.equal(h.timers.size, 0);
+});
+
 test("deletion cancels the request before deleting and can create the fallback desk", async () => {
   const h = await harness(), query = deferred();
   h.setOverride(c => c.url === "/api/chat" ? query.promise : c.url.endsWith("/cancel") ? response(answer("cancelled")) : undefined);

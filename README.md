@@ -6,19 +6,23 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 ## Workspace
 
-The **Evidence canvas** is the main workspace. Questions, source frames and findings remain connected as you investigate a recording.
+The default **Review** view places the video on the left and a visible question box on the right. Ask a visual question, then click a cited timestamp to check the original footage. **Canvas** is the optional spatial view for organizing questions, source frames and findings. `/#review` opens the workspace directly.
 
-First-time visitors see a product entry page with a real workspace screenshot and a source-linked question → frame → finding example. **Explore synthetic demo** is the primary action; **Upload a recording** uses the existing upload/preflight path. The screenshot, video and preset answers are explicitly labeled synthetic and do not establish model quality or UX-study value. Existing recordings, research context and drafts restore directly. The CtrlF Video rail button reopens the start page; `/#start` opens it directly while preserving the restored investigation. **Demo library** is also available directly in the workspace header.
+First-time visitors see a product entry page with a real workspace screenshot and a source-linked question → frame → finding example. **Explore synthetic demo** is available above and below the example; **Upload a recording** uses the existing upload/preflight path. The screenshot, video and preset answers are explicitly labeled synthetic and do not establish model quality or UX-study value. Existing recordings, research context and drafts restore directly. The CtrlF Video rail button reopens the start page; `/#start` opens it directly, and `/#evidence-chain` opens its How it works section, while preserving the restored investigation. **Demo library** is also available directly in the workspace header.
 
-- **Agent chat:** ask a question or follow up on a selected result in the docked right panel. Replay supporting thumbnails or pin a frame to the canvas. Minimize the panel to make room; drafts survive reopening and refresh.
-- **Source player:** replay a cited timestamp in the dark teal bottom dock, alongside the current question's supporting frames. Expand it to inspect detail, or hide it while organizing the canvas.
+**How it works** explains the approved Gemini path: searchable descriptions of sampled frames → retrieval of candidate moments → visual review → source-timestamp replay and a researcher-saved finding. The implementation uses Gemini rather than a custom-trained model, and sampling can miss brief events.
+
+The landing addresses UX researchers with “Turn a UX recording into findings you can verify.” Each investigation handles one recording. Cross-session questions and aggregation remain a product hypothesis, not an implemented capability; AskTape is only an exploratory working name. Existing exports are Markdown, JSON and HTML.
+
+- **Questions:** ask or follow up in the right panel, then replay supporting timestamps. The composer stays visible in Review; Canvas can minimize the panel. Drafts survive view switching and refresh.
+- **Source player:** watch the recording in the left pane. In Canvas, the compact bottom dock can be expanded or hidden while organizing evidence.
 - **Finding editor:** open a finding from its card. Edit its title, observed facts, interpretation and open questions. Observed facts update the canvas summary while the original answer and evidence remain available.
 - **Research context:** expand this section in agent chat to record the participant's task and whether the recording is a UX study or a technical sample. Each question captures the context submitted with it.
-- **Reports:** export Markdown, JSON or HTML with findings, source timestamps and unresolved questions. HTML can optionally include evidence images.
+- **Reports:** use **Menu → Export report** for Markdown, JSON or HTML with findings, source timestamps and unresolved questions. Canvas also retains the header export button. HTML can optionally include evidence images.
 
 All application labels and synthetic demo content are English. Researcher-entered content keeps its original language. This edition targets desktop use.
 
-The Coral Fieldnotes workspace uses a warm paper canvas, coral questions, amber evidence and mint findings. The docked player and research panel leave the graph unobstructed; **Question paths → Arrange** separates questions, pinned source frames and conclusions into columns while retaining their actual source relationships. **Sources** in the left rail opens the recording library; **Player** shows or hides playback.
+The Coral Fieldnotes workspace uses a warm paper canvas, coral questions, amber evidence and mint findings. The docked player and research panel leave the graph unobstructed; **Question paths → Arrange** separates questions, pinned source frames and conclusions into columns while retaining their actual source relationships. **Sources** in the left rail opens the recording library. Canvas has player visibility controls; explicit Locate actions switch to Canvas before revealing their target.
 
 ## Current status
 
@@ -26,7 +30,7 @@ Local upload, media preflight, private playback, persistent investigations, canv
 
 **Default mode: `fixture`.** It makes no model requests and labels its preset answers and source video as synthetic. Uploaded footage can be checked and played in fixture mode, but cannot receive demo answers. Saving uses revision checks; a conflict is shown for recovery instead of overwriting another window's edits.
 
-The first product use case remains UX research. The sports video is a technical sample only; a playable local copy and an actual UX recording are still needed for the planned validation. See [sample availability](docs/SPORTS_SAMPLE.md), [acceptance backlog](TODOS.md) and [design QA](design-qa.md).
+The first product use case remains UX research. The NBA recording has a verified local playback flow and limited live Gemini evidence; it remains a technical sample, with person-matching limitations retained in [live-test records](docs/LIVE_GEMINI_TEST.md). An actual UX recording and participant task are still needed for product validation. See [sample availability](docs/SPORTS_SAMPLE.md), [acceptance backlog](TODOS.md) and [design QA](design-qa.md).
 
 This edition is Gemini-only. The original implementation's separate workspace/repository remains preserved. [Provenance](docs/provenance.md) records the source lineage and unresolved hackathon eligibility. The repository is private; publication and deployment require separate authorization.
 
@@ -69,11 +73,11 @@ Open http://127.0.0.1:8765. Use one API/worker process per storage directory. Lo
 
 ## Try the local demo
 
-1. Open the workspace menu and choose **Demo library**, then load a preset example.
-2. In agent chat, ask **“When is the package at the center?”** or use a suggested question.
-3. Replay a timestamp to inspect the source. Use **Edit as finding** to save the answer and open its editor.
-4. Add observed facts and open questions, then choose **Save finding**. Check the header save indicator before leaving the investigation.
-5. Use **Export report** to preview or download the investigation. Refresh to check that its findings, layout and draft restore.
+1. Open the workspace, or use `/#review` to enter it directly. The default Review view places the video on the left and the question box on the right.
+2. Ask **“When is the package at the center?”** or choose the example question. The synthetic demo uses preset answers without model calls.
+3. Click **00:06 · Watch this moment** in the answer to seek the original video. Play the surrounding footage to check the source.
+4. Optionally expand **Save an observation or follow up → Write a finding**, enter observed facts and open questions, then **Save finding**. Check the save indicator before leaving.
+5. Use **Menu → Export report** to preview or download the investigation. **Canvas** opens the spatial view for organizing questions and evidence. Switching views retains the question draft and player position.
 
 The demo is an 18-second synthetic video composed of static scenes, not proof of real continuous movement. Open **Sources** from the workspace menu to upload a local recording for preflight and playback. The app accepts local video files, not arbitrary video URLs. Real analysis remains blocked until model, media-consent, calibration and budget prerequisites are met.
 
