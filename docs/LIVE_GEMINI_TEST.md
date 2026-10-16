@@ -51,3 +51,9 @@ The operator takes a consistent, restored-and-verified backup before changing mo
 - CI [38884904791](https://github.com/zipking1988/ctrlf-video/actions/runs/38884904791) passed 215 Linux backend tests, 100 frontend tests, build/schema/lint checks, and deployed both components from reviewed commit `e67468f`. Subsequent activation changed private runtime/ledger configuration, with no frontend key.
 - A managed real-mode rollback drill reached a healthy candidate, verified a restorable backup, and returned to the prior reviewed code. Runtime and every financial row stayed unchanged; no model calls were added. The local backup was independently restored to a scratch directory and verified by complete file hashes plus both SQLite integrity checks.
 - Browser refresh after rollback restored the real question, source and edited finding. The restored private MP4 loaded all 18 seconds and played successfully.
+
+## Budget rollover verification
+
+The replacement v2 grant was applied October 16 at 20:11 JST after CI [38891244799](https://github.com/zipking1988/ctrlf-video/actions/runs/38891244799) passed 219 Linux backend tests and 100 frontend tests and deployed `19b6aa6` to both components. Focused transport regressions cover funded reuse, unlisted index rejection, absent new approvals, model revision mismatch and retention of old unknown reservations. No model dispatch was added by the rollover or its readiness checks.
+
+Before/after consistent backups passed complete-file hashes and isolated restoration of both SQLite databases. All nine historical cloud attempts and JPY 214 reserved remained unchanged, old unused funding was revoked, and the original ready index retained its provenance. The current browser shows all model prerequisites available; a fresh unapproved session remains unfunded. Current reservation capacity is JPY 761, not an invoice-based credit balance.
