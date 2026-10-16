@@ -148,11 +148,14 @@ class Release:
             connection.close()
 
     def healthy(self, *, check_canary=True):
+        expected_mode = self.config.get("expected_mode", "fixture")
+        if expected_mode not in {"fixture", "real"}:
+            raise RuntimeError("Unapproved backend verification mode")
         for _ in range(30):
             try:
                 health, _ = self.request("/health")
-                if health["mode"] != "fixture":
-                    raise RuntimeError("Automatic test releases require fixture mode")
+                if health["mode"] != expected_mode:
+                    raise RuntimeError("Backend model mode differs from operator configuration")
                 canary = self.state.get("canary")
                 if canary and check_canary:
                     desk, _ = self.request(canary["path"], cookie=canary["cookie"])

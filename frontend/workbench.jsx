@@ -276,7 +276,7 @@ function AgentConversation() {
     <div className="partner-identity">{icon("chats-circle")}<strong>CtrlF Research partner</strong></div>
     <h2>What should we investigate?</h2>
     <p>Ask about a moment in your recording. Review the source frames, then turn the evidence into a finding.</p>
-    <p className="agent-disclosure">{state.local ? "Playback only · this source is not ready for analysis." : state.sourceInfo?.id && state.sourceInfo.id !== "demo_parcel" ? "Uploaded source · analysis requires model readiness." : "Synthetic demo · preset answers, no model calls"}</p>
+    <p className="agent-disclosure">{state.local ? "Playback only · this source is not ready for analysis." : state.sourceInfo?.id && state.sourceInfo.id !== "demo_parcel" ? "Uploaded source · Gemini reviews sampled frames. No audio transcription." : "Synthetic demo · preset answers, no model calls"}</p>
     <button className="outline-button" onClick={() => document.getElementById("question").focus()}>Ask about the video {icon("arrow-right")}</button>
   </section>;
   const {query} = selected;

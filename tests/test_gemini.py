@@ -299,6 +299,43 @@ def test_gemini_unapproved_budget_sends_nothing(tmp_path, monkeypatch):
     assert not calls
 
 
+@pytest.mark.parametrize("role", ["text", "rerank", "vision"])
+def test_generation_text_bound_rejects_before_budget_or_network(tmp_path, monkeypatch, role):
+    calls = []
+    p = provider(tmp_path, monkeypatch, lambda req: calls.append(req))
+    approve(p.ledger, "owner")
+    oversized = "界" * (64 * 1024 // 3 + 1)
+    with pytest.raises(AgentError, match="gemini_text_input_limit"):
+        if role == "rerank":
+            p.call(
+                role,
+                "/rerank",
+                {"model": "gemini-test", "query": "find", "documents": [oversized], "top_n": 1},
+                **kwargs(),
+            )
+        elif role == "vision":
+            import base64
+
+            p.chat(
+                role,
+                [
+                    {"type": "text", "text": oversized},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": "data:image/jpeg;base64,"
+                            + base64.b64encode(b"\xff\xd8\xff").decode()
+                        },
+                    },
+                ],
+                **kwargs(),
+            )
+        else:
+            p.chat(role, oversized, **kwargs())
+    assert not calls
+    assert p.ledger.read_attempt("req_test_plan", "owner") is None
+
+
 @pytest.mark.parametrize("finish", ["MAX_TOKENS", "SAFETY", "RECITATION"])
 def test_gemini_incomplete_results_are_unknown_and_never_resent(tmp_path, monkeypatch, finish):
     calls = []

@@ -99,6 +99,7 @@ jobs:
       - name: Push private image and deploy both components
         env:
           ROLLBACK_DRILL: ${{ inputs.rollback_drill || 'false' }}
+          CTRLF_EXPECTED_MODE: ${{ vars.CTRLF_EXPECTED_MODE || 'fixture' }}
           GCP_DEPLOY_ACCESS_TOKEN: ${{ steps.gcp-auth.outputs.access_token }}
           CLOUDSDK_AUTH_ACCESS_TOKEN_FILE: ${{ runner.temp }}/ctrlf-gcp-access-token
         run: |

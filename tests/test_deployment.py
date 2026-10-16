@@ -150,6 +150,30 @@ def test_successful_systemd_stop_post_does_not_corrupt_primary_json_output():
     assert result.stdout == b""
 
 
+@pytest.mark.parametrize("mode", ["fixture", "real"])
+def test_backend_health_uses_explicit_operator_mode_without_model_calls(release, mode):
+    release.config["expected_mode"] = mode
+    requested = []
+
+    def request(path, **kwargs):
+        requested.append(path)
+        return {"mode": mode}, None
+
+    release.request = request
+    release_module.Release.healthy(release)
+    assert requested == ["/health"]
+
+
+def test_backend_health_rejects_mode_drift_and_invalid_configuration(release, monkeypatch):
+    monkeypatch.setattr(release_module.time, "sleep", lambda seconds: None)
+    release.request = lambda *args, **kwargs: ({"mode": "real"}, None)
+    with pytest.raises(RuntimeError, match="health or persistence"):
+        release_module.Release.healthy(release)
+    release.config["expected_mode"] = "anything"
+    with pytest.raises(RuntimeError, match="Unapproved"):
+        release_module.Release.healthy(release)
+
+
 @pytest.mark.parametrize("phase", ["preparing", "switching", "pending"])
 def test_interrupted_release_boot_recovery_restores_previous_code_before_service_start(
     release, phase
@@ -303,6 +327,52 @@ def orchestrator(monkeypatch):
 
 IMAGE = "asia-northeast1-docker.pkg.dev/ctrlfvideo/ctrlfvideo/frontend@sha256:" + "a" * 64
 REVISION = "ctrlfvideo-frontend-ci-aaaaaaaa-123"
+
+
+@pytest.mark.parametrize("mode", ["fixture", "real"])
+def test_public_health_verifies_configured_mode_without_paid_operations(
+    orchestrator, monkeypatch, mode
+):
+    module, _ = orchestrator
+    # Restore the implementation replaced by the orchestration fixture.
+    spec = importlib.util.spec_from_file_location(
+        "public_mode_check", MODULE.with_name("deploy.py")
+    )
+    checker = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(checker)
+    monkeypatch.setenv("CTRLF_EXPECTED_MODE", mode)
+    paths = []
+
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def read(self):
+            return json.dumps({"mode": mode}).encode()
+
+    def urlopen(url, **kwargs):
+        paths.append(url)
+        return Response()
+
+    monkeypatch.setattr(checker.urllib.request, "urlopen", urlopen)
+    checker.public_check("https://ctrlfvideo.com")
+    assert paths == [
+        "https://ctrlfvideo.com" + path
+        for path in ("/", "/gateway/health", "/health", "/api/session")
+    ]
+    monkeypatch.setenv("CTRLF_EXPECTED_MODE", "real" if mode == "fixture" else "fixture")
+    with pytest.raises(RuntimeError, match="Unexpected model mode"):
+        checker.public_check("https://ctrlfvideo.com")
+    monkeypatch.setenv("CTRLF_EXPECTED_MODE", "unapproved")
+    before = len(paths)
+    with pytest.raises(RuntimeError, match="Unapproved public verification mode"):
+        checker.public_check("https://ctrlfvideo.com")
+    assert len(paths) == before
 
 
 def test_both_components_publish_only_after_backend_verification(orchestrator):

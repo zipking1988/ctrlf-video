@@ -611,7 +611,8 @@ class Agent:
                 content_for_frames(
                     directory,
                     sampled,
-                    'Describe each supplied frame in Chinese. Return {"frames":[{"frame_id":"...",'
+                    "Describe each supplied frame in English in at most 18 words. "
+                    'Return {"frames":[{"frame_id":"...",'
                     '"caption":"directly observable description"}]}. Do not add unseen frames.',
                 ),
                 attempt=f"{video}_{generation}_coarse_{i}",

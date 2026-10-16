@@ -81,12 +81,15 @@ def frontend_traffic(revisions):
 def public_check(origin):
     if origin not in PUBLIC_ORIGINS:
         raise RuntimeError("Unapproved public deployment origin")
+    expected_mode = os.environ.get("CTRLF_EXPECTED_MODE", "fixture")
+    if expected_mode not in {"fixture", "real"}:
+        raise RuntimeError("Unapproved public verification mode")
     for path in ("/", "/gateway/health", "/health", "/api/session"):
         with urllib.request.urlopen(origin + path, timeout=30) as response:
             body = response.read()
             if response.status != 200:
                 raise RuntimeError("Public deployment check failed")
-            if path == "/health" and json.loads(body)["mode"] != "fixture":
+            if path == "/health" and json.loads(body)["mode"] != expected_mode:
                 raise RuntimeError("Unexpected model mode after release")
 
 
@@ -191,7 +194,7 @@ def release(image, *, drill=False):
             remote("finalize", sha)
             public_check(public_origin)
             pending = False
-            print("Both services deployed; session, fixture mode and persistence checks passed.")
+            print("Both services deployed; session, configured mode and persistence checks passed.")
         except Exception:
             failures = []
             if frontend_changed:

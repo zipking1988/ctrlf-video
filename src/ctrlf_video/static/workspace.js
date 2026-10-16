@@ -136,7 +136,7 @@
     const active=()=>owns(deskId,epoch) && token===libraryEpoch;
     await flush(); if (!active()) return; libraryNotice("");
     $("library-title").textContent=kind === "videos" ? "Sources" : "Investigations";
-    $("library-intro").textContent=kind === "videos" ? "Each source keeps its own questions and evidence. Upload for preflight, then analyze within approved budgets." : `Investigations are saved in this workspace, retained for ${session.ttl_hours} hours by default. Resume or start an investigation.`;
+    $("library-intro").textContent=kind === "videos" ? "Upload checks your video locally. Start analysis sends sampled JPEG frames to Google Gemini within your approved budget. The original video stays on this server; audio is not transcribed." : `Investigations are saved in this workspace, retained for ${session.ttl_hours} hours by default. Resume or start an investigation.`;
     $("library-add").textContent=kind === "videos" ? "Upload video" : "New investigation";
     $("library-add").onclick=()=>{
       if(kind === "videos") {$("workspace-library").close();$("file-input").click();}
@@ -150,7 +150,8 @@
       if (!active()) return;
       for (const video of data.items) {
         const job=video.job;
-        const row=item(video.name,`${Math.round(video.bytes/1024/1024)} MB · ${labels[job?.state] || "Uploaded"}${job?.total ? ` · ${job.completed}/${job.total} windows` : ""}`,()=>openSource(video));
+        const jobLabel=job?.state === "awaiting_configuration" && session.real_ready ? "Ready to analyze" : labels[job?.state] || "Uploaded";
+        const row=item(video.name,`${Math.round(video.bytes/1024/1024)} MB · ${jobLabel}${job?.total ? ` · ${job.completed}/${job.total} windows` : ""}`,()=>openSource(video));
         if (["failed","cancelled"].includes(job?.state) && !video.metadata?.windows) {
           const retry=document.createElement("button");retry.className="outline-button";retry.textContent="Run preflight again";
           retry.onclick=async()=>{try {await api(`/api/videos/${video.id}/retry`,"POST");libraryNotice("Preflight restarted.");if(currentVideo.id===video.id) watch(video.id,requestEpoch);}catch(e){libraryNotice(e.message);}};
@@ -158,7 +159,7 @@
         } else if (["awaiting_configuration","failed","cancelled"].includes(job?.state)) {
           const analyze=document.createElement("button");analyze.className="outline-button";analyze.textContent="Start analysis";
           analyze.disabled=!session.real_ready || !video.metadata?.windows;
-          analyze.title=analyze.disabled ? "Requires model configuration, valid calibration and approved budgets" : "Analyze the full source within approved budgets";
+          analyze.title=analyze.disabled ? "Requires model configuration, valid calibration and approved budgets" : "Send sampled JPEG frames to Google Gemini using your approved budget";
           analyze.onclick=async()=>{try {await api(`/api/videos/${video.id}/analyze`,"POST"); libraryNotice("Analysis accepted. Refresh to see progress."); if (currentVideo.id===video.id) watch(video.id,requestEpoch);}catch(e){libraryNotice(e.message);}};
           row.append(analyze);
         }
