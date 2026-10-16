@@ -16,6 +16,31 @@ let taskSequence = 0;
 let lastQueryId = null;
 let evidenceReturnFocus = null;
 let investigation = null;
+let entryConnected = false;
+
+function showWelcome(show, focus = false) {
+  $("research-welcome").hidden = !show;
+  document.querySelector(".agent-shell").inert = show;
+  $("skip-link").href = show ? "#welcome-title" : "#question";
+  if (show) player.pause();
+  if (focus) {
+    const target = show ? $("welcome-title") : $("question").disabled ? $("chat-content") : $("question");
+    target.focus();
+  }
+}
+
+$("welcome-upload").addEventListener("click", () => $("file-input").click());
+$("welcome-demos").addEventListener("click", () => {
+  showWelcome(false);
+  openDemoLibrary();
+});
+$("workspace-demos").addEventListener("click", openDemoLibrary);
+$("welcome-resume").addEventListener("click", () => showWelcome(false, true));
+$("open-welcome").addEventListener("click", () => {
+  $("welcome-resume").hidden = !entryConnected;
+  showWelcome(true, true);
+});
+$("welcome-retry").addEventListener("click", () => window.location.reload());
 
 function setSourceOpen(open) {
   document
@@ -160,6 +185,8 @@ function announce(message) {
 function notice(message) {
   $("form-notice").textContent = message;
   $("form-notice").hidden = !message;
+  $("welcome-notice").textContent = message;
+  $("welcome-notice").hidden = !message;
 }
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -500,7 +527,8 @@ async function startScenario(id) {
   investigation?.arrange(scenario.layout || "threads");
   $("demo-current").textContent = `${scenario.title} · ${seeds.length} preset questions`;
   $("demo-current").hidden = false;
-  window.CtrlFVideoWorkbench?.rename(`${scenario.title}Investigation`);
+  window.CtrlFVideoWorkbench?.setStudyType("technical_sample");
+  window.CtrlFVideoWorkbench?.rename(`${scenario.title} investigation`);
   if (window.CtrlFVideoWorkbench && window.innerWidth < 1400) {
     $("zoom-reset").click();
     investigation.choose(turnIds[0]);
@@ -508,7 +536,7 @@ async function startScenario(id) {
   }
   $("question").focus();
   announce(
-    `Loaded${scenario.title}, ${seeds.length}preset questions loaded. Select a card to follow up.`,
+    `Loaded ${scenario.title}, ${seeds.length} preset questions loaded. Select a card to follow up.`,
   );
 }
 function renderScenarios() {
@@ -532,6 +560,8 @@ function renderScenarios() {
   });
   $("open-demos").disabled = false;
   $("demo-library-empty").disabled = false;
+  $("workspace-demos").disabled = false;
+  $("welcome-demos").disabled = !entryConnected;
 }
 $("open-demos").addEventListener("click", openDemoLibrary);
 $("demo-library-empty").addEventListener("click", openDemoLibrary);
@@ -947,10 +977,25 @@ fetch("/demo/catalog")
   })
   .catch(() => {
     notice("Demo data unavailable. Reload to retry.");
+    $("welcome-retry").hidden = false;
     announce("Demo data failed to load.");
   });
 
 window.CtrlFVideoSessionUI = {
+  entryReady(welcome) {
+    entryConnected = true;
+    $("welcome-upload").disabled = false;
+    $("welcome-demos").disabled = !demo?.scenarios?.length;
+    $("welcome-resume").hidden = welcome;
+    $("welcome-notice").hidden = true;
+    showWelcome(welcome);
+  },
+  entryFailed() {
+    $("welcome-retry").hidden = false;
+  },
+  entered() {
+    if (entryConnected && !$("research-welcome").hidden) showWelcome(false, true);
+  },
   snapshot: () => ({ ...window.CtrlFVideoWorkbench.getSnapshot(), canvas: investigation?.snapshot(),
     ui: { sourceOpen: !document.querySelector(".agent-shell").classList.contains("source-collapsed"),
       inspectorOpen: !document.querySelector(".agent-shell").classList.contains("inspector-collapsed"),

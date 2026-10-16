@@ -1,5 +1,13 @@
 # Coral Fieldnotes desktop design QA
 
+## Research entry follow-up, October 16
+
+First use now presents the research purpose, primary recording upload and secondary synthetic demo in the existing palette. The rail brand reopens this entry without clearing work; the header exposes Demo library directly. An untouched starter desk stays behind the entry; recordings, populated investigations, task briefs, notes and drafts restore directly. Demo creation/loading marks its purpose as a technical sample. Service/catalog failure exposes reload, and cancelling or failing upload keeps the entry available. Failed source jobs show the API error code and retained window progress; unknown dispatch outcomes disable another analysis attempt.
+
+Verified locally in the in-app browser at the default 1280 × 720 viewport: entry hierarchy and disclosures, six demo paths, loading a preset path, direct header demo access, populated-desk restoration after refresh, returning to the entry, keyboard search isolation, and uploading the user's new 70.2-second basketball technical sample through the primary action. Private video decoding reached 1280 × 720 and media readyState 4; no browser warning/error was recorded. These local checks made no model requests. The temporary viewport override did not change the measured viewport, so no new 1024px visual verification is claimed.
+
+Updated local validation: 113 frontend tests passed; 218 backend tests passed with the Linux-only isolation test skipped; lint/format/contracts, rebuild and whitespace checks passed. The new source was separately uploaded to the existing funded cloud session. Real indexing stopped after 1/2 windows; no successful query or model-quality acceptance is claimed. This failure is being investigated without automatic redispatch. Screenshot: `research-entry.png` in the task's local visualization directory.
+
 Date: 2026-10-16
 
 final result: passed

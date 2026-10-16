@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#084f52" />
     <title>CtrlF Video · Ctrl+F for video</title>
-    <meta name="description" content="Ctrl+F for video. Ask questions, find evidence frames and follow up on a desktop investigation canvas." />
+    <meta name="description" content="Review UX recordings with questions, source frames and findings connected on one desktop canvas." />
     <link rel="icon" href="/static/icons/play.svg" type="image/svg+xml" />
     <link
       rel="preload"
@@ -16,22 +16,48 @@
     />
     <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
-    <link rel="stylesheet" href="/static/fieldnotes.css?v=5ec7574a2a70" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=d0b1b75d05cb" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
-    <script src="/static/investigation-canvas.js?v=9397d436b9a6" defer></script>
+    <script src="/static/investigation-canvas.js?v=fe12c071635a" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=ed151f859e0d" defer></script>
-    <script src="/static/workbench.js?v=aec91a38b1ec" defer></script>
-    <script src="/static/workspace.js?v=71682dc41481" defer></script>
-    <script src="/static/app.js?v=5f47191043ab" defer></script>
+    <script src="/static/workbench.js?v=65c28575112a" defer></script>
+    <script src="/static/workspace.js?v=6569e1ca571e" defer></script>
+    <script src="/static/app.js?v=592aff4a08a9" defer></script>
   </head>
   <body>
-    <a href="#question" class="skip-link">Skip to question input</a>
+    <a id="skip-link" href="#welcome-title" class="skip-link">Skip to main content</a>
     <div class="desktop-message">
       <h1>CtrlF Video</h1>
       <p>This workspace needs a desktop browser.</p>
     </div>
-    <div class="agent-shell workbench-shell review-desk canvas-first fieldnotes inspector-collapsed">
+    <section id="research-welcome" class="research-welcome" aria-labelledby="welcome-title">
+      <header class="welcome-header"><a href="/" class="welcome-brand">CtrlF Video<span>Ctrl+F for video</span></a><span class="welcome-edition">A workspace for UX recording review</span></header>
+      <div class="welcome-content">
+        <div class="welcome-intro">
+          <span class="welcome-kicker">FROM RECORDING TO FINDING</span>
+          <h1 id="welcome-title" tabindex="-1">Find the moment.<br /><em>Keep the evidence.</em></h1>
+          <p>Review usability recordings with visual questions. Replay supporting frames, follow up and turn observations into findings you can trace back to the source.</p>
+          <div class="welcome-actions"><button id="welcome-upload" class="welcome-primary" type="button" disabled>Upload a UX recording <span aria-hidden="true">↗</span></button><button id="welcome-demos" class="welcome-secondary" type="button" disabled>Explore synthetic demo</button></div>
+          <p class="welcome-access">Upload and playback are available without model analysis. Gemini analysis requires an approved test session. Audio transcription is unavailable.</p>
+          <p id="welcome-notice" role="status">Connecting to your workspace…</p>
+          <button id="welcome-retry" class="text-button" type="button" hidden>Reload to reconnect</button>
+          <button id="welcome-resume" class="text-button" type="button" hidden>Return to your investigation →</button>
+        </div>
+        <aside class="welcome-workflow" aria-label="Recording review workflow">
+          <span class="welcome-workflow-label">YOUR REVIEW, CONNECTED</span>
+          <ol>
+            <li><span class="welcome-step">01</span><div><h2>Set the task</h2><p>Upload your recording and add what the participant was trying to do.</p></div></li>
+            <li><span class="welcome-step">02</span><div><h2>Ask. Replay. Follow up.</h2><p>Check the visible evidence and its source timestamp before drawing a conclusion.</p></div></li>
+            <li><span class="welcome-step">03</span><div><h2>Build a finding</h2><p>Keep observations, interpretations and open questions separate. Export the evidence with them.</p></div></li>
+          </ol>
+          <p class="welcome-demo-note">The optional demo uses an 18-second synthetic package video and preset answers. It demonstrates the workflow; it is not a UX study or a model-quality test.</p>
+        </aside>
+      </div>
+      <footer class="welcome-footer"><span>Questions · Evidence · Findings</span><span>Designed for desktop review</span></footer>
+    </section>
+    <input id="file-input" type="file" accept="video/*" hidden />
+    <div class="agent-shell workbench-shell review-desk canvas-first fieldnotes inspector-collapsed" inert>
       <header class="studio-header">
         <a class="brand" href="/" aria-label="CtrlF Video Home" title="Ctrl+F for video">CtrlF Video</a>
         <div id="project-title"></div>
@@ -54,9 +80,10 @@
           />Upload video
         </button>
         <button id="export-report" class="outline-button">Export report</button>
+        <button id="workspace-demos" class="outline-button" type="button" disabled>Demo library</button>
       </header>
       <nav class="studio-rail" aria-label="Workspace navigation">
-        <a class="rail-brand" href="/" aria-label="CtrlF Video Home">CtrlF<br />Video</a>
+        <button class="rail-brand" id="open-welcome" type="button" aria-label="Open CtrlF Video start page">CtrlF<br />Video</button>
         <button
           id="rail-canvas"
           class="rail-button active"
@@ -436,7 +463,6 @@
         <dl class="shortcut-list"><dt>Search investigation</dt><dd>⌘ / Ctrl + K</dd><dt>Select multiple objects</dt><dd>Shift + Click card selection buttons</dd><dt>Move selection</dt><dd>Drag the title of any selected card</dd><dt>Undo / Redo</dt><dd>⌘ / Ctrl + Z / Shift + Z</dd><dt>Select all / Clear selection</dt><dd>In the canvas ⌘ / Ctrl + A / Esc</dd><dt>Move card</dt><dd>Arrow keys when title is focused · Shift Faster</dd><dt>Focus / Fit view</dt><dd>In the canvas F / Home</dd><dt>Pan / Zoom</dt><dd>Drag background / ⌘ + Scroll wheel</dd></dl>
         <p class="muted-text">Undo affects layout, groups and paths in this session. Layout persists after refresh; undo history resets.</p>
       </dialog>
-      <input id="file-input" type="file" accept="video/*" hidden />
       <dialog
         id="branch-name-dialog"
         class="branch-name-dialog"
@@ -500,7 +526,7 @@
         </button>
       </header>
       <p class="demo-library-intro">
-        Six demo paths. Replay evidence, organize the canvas or select a question to follow up.
+        Six preset paths using a synthetic package video. Try the investigation workflow without model calls. This sample is not a UX study.
       </p>
       <div id="demo-scenarios" class="demo-scenarios"></div>
       <p class="demo-library-note">

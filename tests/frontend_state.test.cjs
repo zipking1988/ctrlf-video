@@ -80,6 +80,8 @@ class Element {
     return { top: 0 };
   }
   scrollIntoView() {}
+  showModal() { this.open = true; }
+  close() { this.open = false; }
   pause() {
     this.paused = true;
   }
@@ -168,6 +170,39 @@ async function harness(readyState = 1, width = 1440) {
   });
   return { get, player, run, shell, answer };
 }
+
+test("research entry keeps upload cancellation on the welcome screen and demo access explicit", async () => {
+  const h = await harness();
+  h.run('demo = { scenarios: [{ id: "first" }] }; window.CtrlFVideoSessionUI.entryReady(true)');
+  assert.equal(h.get("research-welcome").hidden, false);
+  assert.equal(h.shell.inert, true);
+  assert.equal(h.get("welcome-upload").disabled, false);
+  let opened = 0;
+  h.get("file-input").addEventListener("click", () => opened++);
+  h.get("welcome-upload").click();
+  h.get("file-input").files = [];
+  h.get("file-input").dispatch("change");
+  assert.equal(opened, 1);
+  assert.equal(h.get("research-welcome").hidden, false);
+  h.run('notice("Upload failed. Try again.")');
+  assert.match(h.get("welcome-notice").textContent, /Upload failed/);
+  h.get("welcome-demos").click();
+  assert.equal(h.get("research-welcome").hidden, true);
+  assert.equal(h.shell.inert, false);
+  assert.equal(h.get("demo-library").open, true);
+  h.get("demo-library").close();
+  h.get("workspace-demos").click();
+  assert.equal(h.get("demo-library").open, true);
+});
+
+test("entry connection failure exposes retry while preserving disabled upload", async () => {
+  const h = await harness();
+  h.get("welcome-upload").disabled = true;
+  h.run('window.CtrlFVideoSessionUI.entryFailed(); notice("Workspace unavailable")');
+  assert.equal(h.get("welcome-retry").hidden, false);
+  assert.equal(h.get("welcome-upload").disabled, true);
+  assert.equal(h.get("welcome-notice").textContent, "Workspace unavailable");
+});
 
 test("cached metadata supports immediate seek; deferred metadata applies a queued seek", async () => {
   let h = await harness();

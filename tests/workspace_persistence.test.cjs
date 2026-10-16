@@ -43,20 +43,23 @@ class Element {
   scrollIntoView() {}
   querySelector() { return new Element(); }
 }
-async function harness({ state = {}, requests = [], job = "ready", realReady = true } = {}) {
-  const store = createStore(), ids = new Map(), calls = [], answers = [], timers = new Map();
+async function harness({ state = {}, requests = [], job = "ready", realReady = true, starter = false, empty = false } = {}) {
+  const store = createStore(), ids = new Map(), calls = [], answers = [], timers = new Map(), entries = [];
   let seq = 100, timerSeq = 0, ready = false, busy = false, context = null, override = null;
   const get = id => { if (!ids.has(id)) ids.set(id, new Element()); return ids.get(id); };
   const desks = new Map([
     ["desk-A", { id: "desk-A", video: "video-A", title: "A", revision: 1, state }],
     ["desk-B", { id: "desk-B", video: "video-B", title: "B", revision: 1, state: {} }],
   ]);
+  if (starter) { desks.delete("desk-B"); Object.assign(desks.get("desk-A"), { video: "demo_parcel", title: "Untitled investigation" }); }
+  if (empty) desks.clear();
   const videos = new Map([
     ["video-A", { id: "video-A", name: "A.mp4", metadata: { windows: 1 }, bytes: 10, job: { state: job } }],
     ["video-B", { id: "video-B", name: "B.mp4", metadata: { windows: 1 }, bytes: 10, job: { state: "ready" } }],
   ]);
   const requestLists = new Map([["desk-A", requests], ["desk-B", []]]);
   const ui = {
+    entryReady: welcome => entries.push(welcome),
     ready: () => ready, busy: value => { busy = value; }, notify: value => { get("notice").textContent = value; },
     snapshot: () => ({ ...store.getSnapshot(), ui: { draft: get("question").value } }),
     currentContext: () => context, showSource() {},
@@ -104,11 +107,33 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
     .replace("window.CtrlFVideoPersistence={flush,", "window.testWorkspace={start,openDesk,openSource,recover,confirmDelete,get:()=>({current,currentVideo,activeRequest,requestEpoch})}; window.CtrlFVideoPersistence={flush,");
   vm.runInContext(source, sandbox);
   ready = true; await window.testWorkspace.start();
-  return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers,
+  return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers, entries,
     get busy() { return busy; }, setContext(value) { context = value; }, setOverride(fn) { override = fn; },
     async timer(delay) { const entry = [...timers].find(([, timer]) => timer.delay === delay); assert.ok(entry, `Missing ${delay}ms timer`); timers.delete(entry[0]); entry[1].fn(); await tick(); },
   };
 }
+
+test("new visitors and untouched demo desks enter through the research welcome without model dispatch", async () => {
+  for (const options of [{ empty: true }, { starter: true }]) {
+    const h = await harness(options);
+    assert.deepEqual(h.entries, [true]);
+    assert.ok(h.window.testWorkspace.get().current);
+    assert.equal(h.calls.some(c => /analyze|chat|prepare/.test(c.url)), false);
+  }
+});
+
+test("returning recordings, research context and unsent drafts bypass the welcome screen", async () => {
+  for (const options of [{}, { starter: true, state: { ui: { draft: "Keep this question" } } },
+    { starter: true, state: { taskBrief: "Complete checkout" } },
+    { starter: true, state: { note: "Observation to keep" } },
+    { starter: true, state: { title: "My review" } },
+    { starter: true, state: { records: [{ id: "task-1", query: answer("saved") }] } }]) {
+    const h = await harness(options);
+    assert.deepEqual(h.entries, [false]);
+    if (options.state?.ui?.draft) assert.equal(h.get("question").value, options.state.ui.draft);
+    if (options.state?.taskBrief) assert.equal(h.store.getSnapshot().taskBrief, options.state.taskBrief);
+  }
+});
 
 test("failed source listing shows an in-dialog error and permits refresh without losing the draft", async () => {
   const h = await harness();
@@ -124,6 +149,17 @@ test("failed source listing shows an in-dialog error and permits refresh without
   assert.equal(h.get("library-notice").textContent, "");
   assert.equal(h.get("library-items").children.length, 3);
   assert.equal(h.get("question").value, "Keep this unsent question");
+});
+
+test("a failed source exposes its error and retained progress without dispatching another attempt", async () => {
+  const h = await harness();
+  h.videos.get("video-A").job = {state:"failed", error:"model_unknown", completed:1, total:2};
+  await h.window.CtrlFVideoPersistence.library("videos");
+  const row = h.get("library-items").children[1];
+  assert.match(row.children[0].children[1].textContent, /1\/2 windows/);
+  assert.match(row.children[0].children.find(c => c.className === "library-job-error").textContent, /model_unknown.*Completed windows are retained/);
+  assert.equal(row.children.find(c => c.textContent === "Start analysis").disabled, true);
+  assert.equal(h.calls.some(c => c.method === "POST"), false);
 });
 
 test("a stale source-list failure cannot replace the current investigation library notice", async () => {

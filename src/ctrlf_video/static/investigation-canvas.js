@@ -1401,6 +1401,7 @@
     $("canvas-shortcuts")?.addEventListener("click",()=>$("canvas-shortcuts-dialog").showModal());
     $("canvas-shortcuts-close")?.addEventListener("click",()=>$("canvas-shortcuts-dialog").close());
     document.addEventListener("keydown",e=>{
+      if(viewport.closest("[inert]"))return;
       if(document.querySelector("dialog[open]"))return;
       if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==="k") {e.preventDefault();openSearch();return;}
       if(e.target.closest("input,textarea,select,[contenteditable=true]"))return;

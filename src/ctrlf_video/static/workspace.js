@@ -66,6 +66,7 @@
       suspended=true;
       current=desk; currentVideo=video; conflict=false;
       ui().restore({...desk.state,title:desk.state.title || desk.title},video);
+      ui().entered?.();
       const restored=snapshot();lastSaved=JSON.stringify(restored);lastSavedEdits=editSnapshot(restored);
       remember(); status("Investigation restored","saved");
       $("workspace-library").close();
@@ -89,6 +90,8 @@
       current=desk;
       currentVideo=video; conflict=false;
       ui().applySource(video); store().rename(current.title);
+      if (video.id==="demo_parcel") store().setStudyType("technical_sample");
+      ui().entered?.();
       lastSaved=""; lastSavedEdits="";remember();
       suspended=false;
       await flush(); if (!owns(desk.id,epoch)) return false;
@@ -154,14 +157,20 @@
         const job=video.job;
         const jobLabel=job?.state === "awaiting_configuration" && session.real_ready ? "Ready to analyze" : labels[job?.state] || "Uploaded";
         const row=item(video.name,`${Math.round(video.bytes/1024/1024)} MB · ${jobLabel}${job?.total ? ` · ${job.completed}/${job.total} windows` : ""}`,()=>openSource(video));
+        if (job?.state==="failed" && job.error) {
+          const detail=document.createElement("p");detail.className="library-job-error";
+          detail.textContent=`Processing stopped: ${job.error}. Completed windows are retained; review the error before retrying.`;
+          row.firstElementChild.append(detail);
+        }
         if (["failed","cancelled"].includes(job?.state) && !video.metadata?.windows) {
           const retry=document.createElement("button");retry.className="outline-button";retry.textContent="Run preflight again";
           retry.onclick=async()=>{try {await api(`/api/videos/${video.id}/retry`,"POST");libraryNotice("Preflight restarted.");if(currentVideo.id===video.id) watch(video.id,requestEpoch);}catch(e){libraryNotice(e.message);}};
           row.append(retry);
         } else if (["awaiting_configuration","failed","cancelled"].includes(job?.state)) {
           const analyze=document.createElement("button");analyze.className="outline-button";analyze.textContent="Start analysis";
-          analyze.disabled=!session.real_ready || !video.metadata?.windows;
-          analyze.title=analyze.disabled ? "Requires model configuration, valid calibration and approved budgets" : "Send sampled JPEG frames to Google Gemini using your approved budget";
+          const unknown=["unknown","model_unknown","unknown_attempt_do_not_resend"].includes(job?.error);
+          analyze.disabled=unknown || !session.real_ready || !video.metadata?.windows;
+          analyze.title=unknown ? "Dispatch outcome is unknown. Operator review is required before another attempt." : analyze.disabled ? "Requires model configuration, valid calibration and approved budgets" : "Send sampled JPEG frames to Google Gemini using your approved budget";
           analyze.onclick=async()=>{try {await api(`/api/videos/${video.id}/analyze`,"POST"); libraryNotice("Analysis accepted. Refresh to see progress."); if (currentVideo.id===video.id) watch(video.id,requestEpoch);}catch(e){libraryNotice(e.message);}};
           row.append(analyze);
         }
@@ -379,7 +388,14 @@
       $("resume-query").onclick=()=>recover().catch(e=>ui().notify(e.message));
       $("close-library").onclick=()=>$("workspace-library").close();
       $("delete-cancel").onclick=()=>$("delete-dialog").close();
-    }catch(error){suspended=true;status("Investigation service unavailable","error");ui().notify(error.message);}
+      // Only an untouched starter desk belongs behind the entry screen. Restore
+      // actual recordings, research context and drafts directly for returning work.
+      const state=snapshot();
+      const starter=currentVideo.id==="demo_parcel" && desks.length<=1 &&
+        state.title==="Untitled investigation" && !state.records?.length && !state.pins?.length &&
+        !state.note && !state.taskBrief && !state.ui?.draft;
+      ui().entryReady?.(starter);
+    }catch(error){suspended=true;status("Investigation service unavailable","error");ui().notify(error.message);ui().entryFailed?.();}
   }
   window.CtrlFVideoPersistence={flush,upload,ask,library,openDemo:()=>openSource(demo).catch(e=>ui().notify(e.message)),
     captureContext:()=>current ? {id:current.id,epoch:requestEpoch} : null,

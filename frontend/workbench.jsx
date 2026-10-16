@@ -199,7 +199,7 @@ function ProjectTitle() {
         maxLength={80}
       />
       <span className="session-label">Autosaved</span>
-      <p className="project-caption">Questions, evidence and findings — connected.</p>
+      <p className="project-caption">UX recording review · Questions, evidence and findings</p>
     </div>
   );
 }

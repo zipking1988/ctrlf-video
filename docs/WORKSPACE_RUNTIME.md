@@ -8,7 +8,7 @@ Use `make setup`, `make preflight`, `make run` and open http://127.0.0.1:8765. T
 
 Investigation storage includes the latest 12 questions, up to eight findings, notes, layout, groups, paths, viewport, drafts and player position in local SQLite. Default retention is 24 hours. Ownership follows the `ctrlf_session` cookie; clearing it does not transfer an old investigation. There is no account-based cross-device sync.
 
-The synthetic library uses a public 18-second static-scene demo. It demonstrates the UI and contracts; it cannot answer uploaded-source questions or establish model quality.
+The synthetic library uses a public 18-second static-scene demo. It demonstrates the UI and contracts; it cannot answer uploaded-source questions or establish model quality. New visitors see a UX recording review entry first, with upload primary and this demo secondary. Returning work restores directly. The entry's upload uses the same owned upload/preflight path and does not start model analysis. A demo starter desk is initialized for ownership/saving, without dispatching a model request.
 
 ## Trusted Gemini configuration
 

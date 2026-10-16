@@ -4,6 +4,8 @@ Updated: 2026-10-16. Current direction: the user selected the first colorful con
 
 ## Product experience
 
+First use opens a research entry page in the selected Coral Fieldnotes palette. Upload a UX recording is primary; the synthetic package demo is optional and explicitly described as a workflow sample rather than a UX study or model-quality result. Returning recordings, drafts, research context, notes and populated investigations restore directly. An untouched starter demo remains behind the entry page. Upload cancellation or failure keeps the entry available with an actionable notice; session/catalog failures offer reload. The rail brand reopens the entry without clearing the investigation. Demo library has a direct header button as well as its existing menu route.
+
 The spatial investigation canvas is the central workspace. Questions form paths, evidence frames remain connected to their questions, and findings preserve their source. A synchronized player lets users inspect the original footage at absolute timestamps.
 
 The spatial canvas sits between a permanent dark teal navigation rail and a docked research panel. A compact source player and the current question's supporting frames share a dark teal dock beneath the canvas. Tools occupy separate grid regions rather than covering graph content. Expand, shrink and hide controls remain available. The agent panel can be minimized; its launcher restores it without clearing the draft. The conversation selector returns to stored questions, and Research context expands to edit the task and recording purpose.

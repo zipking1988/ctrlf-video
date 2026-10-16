@@ -1,4 +1,60 @@
 /* Coral Fieldnotes: docked tools leave the spatial canvas unobstructed. */
+.research-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 32px clamp(32px, 6vw, 96px) 24px;
+  color: #192b30;
+  background: #faf7f2;
+}
+.research-welcome[hidden] { display: none; }
+.library-job-error { margin: 6px 0 0; font-size: 12px; line-height: 1.6; color: #8f3c2b; overflow-wrap: anywhere; }
+.welcome-header, .welcome-footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.welcome-header { padding-bottom: 26px; border-bottom: 1px solid #dcded5; }
+.welcome-brand { color: #084f52; text-decoration: none; font-size: 26px; font-weight: 750; letter-spacing: -1px; }
+.welcome-brand span { display: block; font-size: 12px; font-weight: 500; letter-spacing: 0; margin-top: 3px; }
+.welcome-edition, .welcome-footer { font-size: 12px; color: #526461; }
+.welcome-content { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .85fr); gap: clamp(40px, 7vw, 110px); align-items: center; flex: 1; padding: 48px 0; max-width: 1340px; width: 100%; margin: auto; }
+.welcome-kicker, .welcome-workflow-label { font-size: 11px; font-weight: 750; letter-spacing: 1.6px; }
+.welcome-kicker { color: #8f3c2b; }
+.welcome-intro h1 { font-size: clamp(42px, 4.8vw, 72px); font-weight: 720; line-height: 1.05; letter-spacing: -2.7px; margin: 20px 0 24px; }
+.welcome-intro h1 em { color: #084f52; font-style: normal; }
+.welcome-intro > p { max-width: 550px; font-size: 17px; line-height: 1.65; color: #526461; }
+.welcome-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 28px 0 16px; }
+.welcome-primary, .welcome-secondary { min-height: 48px; border-radius: 9px; padding: 12px 18px; font-size: 14px; font-weight: 650; }
+.welcome-primary { background: #ed654b; color: #192b30; border: 1px solid #ed654b; }
+.welcome-primary span { padding-left: 16px; }
+.welcome-primary:hover { background: #f17d64; }
+.welcome-secondary { background: transparent; color: #084f52; border: 1px solid #9cac9f; }
+.welcome-secondary:hover { background: #e1f2e9; }
+.welcome-actions button:disabled { opacity: .55; cursor: wait; }
+.welcome-intro > .welcome-access { font-size: 12px; line-height: 1.6; max-width: 480px; }
+.welcome-intro > #welcome-notice { font-size: 13px; color: #8f3c2b; }
+.welcome-workflow { padding: 30px; background: #084f52; color: #fffefa; border-radius: 18px; }
+.welcome-workflow-label { color: #c5e2d9; }
+.welcome-workflow ol { list-style: none; margin: 20px 0 26px; padding: 0; }
+.welcome-workflow li { display: flex; gap: 16px; padding: 22px 0; border-bottom: 1px solid #427577; }
+.welcome-step { display: flex; flex-shrink: 0; width: 36px; height: 36px; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; font-weight: 700; color: #192b30; background: #fff0e9; }
+.welcome-workflow li:nth-child(2) .welcome-step { background: #ffe8ad; }
+.welcome-workflow li:nth-child(3) .welcome-step { background: #c4e9d5; }
+.welcome-workflow h2 { font-size: 18px; margin: 0 0 8px; letter-spacing: -.3px; }
+.welcome-workflow li p { font-size: 13px; line-height: 1.6; color: #d4e7e1; margin: 0; }
+.welcome-demo-note { font-size: 12px; line-height: 1.65; color: #d4e7e1; margin: 0; }
+.welcome-footer { padding-top: 20px; border-top: 1px solid #dcded5; }
+.research-welcome button:focus-visible, .research-welcome a:focus-visible { outline: 3px solid #084f52; outline-offset: 4px; }
+.fieldnotes.canvas-first.review-desk #workspace-demos { display: block; min-height: 40px; white-space: nowrap; }
+.fieldnotes.canvas-first.review-desk button.rail-brand { background: transparent; border: 0; color: #fff; text-align: left; cursor: pointer; }
+@media (max-width: 1100px) {
+  .research-welcome { padding: 24px 36px; }
+  .welcome-content { gap: 32px; padding: 36px 0; }
+  .welcome-workflow { padding: 24px; }
+  .welcome-intro h1 { font-size: 46px; }
+  .fieldnotes.canvas-first.review-desk .project-name input { width: min(440px, 31vw); }
+}
+@media (max-width: 850px) { .research-welcome { display: none; } }
 .fieldnotes.canvas-first.review-desk.workbench-shell {
   --rail-width: 88px;
   --research-width: clamp(326px, 27vw, 392px);
