@@ -50,6 +50,8 @@ jobs:
         run: |
           uv sync --frozen
           make check
+          sysctl kernel.apparmor_restrict_unprivileged_userns || true
+          /usr/bin/bwrap --unshare-all --ro-bind / / /usr/bin/true
           make test
 
   deploy:
