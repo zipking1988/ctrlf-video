@@ -28,7 +28,10 @@ This edition is Gemini-only. The original implementation's separate workspace/re
 
 ## Initial cloud test
 
-Open [CtrlF Video on Google Cloud](https://ctrlfvideo-frontend-655757141159.asia-northeast1.run.app/).
+Open [CtrlF Video](https://ctrlfvideo.com/). The custom domain has a verified
+Google-managed HTTPS certificate; HTTP redirects to HTTPS. Browser checks verified
+source playback, edited findings and restoration after refresh. Twenty live API
+checks also passed, including private video Range delivery and owner/CSRF checks.
 The Cloud Run frontend and durable Tokyo GCE backend are separate components with
 one browser origin. The cloud service currently runs the **labeled synthetic
 fixture**; uploaded footage supports preflight/playback, with model analysis blocked.
@@ -108,9 +111,9 @@ passed 100 frontend and 195 backend tests; both services now run that tested
 application source. Final verification corrected the frontend revision selection
 and checked 100% traffic, with 27 deployment regressions passing. A live
 forced-failure rollback and independent local backup restoration also passed.
-Four attempts were consumed during setup. The overly restrictive initial cap of
-four was increased to 24 without resetting history, allowing 20 more attempts in
-the existing window. Instance limits, the JPY 3,000 total and cleanup deadline
+The overly restrictive initial cap of four was increased to 24 without resetting
+history. Five backend attempts are now recorded, leaving 19 in the existing
+window. Instance limits, the JPY 3,000 total and cleanup deadline
 remain unchanged. The app remains in fixture mode; actual cloud billing is not
 yet reconciled, and budget alerts do not enforce a hard spending cutoff.
 

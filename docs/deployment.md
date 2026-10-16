@@ -85,14 +85,18 @@ The local Python/ASGI tests exercise the gateway and real workspace together.
 
 ## Configuration boundaries
 
-### Custom domain preparation (October 16)
+### Verified custom domain (October 16)
 
 `ctrlfvideo.com` is delegated to the public Cloud DNS zone `ctrlfvideo-com` in
 this temporary project. Google ownership verification passed using the user's
 TXT record alongside the retained SPF. The Cloud Run mapping exists and its
-returned A/AAAA records replace the previous parking address; managed certificate
-issuance is pending at this preparation stage. No successful custom-domain HTTPS
-test is claimed until the live certificate and application checks pass.
+returned A/AAAA records replace the previous parking address. Mapping Ready,
+CertificateProvisioned and DomainRoutable are all True. The Google-managed
+certificate validates for `ctrlfvideo.com` (TLS 1.3 independently checked from
+Tokyo); HTTP returns a 302 redirect to HTTPS. The frontend revision
+`ctrlfvideo-frontend-domain-ecbd8db3-1792143729` serves 100% of traffic using the
+immutable image tested by [this successful CI run](https://github.com/zipking1988/ctrlf-video/actions/runs/38880993686).
+It passed 100 frontend tests and 204 backend tests, including Linux isolation.
 
 The frontend can use `CTRLF_PUBLIC_ORIGIN=https://ctrlfvideo.com` while the
 durable backend retains its existing canonical origin. Set gateway-only
@@ -108,16 +112,26 @@ needed for the domain change; retained frontend revisions provide rollback.
 The publisher reads `CTRLF_PUBLIC_ORIGIN` from the existing Cloud Run service
 instead of assuming the default hostname. Only the existing run.app origin and
 `https://ctrlfvideo.com` are accepted; missing/other origins reject the release
-before backend work. The existing run.app URL stays operational until cutover.
+before backend work. After cutover, use `https://ctrlfvideo.com`; the default
+run.app hostname is retained only as the backend's canonical ingress identity.
 Domain mapping and DNS remain within the October 19 cleanup window; a custom
 domain does not extend the hosting authorization.
+
+Twenty live HTTPS checks passed: page/session/fixture health, Secure/HttpOnly
+cookies, public and private video Range playback, bounded uploaded-media
+preflight, finding save/restore, revision conflicts, rejected foreign Origin and
+missing CSRF, same-origin redirects and cross-owner access denial. Synthetic API
+test sources/desks were deleted afterward. Browser testing separately verified
+timestamp seeking, actual playback, finding editing and restoration after reload.
+No model requests ran. The operational results, screenshot and DNS recovery export
+are private ignored artifacts under `.ctrlf-video-eval/`.
 
 ### Component settings
 
 | Component | Required configuration |
 | --- | --- |
 | Frontend | `CTRLF_COMPONENT=frontend`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, optional `CTRLF_BACKEND_PUBLIC_ORIGIN`, optional `CTRLF_BACKEND_CA_FILE`, `PORT` |
-| Workspace | `CTRLF_COMPONENT=workspace`, same `CTRLF_PUBLIC_ORIGIN` and private `CTRLF_GATEWAY_TOKEN`, persistent `CTRLF_DATA_DIR`, trusted `CTRLF_RUNTIME_FILE`, backend-only `GEMINI_API_KEY`, `CTRLF_VIDEO_MODE=real` only after prerequisites |
+| Workspace | `CTRLF_COMPONENT=workspace`, canonical `CTRLF_PUBLIC_ORIGIN` (gateway's `CTRLF_BACKEND_PUBLIC_ORIGIN` when different), same private `CTRLF_GATEWAY_TOKEN`, persistent `CTRLF_DATA_DIR`, trusted `CTRLF_RUNTIME_FILE`, backend-only `GEMINI_API_KEY`, `CTRLF_VIDEO_MODE=real` only after prerequisites |
 
 Both origins must be exact HTTPS origins without credentials, path, query or
 fragment. They must differ. The shared token must be 32–256 printable ASCII
@@ -325,10 +339,9 @@ Verified on October 16, 2026:
   configuration and source media. Operational archives/manifests stay ignored
   under `.ctrlf-video-eval/cloud-backups/`, outside Git and CI artifacts.
 
-Four attempts were consumed (preparation failure, drill, recovered connection
-failure and successful release). The initial four-attempt operator setting was
-overly restrictive and has been increased to 24, preserving all four records and
-allowing 20 additional attempts within the same authorized test window. No compute
+The initial four-attempt operator setting was overly restrictive and was increased
+to 24 without deleting any records. The custom-domain code release is the fifth
+backend attempt, leaving 19 within the same authorized test window. No compute
 size, instance cap, model allowance, JPY 3,000 total or deadline is increased.
 Billing reconciliation remains unavailable, so this is verified deployment/recovery
 evidence, not a verified remaining balance or live model-quality result.

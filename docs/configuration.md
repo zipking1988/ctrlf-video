@@ -32,7 +32,7 @@ Use `CTRLF_VIDEO_COARSE_FRAMES=8 make preflight` or `CTRLF_VIDEO_CONFIG=/absolut
 | --- | --- |
 | `CTRLF_DATA_DIR` | Private storage; default `.ctrlf-video-data/` |
 | `CTRLF_RUNTIME_FILE` | Trusted private Gemini runtime JSON |
-| `CTRLF_PUBLIC_ORIGIN` | Reviewed public HTTPS origin |
+| `CTRLF_PUBLIC_ORIGIN` | Reviewed component HTTPS origin: frontend browser origin, or the backend's canonical ingress origin |
 | `CTRLF_COMPONENT` | `workspace` default, stateless `gateway`, or `frontend` UI/gateway |
 | `CTRLF_BACKEND_ORIGIN` | Separate HTTPS durable workspace origin for gateway |
 | `CTRLF_BACKEND_PUBLIC_ORIGIN` | Gateway-only optional canonical HTTPS origin expected by the backend; defaults to `CTRLF_PUBLIC_ORIGIN`. Allows a custom frontend domain without changing durable backend configuration. |
