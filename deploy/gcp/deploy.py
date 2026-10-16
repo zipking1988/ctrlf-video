@@ -59,6 +59,8 @@ def remote(*args):
             INSTANCE,
             f"--zone={ZONE}",
             "--tunnel-through-iap",
+            "--ssh-flag=-oServerAliveInterval=15",
+            "--ssh-flag=-oServerAliveCountMax=8",
             f"--command={command}",
         )
     )
