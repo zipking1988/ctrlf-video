@@ -205,6 +205,14 @@ bindings expire October 19 at 23:00 JST. There are no service-account keys or
 Gemini credentials in GitHub. The OS Login user has only the reviewed release
 command in sudoers; the runtime identity and original workspace remain separate.
 
+The auth action explicitly generates an 1,800-second service-account OAuth token
+for the bounded 25-minute deployment job. It is masked, written only to a private
+runner-temporary file and removed on exit. This avoids refreshing the five-minute
+GitHub OIDC assertion during a long native test run. SSH sends keepalives through
+IAP; a lost connection still invokes the managed recovery/watchdog safeguards.
+See [Google's token inputs](https://github.com/google-github-actions/auth#inputs-generating-oauth-20-access-tokens)
+and [gcloud access-token file configuration](https://cloud.google.com/sdk/gcloud/reference/topic/configurations).
+
 The workflow first runs Node frontend tests/build/hash checks, frozen Python
 lint/schema/tests and real Linux media isolation. It then builds/pushes the
 frontend image and uses its digest. On the backend,
@@ -259,9 +267,31 @@ reconciliation of newer/deleted data and reserved model attempts. Installation i
 in [bootstrap_release.py](../deploy/gcp/bootstrap_release.py); release-control or
 persistence/API changes need a reviewed operator update, not self-modification.
 
-The first hosted deployment/forced-failure drill is pending verification at the
-time this workflow is introduced. Local fault-injection and native installation
-backup/restore checks are separate evidence, not a completed hosted release.
+Verified on October 16, 2026:
+
+- [The main-push pipeline](https://github.com/zipking1988/ctrlf-video/actions/runs/38876396945)
+  passed 100 frontend tests, asset rebuild checks, lint/schema checks and 195
+  backend tests, including real Linux isolation. The full backend suite also
+  passed as the unprivileged service user on the GCE host before switching code.
+  Both components deployed commit `712006553cfad5f3725bbc7e84c68bce3382f61b`;
+  public UI, gateway health, fixture-mode health and session checks passed.
+- [The earlier drill](https://github.com/zipking1988/ctrlf-video/actions/runs/38874962485)
+  reached a healthy candidate, intentionally failed and recovered the previous
+  code with its owned investigation. That run later lost its SSH connection on
+  the normal release and automatically recovered too; the complete run was not
+  successful. The final pipeline above verifies the corrected token/keepalives.
+- Every live release backup was restored to scratch, checked against per-file
+  SHA-256 and both SQLite integrity checks. A private recovery copy was downloaded
+  locally and independently verified: 17 files, two intact databases, runtime
+  configuration and source media. Operational archives/manifests stay ignored
+  under `.ctrlf-video-eval/cloud-backups/`, outside Git and CI artifacts.
+
+The initial four-attempt allowance is now exhausted (including preparation failure,
+drill, recovered connection failure and successful release). Further backend
+releases fail closed; review actual spend and the remaining authorized window
+before any operator changes that finite allowance. Tests can still run. Billing
+reconciliation remains unavailable, so this is verified deployment/recovery
+evidence, not a verified final spend or live model-quality result.
 
 ## Primary references
 

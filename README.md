@@ -101,6 +101,13 @@ changes; those need a reviewed migration. A rollback restores code and keeps the
 current workspace and model ledger. See the
 [release and recovery guide](docs/deployment.md#release-process-and-cicd).
 
+The [October 16 pipeline](https://github.com/zipking1988/ctrlf-video/actions/runs/38876396945)
+passed 100 frontend and 195 backend tests and deployed both services. A live
+forced-failure rollback and independent local backup restoration also passed.
+The initial four release attempts are consumed; further deployments are blocked
+until an operator reviews spending and the remaining authorized window. The app
+remains in fixture mode; actual cloud billing is not yet reconciled.
+
 ```sh
 make test          # backend contracts and Gemini mock transports
 make check         # lint, format and exported schema drift
