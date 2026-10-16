@@ -7,6 +7,7 @@ automatic retries, cloud provisioning or separate SDK dispatch path.
 import base64
 import json
 import re
+import unicodedata
 
 from ctrlf_video.agent import AgentError
 
@@ -135,10 +136,19 @@ def prepare_request(role, route, payload, category):
             "contents": [{"role": "user", "parts": parts}],
             "generationConfig": generation,
         }
+
         # Bound billed text independently of inline JPEG bytes. This also covers
         # system instructions, retrieval documents, context and repair prompts.
-        text_bytes = len(system.encode("utf-8")) + sum(
-            len(part["text"].encode("utf-8")) for part in parts if "text" in part
+        def bounded_text_size(text):
+            # Compatibility characters can expand during token normalization.
+            # Bound both representations without changing source evidence.
+            return max(
+                len(text.encode("utf-8")),
+                len(unicodedata.normalize("NFKC", text).encode("utf-8")),
+            )
+
+        text_bytes = bounded_text_size(system) + sum(
+            bounded_text_size(part["text"]) for part in parts if "text" in part
         )
         if text_bytes > MAX_GENERATION_TEXT_BYTES:
             raise AgentError("gemini_text_input_limit")

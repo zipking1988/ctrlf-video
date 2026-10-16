@@ -300,11 +300,13 @@ def test_gemini_unapproved_budget_sends_nothing(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("role", ["text", "rerank", "vision"])
-def test_generation_text_bound_rejects_before_budget_or_network(tmp_path, monkeypatch, role):
+@pytest.mark.parametrize("oversized", ["界" * (64 * 1024 // 3 + 1), "\ufdfa" * 4000])
+def test_generation_text_bound_rejects_before_budget_or_network(
+    tmp_path, monkeypatch, role, oversized
+):
     calls = []
     p = provider(tmp_path, monkeypatch, lambda req: calls.append(req))
     approve(p.ledger, "owner")
-    oversized = "界" * (64 * 1024 // 3 + 1)
     with pytest.raises(AgentError, match="gemini_text_input_limit"):
         if role == "rerank":
             p.call(
