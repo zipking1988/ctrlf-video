@@ -199,6 +199,7 @@ function ProjectTitle() {
         maxLength={80}
       />
       <span className="session-label">Autosaved</span>
+      <p className="project-caption">Questions, evidence and findings — connected.</p>
     </div>
   );
 }
@@ -273,7 +274,7 @@ function AgentConversation() {
   const state = useDesk();
   const selected = state.records.find(record => record.id === state.selectedId);
   if (!selected) return <section className="agent-conversation agent-welcome">
-    <div className="partner-identity">{icon("chats-circle")}<strong>CtrlF Research partner</strong></div>
+    <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>CtrlF</strong><small>Your research partner</small></div></div>
     <h2>What should we investigate?</h2>
     <p>Ask about a moment in your recording. Review the source frames, then turn the evidence into a finding.</p>
     <p className="agent-disclosure">{state.local ? "Playback only · this source is not ready for analysis." : state.sourceInfo?.id && state.sourceInfo.id !== "demo_parcel" ? "Uploaded source · Gemini reviews sampled frames. No audio transcription." : "Synthetic demo · preset answers, no model calls"}</p>
@@ -284,7 +285,8 @@ function AgentConversation() {
   const frames = [...new Map(response.events.flatMap(event => event.evidence).map(frame => [frame.uri, frame])).values()];
   return <section className="agent-conversation" aria-label="Agent conversation">
     {state.records.length > 1 && <label className="agent-history">Conversation<select aria-label="Conversation question" value={selected.id} onChange={event => ui()?.select(event.target.value)}>{state.records.map((record, index) => <option key={record.id} value={record.id}>{index + 1}. {record.query.question}</option>)}</select></label>}
-    <div className="agent-user"><span className="speaker-label">You</span><p>{query.question}</p></div>
+    <div className="agent-user"><span className="speaker-label">Your question</span><p>{query.question}</p></div>
+    <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>CtrlF</strong><small>{query.mode === "real" ? "Answer from sampled source frames" : "Synthetic demo · preset answer"}</small></div></div>
     <div className="agent-assistant">
     <p className="agent-answer">{response.answer}</p>
     <p className="agent-disclosure">{query.mode === "real" ? labels[response.status] : "Synthetic demo · preset result"}</p>
@@ -292,11 +294,24 @@ function AgentConversation() {
       <p>{query.mode === "real" ? `${response.trace?.visible?.segments_reviewed ?? 0} segments reviewed. These frames support this answer; they do not establish what happened between samples.` : "This example uses preset answers and synthetic source frames. No model request was made."}</p>
       <button className="text-button" onClick={() => ui()?.openInspector("context")}>Inspect evidence details</button>
     </details>
-    {!!frames.length && <div className="agent-frames">{frames.map(frame => <button key={frame.uri} onClick={() => ui()?.seek(frame.t, query)} aria-label={`Replay agent frame ${clock(frame.t)}`}><img src={frame.uri} alt={frame.caption} /><span>{clock(frame.t)}</span></button>)}</div>}
-    {!!response.unresolved.length && <details className="agent-unresolved"><summary>What remains unknown</summary>{response.unresolved.map(text => <p key={text}>{text}</p>)}</details>}
+    {!!frames.length && <div className="agent-frames" aria-label="Supporting source frames">{frames.map(frame => {
+      const saved = state.pins.some(pin => pin.kind === "evidence" && pin.frame.uri === frame.uri && pin.frame.t === frame.t);
+      return <div className="agent-frame-row" key={frame.uri}>
+        <button className="agent-frame-replay" onClick={() => ui()?.seek(frame.t, query)} aria-label={`Replay agent frame ${clock(frame.t)}`}><img src={frame.uri} alt={frame.caption || "Source frame"} /><span><strong>{icon("play")}{clock(frame.t)}</strong><small>{frame.caption || "Replay source frame"}</small></span></button>
+        <button className="agent-frame-pin" aria-label={`${saved ? "Locate" : "Pin"} frame ${clock(frame.t)} on canvas`} disabled={!saved && state.pins.length >= 8} onClick={() => ui()?.saveEvidence(selected.id, query, frame)} title={saved ? "Locate on canvas" : "Pin frame to canvas"}>{icon(saved ? "stack" : "plus")}</button>
+      </div>;
+    })}</div>}
+    {!!response.unresolved.length && <section className="agent-unresolved" aria-label="What remains unknown"><h3>Still to verify</h3>{response.unresolved.map(text => <p key={text}>{text}</p>)}</section>}
     </div>
-    <div className="agent-result-actions"><button className="text-button" disabled={state.local} onClick={() => ui()?.continueFrom(selected.id)}>Follow up {icon("arrow-right")}</button>{["ok", "partial"].includes(response.status) && <button className="text-button" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>Edit as finding</button>}</div>
+    <div className="agent-result-actions">{["ok", "partial"].includes(response.status) && <button className="save-finding-action" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>{icon("stack")}Edit as finding</button>}<button className="text-button" disabled={state.local} onClick={() => ui()?.continueFrom(selected.id)}>Follow up {icon("arrow-right")}</button></div>
   </section>;
+}
+function SourceEvidenceStrip() {
+  const state = useDesk();
+  const selected = state.records.find(record => record.id === state.selectedId);
+  const frames = selected ? [...new Map(selected.query.response.events.flatMap(event => event.evidence).map(frame => [frame.uri, frame])).values()] : [];
+  if (!frames.length) return <div className="source-strip-empty"><strong>Keep the source in view.</strong><p>Replay a moment here. Supporting frames appear after you ask a question.</p></div>;
+  return <section className="source-evidence-strip" aria-label="Current question evidence"><div className="source-strip-label"><span>Supporting frames</span><small>{frames.length} linked to this question</small></div><div className="source-strip-frames">{frames.map(frame => <button key={frame.uri} onClick={() => ui()?.seek(frame.t, selected.query)} aria-label={`Replay source strip frame ${clock(frame.t)}`}><img src={frame.uri} alt={frame.caption || "Source frame"} /><span>{icon("play")}{clock(frame.t)}</span></button>)}</div></section>;
 }
 function ComposerSource() {
   const state = useDesk();
@@ -1018,3 +1033,4 @@ createRoot(document.getElementById("research-task")).render(<ResearchTask />);
 createRoot(document.getElementById("composer-source")).render(<ComposerSource />);
 
 createRoot(document.getElementById("agent-conversation-root")).render(<AgentConversation />);
+createRoot(document.getElementById("source-evidence-strip")).render(<SourceEvidenceStrip />);

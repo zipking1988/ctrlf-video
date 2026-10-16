@@ -8,7 +8,7 @@
     if (scale >= 0.82) return "detail";
     return current === "map" ? "overview" : current;
   };
-  function createModel() {
+  function createModel({ docked = false } = {}) {
     const items = new Map();
     const collapsed = new Set();
     const groups = new Map();
@@ -87,10 +87,23 @@
           y: origin
             ? origin.y + (n === 2 ? 200 : 40) + siblings * 460
             : 175 + Math.floor(n / 3) * 480,
-          width: 330,
+          width: docked ? 260 : 330,
           height: 420,
         };
         items.set(id, item);
+        if (docked) {
+          const others = [...items.values()].filter(other => other.id !== id);
+          const lane = Math.max(312, ...others.map(other => other.width + 52));
+          item.x = item.kind ? (origin?.x ?? 32) + (item.kind === "conclusion" ? 2 : 1) * lane : 32;
+          item.y = item.kind && origin ? origin.y : Math.max(28, ...others.map(other => other.y + other.height + 48));
+          // Insertion keeps existing manual positions and skips every occupied
+          // rectangle, including follow-ups added before their source frames.
+          let collisions;
+          do {
+            collisions = others.filter(other => item.x < other.x + other.width + 28 && item.x + item.width + 28 > other.x && item.y < other.y + other.height + 28 && item.y + item.height + 28 > other.y);
+            if (collisions.length) item.y = Math.max(...collisions.map(other => other.y + other.height + 28));
+          } while (collisions.length);
+        }
         return item;
       },
       remove(id) {
@@ -319,7 +332,32 @@
               (({ ok: 0, partial: 1, no_result: 2, error: 3 })[a.status] ?? 4) -
               ({ ok: 0, partial: 1, no_result: 2, error: 3 }[b.status] ?? 4),
           );
-        if (mode === "workspace") {
+        if (docked && mode === "threads") {
+          const lane = Math.max(312, ...ordered.map(item => item.width + 52));
+          let top = 28;
+          for (const question of ordered.filter(item => !item.kind)) {
+            const children = ordered.filter(item => item.parent === question.id && item.kind);
+            const stackHeight = kind => Math.max(0, children.filter(item => item.kind === kind).reduce((height, item) => height + item.height + 28, 0) - 28);
+            const evidenceHeight = stackHeight("evidence");
+            const findingHeight = stackHeight("conclusion");
+            const rowHeight = Math.max(question.height, evidenceHeight, findingHeight);
+            model.move(question.id, 32, top + (rowHeight - question.height) / 2);
+            let evidenceTop = top + (rowHeight - evidenceHeight) / 2;
+            let findingTop = top + (rowHeight - findingHeight) / 2;
+            for (const child of children) {
+              const evidence = child.kind === "evidence";
+              model.move(child.id, 32 + (evidence ? 1 : 2) * lane, evidence ? evidenceTop : findingTop);
+              if (evidence) evidenceTop += child.height + 28;
+              else findingTop += child.height + 28;
+            }
+            top += rowHeight + 48;
+          }
+          const questions = new Set(ordered.filter(item => !item.kind).map(item => item.id));
+          for (const orphan of ordered.filter(item => item.kind && !questions.has(item.parent))) {
+            model.move(orphan.id, 32 + (orphan.kind === "evidence" ? 1 : 2) * lane, top);
+            top += orphan.height + 48;
+          }
+        } else if (mode === "workspace") {
           const questions = ordered.filter((item) => !item.kind);
           const findings = ordered.filter((item) => item.kind);
           questions.forEach((item, n) => {
@@ -413,12 +451,14 @@
       active: themeColor("--accent", "#3764a0"),
       related: themeColor("--graph-related", "#5f7898"),
       line: themeColor("--graph-line", "#758294"),
+      question: themeColor("--coral", "#758294"),
     };
     const plane = $("canvas-plane");
     const lines = $("canvas-links");
-    const model = createModel();
     const reviewDesk = !!viewport.closest?.(".review-desk");
     const canvasFirst = !!viewport.closest?.(".canvas-first");
+    const docked = !!viewport.closest?.(".fieldnotes");
+    const model = createModel({ docked });
     const records = new Map();
     let selected = null;
     const selectedIds = new Set();
@@ -615,13 +655,15 @@
         const bend = Math.max(45, Math.abs(to.x - from.x) / 2);
         const active = item.id === selected || item.parent === selected;
         const connected = related.has(item.id) && related.has(parent.id);
-        ctx.strokeStyle = active
+        ctx.strokeStyle = docked
+          ? item.kind === "conclusion" ? palette.related : item.kind === "evidence" ? palette.line : palette.question
+          : active
           ? palette.active
           : connected
             ? palette.related
             : palette.line;
         ctx.lineWidth = (active ? 1.8 : 1.15) / scale;
-        ctx.setLineDash(item.kind === "evidence" ? [5 / scale, 5 / scale] : []);
+        ctx.setLineDash(!docked && item.kind === "evidence" ? [5 / scale, 5 / scale] : []);
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         const crossesCard = visible.some(
@@ -794,7 +836,7 @@
       detailFocus = null;
       draw();
       const s = size();
-      const floatingBottom = canvasFirst ? Math.max(24, ...["source-dock", "agent-chat"].map(id => {
+      const floatingBottom = canvasFirst && !docked ? Math.max(24, ...["source-dock", "agent-chat"].map(id => {
         const panel = $(id);
         return panel?.offsetHeight ? viewport.getBoundingClientRect().bottom - panel.getBoundingClientRect().top + 20 : 0;
       })) : 24;
@@ -802,7 +844,7 @@
         s.width,
         s.height,
         window.CtrlFVideoWorkbench
-          ? { top: reviewDesk ? 48 : 24, bottom: Math.min(floatingBottom, Math.max(24, s.height - 120)), full: !reviewDesk }
+          ? { top: docked ? 28 : reviewDesk ? 48 : 24, bottom: Math.min(floatingBottom, Math.max(24, s.height - 120)), full: !reviewDesk }
           : null,
       );
       draw();
@@ -1030,7 +1072,7 @@
           slot++;
         }
       }
-      if (reviewDesk) {
+      if (reviewDesk && !docked) {
         const index = model.items.size - 1;
         model.move(turn.id, 40 + (index % 3) * 320, 30 + Math.floor(index / 3) * 300);
       }
@@ -1138,9 +1180,8 @@
       draw();
       if (window.CtrlFVideoWorkbench) {
         const s = size();
-        const composerTop =
-          $("question-form").getBoundingClientRect().top -
-          viewport.getBoundingClientRect().top;
+        const composerTop = docked ? s.height :
+          $("question-form").getBoundingClientRect().top - viewport.getBoundingClientRect().top;
         const targetScale = Math.min(
           readable ? 1 : model.view.scale,
           1,
@@ -1298,7 +1339,7 @@
       $("arrange-mode").value = mode;
       perform("Arrange", () => {
         model.arrange(mode);
-        if (reviewDesk && ["threads", "spread"].includes(mode)) {
+        if (reviewDesk && !docked && ["threads", "spread"].includes(mode)) {
           const columns = canvasFirst ? Math.max(2, Math.min(4, Math.floor((size().width - 80) / 320))) : 3;
           const rowHeight = Math.max(320, ...model.visible().map(item => item.height + 36));
           model.visible().forEach((item, index) => model.move(item.id, 40 + (index % columns) * 320, 30 + Math.floor(index / columns) * rowHeight));
@@ -1387,6 +1428,7 @@
       const next = size();
       draw();
       if (
+        !docked &&
         selected &&
         !gesture &&
         (next.width < lastSize.width || next.height < lastSize.height)

@@ -22,6 +22,7 @@ for (const file of [
   "workbench.js",
   "styles.css",
   "workbench.css",
+  "fieldnotes.css",
 ]) {
   const hash = createHash("sha256")
     .update(await readFile(base + file))

@@ -3,6 +3,50 @@ const assert = require("node:assert/strict");
 const {
   createModel,
 } = require("../src/ctrlf_video/static/investigation-canvas.js");
+
+function assertNoOverlap(nodes) {
+  for (let i = 0; i < nodes.length; i++) for (const b of nodes.slice(i + 1)) {
+    const a = nodes[i];
+    assert.ok(a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y, `${a.id} overlaps ${b.id}`);
+  }
+}
+
+for (const pinFirst of [true, false]) test(`docked insertion preserves parents and avoids overlapping pins/follow-ups (pin first: ${pinFirst})`, () => {
+  const m = createModel({docked:true});
+  const root = m.add("root", null);
+  const before = {x:root.x,y:root.y};
+  const pin = () => m.add("frame", "root", {kind:"evidence"});
+  const follow = () => m.add("follow", "root");
+  if (pinFirst) { pin(); follow(); } else { follow(); pin(); }
+  m.add("finding", "root", {kind:"conclusion"});
+  m.add("follow-frame", "follow", {kind:"evidence"});
+  assert.equal(m.items.get("follow").parent, "root");
+  assert.equal(m.items.get("frame").parent, "root");
+  assert.equal(m.items.get("follow").x, root.x);
+  assert.ok(m.items.get("frame").x > root.x);
+  assert.deepEqual({x:root.x,y:root.y},before);
+  assertNoOverlap(m.visible());
+});
+
+test("docked arrangement retains typed columns across fold/expand and keeps orphaned pins visible", () => {
+  const m = createModel({docked:true});
+  m.add("root",null);
+  m.add("follow","root");
+  m.add("frame","root",{kind:"evidence"});
+  m.add("frame2","root",{kind:"evidence"});
+  m.add("finding","root",{kind:"conclusion"});
+  m.add("orphan",null,{kind:"evidence"});
+  m.fold("root",true);
+  m.arrange("threads");
+  m.fold("root",false);
+  assertNoOverlap(m.visible());
+  assert.equal(m.items.get("root").x,m.items.get("follow").x);
+  assert.equal(m.items.get("frame").x,m.items.get("frame2").x);
+  assert.ok(m.items.get("finding").x>m.items.get("frame").x);
+  assert.equal(m.items.get("follow").parent,"root");
+  assert.equal(m.items.get("orphan").parent,null);
+});
+
 test("a branch attaches to the explicitly selected turn, not the latest turn", () => {
   const m = createModel();
   m.add("center", null);

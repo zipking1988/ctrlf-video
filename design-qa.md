@@ -1,51 +1,84 @@
-# Canvas-first workspace design QA
+# Coral Fieldnotes desktop design QA
 
-Date: 2026-10-14
+Date: 2026-10-16
 
 final result: passed
 
-## Target and scope
+## Target, implementation and comparison evidence
 
-Selected option 1: `/Users/zip/.codex/generated_images/01a13a7b-3ca9-7902-97f5-5fa8e2c7fc3f/exec-93e1d22f-2d1e-44a2-8764-4962b937f855.png`.
+Selected visual: the first displayed result in the latest colorful ideation set, `/Users/zip/.codex/generated_images/01a14452-3cc0-7292-9187-ec1fb7b2a866/exec-82064454-b3cc-4b77-8705-ec266a768c92.png`.
 
-Implementation: http://127.0.0.1:8877/, existing app in local fixture mode. Main comparison uses 1487 × 1058 CSS pixels and same-size image captures. Additional desktop check: 1024 × 800. Source and final implementation were opened together in one image comparison input, after the fixes below. No mobile acceptance is claimed.
+Implementation: http://127.0.0.1:8877/, the existing application in local fixture mode. Source: 1487 × 1058 pixels. Main implementation capture: 1487 × 1058 pixels at a 1487 × 1058 CSS viewport, density 1. No scaling or density correction was required. Additional desktop checks: 1280 × 720 and 1024 × 800 CSS pixels. Mobile is outside scope.
 
-Both views show a white evidence canvas, a secondary source player at bottom left, and agent bubbles at bottom right with the editor closed. Content differs intentionally: the existing investigation has four saved objects rather than the six conceptual mock objects. Actual question relationships, synthetic source frames and native video controls are retained; no generated evidence or invented findings were inserted to match the illustration. Arrangement remains editable. This is an implementation of the selected hierarchy and interaction model, not a pixel-identical reproduction of the conceptual graph.
+Local evidence directory: `.ctrlf-video-eval/fieldnotes/` (ignored; screenshots contain only the public synthetic source and test annotations).
 
-## Fixes and post-fix evidence
+- Main implementation: `final-desktop.png`.
+- Full-view comparison, with source and implementation in the same image: `comparison-final.jpg` (2974 × 1098 pixels including labels).
+- Focused reference/implementation comparison of answer typography, frame rows and actions: `comparison-agent.png`.
+- Earlier full comparison: `comparison-first.jpg`; first implementation: `first.png`.
+- Additional states: `desktop-1280x720.png`, `desktop-1024x800.png`, `empty.png`, `partial.png`, `editor.png`, `report.png`.
 
-Evidence folder: `.ctrlf-video-eval/canvas-bubbles/` (local, ignored).
+Both main views show an open research panel, source dock, one question, two independent supporting-frame objects and one conclusion. Content intentionally differs: the conceptual invitation flow remains illustration only. The implementation uses canonical synthetic package frames, actual timestamps, a preset answer and source-linked test annotations. Generated UI artwork never becomes video evidence. The graph retains actual question-to-frame/finding relationships; it does not add an unsupported evidence-to-conclusion edge to imitate the mock.
 
-| Finding | Severity | Resolution | Evidence |
+## Findings and comparison history
+
+| Earlier finding | Severity | Fix | Post-fix evidence |
 | --- | --- | --- | --- |
-| Initial floating tools covered the lower evidence card after Fit | P2 | Fit reserves space for visible tools; desktop Arrange uses available width | `first.jpg`, `final-desktop.jpg`, `narrow-final.jpg` |
-| Compact chat put the answer below the visible area | P2 | Answer precedes supporting details; compact composer and revised panel height | `first.jpg`, `final-desktop.jpg`, `narrow-final.jpg` |
-| Canvas finding summary still showed the original answer after editing observations | P2 | Summary reflects researcher observations; source answer remains separate | Browser field edit, immediate card update, save and restoration verified; `editor.jpg` |
-| Header export opened a hidden dialog when the editor was collapsed | P1 | Report/comparison dialogs render outside the dismissible inspector via a portal | `report.jpg`: visible report with editor closed, close control verified |
-| Closing source returned focus to the hidden old rail | P2 | Focus returns to the visible Source launcher | Browser keyboard check and frontend regression |
+| Replay icons inherited thumbnail dimensions; pin icons inherited an image-hiding rule | P1 | Restrict thumbnail styles to direct images and explicitly display row icons | `comparison-agent.png`, `final-desktop.png`; replay and pin/locate controls verified |
+| Header content retained a 60px height inside the new 80px header region | P2 | Let the header fill its grid region | `comparison-final.jpg`; measured header is 80px high |
+| Floating-tool space reservation made Fit unnecessarily shrink the graph | P2 | Fit the unobstructed docked canvas, with 28px top and 24px bottom insets | `final-desktop.png`; the four-node graph fits at approximately 97% at the main viewport |
+| Reopening a panel caused the resize observer to refocus and move the canvas | P2 | Docked-layout resize redraws without changing the viewport transform | Panel collapse/reopen and draft retention checked after the fix |
+| Short-window source dock could clip playback-status text | P2 | Increase its compact row allowance and reduce source-heading height | Source dock checked after the change; 1280 × 720 and 1024 × 800 controls stay in view |
+| Questions and findings were top-aligned rather than centered beside their evidence | P2 | Center each column within its question's evidence stack during Question paths arrangement | `comparison-final.jpg`, `final-desktop.png` |
 
-Final comparison found no remaining P0/P1/P2 issue in the scoped desktop flow.
+The final full-view and focused comparisons found no remaining actionable P0/P1/P2 issue in this desktop scope.
 
-## Fidelity and interaction checks
+## Required fidelity surfaces
 
-- Typography: retained Instrument Sans, clear canvas title, readable question/finding headings and agent answer at the main desktop viewport. No mixed-language application labels introduced.
-- Layout: canvas fills the workspace below the header/toolbar. Player, agent and editor are floating tools. Closing panels preserves the canvas transform and draft. Existing fit/zoom/pan and optional minimap remain available.
-- Colors: white surfaces, charcoal text, restrained green actions and pale green agent response. No gray workspace fill or invented decorative assets.
-- Images/icons: canonical synthetic frames, original source player, existing licensed icon assets. Aspect ratios retained. Reference artwork is not used as evidence.
-- Copy: synthetic results remain explicitly labeled. Existing saved researcher content remains verbatim. Findings show source links and editable observed facts/open questions; interpretation is a disclosure.
-- Keyboard: chat launcher/minimize, evidence replay, source expand/shrink/Escape, source hide/reopen, finding open/save and report open/close verified. Skip link opens the composer when chat is minimized.
-- Persistence: a temporary draft survived chat collapse and page reload. Temporary test text was cleared. Finding edit was saved, reflected on canvas, then restored to its original content and saved again.
-- Browser console: no warning/error entries in the checked session.
+- **Fonts and typography:** retained locally served Instrument Sans and existing language fallbacks. Header uses 24px semibold; canvas titles use 18px, answer text 16px, body text 14px, supporting captions 11–12px. Smaller metadata remains secondary. At the main viewport the fitted graph is near native size. Focus restores a readable individual object on smaller desktops. No clipped primary title or composer at the checked sizes.
+- **Spacing and layout:** dark teal permanent rail, warm canvas, integrated right panel and dark teal bottom player follow the selected composition. Measured main regions: 88px rail, 80px header, 62px canvas toolbar, 1007 × 646px canvas, 392px research panel, 210px source dock and 52px view-control row. Panels cannot cover canvas objects. The toolbar and native player differ from the illustration to retain real controls. Question paths preserves real graph parents and editable positions; it does not silently rearrange a saved desk on load.
+- **Colors and tokens:** warm paper `#faf7f2`, ink `#192b30`, teal rail `#084f52`, coral actions `#ed654b`, coral questions `#fff0e9`, amber evidence `#fff7e3`, mint findings `#e1f2e9`. Color identifies object type; labels independently convey type and result state. Media keeps dark chrome and light text. Keyboard focus and selection remain visible.
+- **Images, icons and asset fidelity:** actual source frames retain their aspect ratio and source URLs. Native playback stays functional. Existing licensed Phosphor icons and font notices remain. No generated evidence, custom replacement icons, decorative raster placeholders or fabricated footage were added. The source dock has the actual two supporting frames rather than inventing the mock's five thumbnails.
+- **Copy and content:** English app labels; researcher-entered text is retained. Synthetic answers remain explicitly labeled. Observations, interpretations and open questions stay separate. Unresolved items are expanded under Still to verify. No fabricated model reasoning, confidence metrics, performance claims or transcription features were added. Findings replaces the concept's Notes tab with a working route to the existing editor.
 
-Full-size comparison images make the primary controls, cards and chat readable; the editor and report received separate state captures. No additional image crops were needed.
+## Interaction and persistence verification
+
+Checked in the in-app browser against the running application:
+
+- Empty investigation; preset question submission; contextual What happened next? and Who moved it? follow-ups; partially verified answer and visible unresolved text.
+- Frame replay from the research panel and source strip; explicit pin to canvas; locate an already pinned frame without duplication.
+- Source library navigation; source expand/shrink with Escape; source/panel hide and reopen; unsent draft retention through panel changes and refresh.
+- Finding selection, title/observation/open-question editing, successful durable Save finding, immediate canvas update and restored findings after reopening the investigation.
+- Export report preview includes the saved annotations, source provenance and limitations. Existing export regressions cover serialization; no new live recording/export accuracy claim is made.
+- Sources and Investigations libraries, new investigation and return to the original saved desk.
+- Fit, Arrange, Focus, selected/busy/saved states and fixed composer at the checked desktop sizes. Larger graphs still require zoom/pan/folding/Focus.
+- Browser warning/error log: empty in the final session.
 
 ## Validation and limits
 
-- `npm run build`: passed; generated bundle and static asset hashes refreshed.
-- `npm test`: 100 passed, 0 failed, including floating-panel, draft, playback, finding-save, selection and recovery regressions.
+- `npm run build`: passed; generated React bundle, retained legal notices and asset hashes updated, including the new authored stylesheet.
+- `npm test`: 102 passed, 0 failed; includes new source-library and findings-navigation draft/playback regressions.
+- `make test`: 218 passed, 1 skipped (Linux namespace integration on macOS).
+- `make check`: passed (lint, formatting and contract-export checks).
 - `git diff --check`: passed.
-- Desktop UI verification only. The subsequent code review also passed 166 backend tests and `make check`; model integration uses mock transports. No live Gemini calls, paid resources, deployment or real-video accuracy acceptance.
-- P3 follow-up: Fit on a narrow desktop shrinks a wide saved graph substantially. Zoom/pan, Focus and minimizing tools remain available; larger investigations may benefit from richer spatial arrangement in a later iteration.
-- Existing question cards retain their evidence previews. The mock's exact graph topology and number of cards are not asserted as implemented data.
+- Local UI and fixture verification only. No paid Gemini calls, budget changes, resource provisioning, push or deployment performed for this redesign. Broad live evidence quality, real UX-recording value, latency and operating costs remain unverified.
 
-The subsequent code review fixed false save confirmation after conflicts, incorrect finding selection under filters, malformed snapshot handling and lost research context during request recovery. Private-main delivery is authorized separately; no public publication or deployment is part of this validation.
+## Implementation checklist
+
+- [x] Apply selected palette, typography, navigation and docked composition to the existing app.
+- [x] Keep actual evidence, owned APIs, immutable submitted context, eight-pin cap and durable save behavior.
+- [x] Fix the P1/P2 findings and inspect final combined comparisons.
+- [x] Rebuild generated assets and run the applicable regressions/checks.
+- [x] Leave the local preview available for review.
+
+## Follow-up polish
+
+P3: dense investigations can fit below comfortable reading size on a 1024px desktop. Focus, pan/zoom and minimizing tools provide the existing supported navigation; richer narrow-window graph layouts can be considered separately. No mobile acceptance is claimed.
+
+## Pre-push code review follow-up
+
+Reviewed October 16 after the visual implementation. Corrected docked placement being overwritten by the older grid, follow-up/frame collisions, typed-column arrangement after folding and orphaned source pins, editor focus returning to a hidden control, low-contrast focus rings on teal surfaces, and clipped source status/return controls. The dock now scrolls when uploaded-source disclosures need extra space.
+
+Browser verification at 1440 × 900 and 1024 × 768 confirmed nonoverlapping follow-up/pinned cards, frame replay at 00:10, editor close returning focus to the visible Findings rail control, and the playback status remaining inside the compact dock. A synthetic MP4 was uploaded to the local fixture backend and returned to the original saved demo investigation without model analysis. No paid calls were made.
+
+Updated validation: 106 frontend regressions passed; 218 backend tests passed locally with the Linux-only isolation test skipped; lint, format, contract exports, generated bundle/content hashes and whitespace checks passed. The native reviewer and red-team checks ran in the current Codex harness; no separate Claude/outside-model review is claimed.

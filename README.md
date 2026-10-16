@@ -8,13 +8,15 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 The **Evidence canvas** is the main workspace. Questions, source frames and findings remain connected as you investigate a recording.
 
-- **Agent chat:** ask a question or follow up on a selected result in the bottom-right popover. Minimize it to make room; drafts survive reopening and refresh.
-- **Source player:** replay a cited timestamp in the bottom-left player. Expand it to inspect detail, or hide it while organizing the canvas.
+- **Agent chat:** ask a question or follow up on a selected result in the docked right panel. Replay supporting thumbnails or pin a frame to the canvas. Minimize the panel to make room; drafts survive reopening and refresh.
+- **Source player:** replay a cited timestamp in the dark teal bottom dock, alongside the current question's supporting frames. Expand it to inspect detail, or hide it while organizing the canvas.
 - **Finding editor:** open a finding from its card. Edit its title, observed facts, interpretation and open questions. Observed facts update the canvas summary while the original answer and evidence remain available.
 - **Research context:** expand this section in agent chat to record the participant's task and whether the recording is a UX study or a technical sample. Each question captures the context submitted with it.
 - **Reports:** export Markdown, JSON or HTML with findings, source timestamps and unresolved questions. HTML can optionally include evidence images.
 
 All application labels and synthetic demo content are English. Researcher-entered content keeps its original language. This edition targets desktop use.
+
+The Coral Fieldnotes workspace uses a warm paper canvas, coral questions, amber evidence and mint findings. The docked player and research panel leave the graph unobstructed; **Question paths → Arrange** separates questions, pinned source frames and conclusions into columns while retaining their actual source relationships. **Sources** in the left rail opens the recording library; **Player** shows or hides playback.
 
 ## Current status
 

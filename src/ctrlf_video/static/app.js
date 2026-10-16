@@ -607,7 +607,7 @@ function toggleInspector() {
   } else {
     shell.classList.add("inspector-collapsed");
     syncInspectorToggle();
-    $("toggle-inspector").focus();
+    $(shell.classList.contains("fieldnotes") ? "rail-findings" : "toggle-inspector").focus();
   }
 }
 function syncInspectorToggle() {
@@ -782,6 +782,8 @@ $("source-dock").addEventListener("keydown", event => {
   if (event.key === "Escape") { setSourceExpanded(false); $("expand-source").focus(); }
 });
 $("rail-findings").addEventListener("click", () => openInspector("findings"));
+$("rail-library")?.addEventListener("click", () => window.CtrlFVideoPersistence?.library("videos"));
+$("agent-findings")?.addEventListener("click", () => openInspector("findings"));
 $("toggle-inspector").addEventListener("click", toggleInspector);
 $("collapse-source").addEventListener("click", () => {
   setSourceExpanded(false);

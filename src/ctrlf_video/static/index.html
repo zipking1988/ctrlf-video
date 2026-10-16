@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#084f52" />
     <title>CtrlF Video · Ctrl+F for video</title>
     <meta name="description" content="Ctrl+F for video. Ask questions, find evidence frames and follow up on a desktop investigation canvas." />
     <link rel="icon" href="/static/icons/play.svg" type="image/svg+xml" />
@@ -14,15 +14,16 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="stylesheet" href="/static/styles.css?v=4a8bf0f3fefb" />
+    <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=8cbfbe597676" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
-    <script src="/static/investigation-canvas.js?v=ef0ebc094960" defer></script>
+    <script src="/static/investigation-canvas.js?v=9397d436b9a6" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=ed151f859e0d" defer></script>
-    <script src="/static/workbench.js?v=9da0424e33be" defer></script>
+    <script src="/static/workbench.js?v=aec91a38b1ec" defer></script>
     <script src="/static/workspace.js?v=c87718078fca" defer></script>
-    <script src="/static/app.js?v=b6c36f399b64" defer></script>
+    <script src="/static/app.js?v=00b49039f6f6" defer></script>
   </head>
   <body>
     <a href="#question" class="skip-link">Skip to question input</a>
@@ -30,9 +31,8 @@
       <h1>CtrlF Video</h1>
       <p>This workspace needs a desktop browser.</p>
     </div>
-    <div class="agent-shell workbench-shell review-desk canvas-first inspector-collapsed">
+    <div class="agent-shell workbench-shell review-desk canvas-first fieldnotes inspector-collapsed">
       <header class="studio-header">
-        <div id="workspace-navigation"></div>
         <a class="brand" href="/" aria-label="CtrlF Video Home" title="Ctrl+F for video">CtrlF Video</a>
         <div id="project-title"></div>
         <button id="save-state" class="save-state" type="button" aria-live="polite">Connecting to workspace…</button>
@@ -56,15 +56,18 @@
         <button id="export-report" class="outline-button">Export report</button>
       </header>
       <nav class="studio-rail" aria-label="Workspace navigation">
-
+        <a class="rail-brand" href="/" aria-label="CtrlF Video Home">CtrlF<br />Video</a>
         <button
           id="rail-canvas"
           class="rail-button active"
           aria-label="Return to evidence canvas"
         >
           <img class="icon" src="/static/icons/chats-circle.svg" alt="" /><span
-            >Investigation</span
+            >Workspace</span
           >
+        </button>
+        <button id="rail-library" class="rail-button" aria-label="Open source library">
+          <img class="icon" src="/static/icons/folder-open.svg" alt="" /><span>Sources</span>
         </button>
         <button
           id="rail-source"
@@ -75,9 +78,10 @@
           title="Hide player"
         >
           <img class="icon" src="/static/icons/folder-open.svg" alt="" /><span
-            >Source</span
+            >Player</span
           >
         </button>
+        <div id="workspace-navigation"></div>
         <button
           id="rail-findings"
           class="rail-button"
@@ -153,6 +157,7 @@
         </button>
         <div class="canvas-actions">
           <span id="board-label" class="board-label">Evidence canvas</span>
+          <div class="canvas-legend" aria-label="Canvas object types"><span class="legend-question">Question</span><span class="legend-evidence">Evidence</span><span class="legend-finding">Finding</span></div>
           <button id="canvas-search" class="outline-button" title="Search canvas(⌘ / Ctrl + K)">Search</button>
           <span id="demo-current" class="demo-current" hidden></span>
           <button id="expand-paths" class="outline-button" hidden>
@@ -211,6 +216,7 @@
             <span id="video-heading">Package positions · Synthetic demo</span
             ><span id="video-state">Demo source</span>
           </div>
+          <div id="source-evidence-strip"></div>
           <div class="player-wrap">
             <video
               id="player"
@@ -312,7 +318,7 @@
       ></aside>
       <p id="form-notice" class="form-notice" role="status" hidden></p>
       <section id="agent-chat" class="agent-chat" aria-label="Research agent">
-        <header class="agent-chat-heading"><span><img class="icon" src="/static/icons/chats-circle.svg" alt="" />Agent</span><button id="collapse-agent" class="icon-button" aria-label="Minimize agent chat"><img class="icon" src="/static/icons/x.svg" alt="" /></button></header>
+        <header class="agent-chat-heading"><span>Investigation</span><button id="agent-findings" class="agent-findings-button">Findings</button><button id="collapse-agent" class="icon-button" aria-label="Minimize agent chat"><img class="icon" src="/static/icons/x.svg" alt="" /></button></header>
         <div id="research-task"></div>
         <div id="agent-conversation-root"></div>
       <section class="composer-area" aria-label="Ask about the recording">
@@ -332,7 +338,7 @@
             id="question"
             rows="2"
             maxlength="1000"
-            placeholder="Ask a follow-up or give the agent a task…"
+            placeholder="Ask about a moment in this recording…"
           ></textarea>
           <div class="composer-tools">
             <button

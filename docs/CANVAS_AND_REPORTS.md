@@ -17,7 +17,7 @@ Layouts/groups are saved with the existing investigation revision and restore af
 
 Select a question and save its answer or supporting frame. The **Findings** tab exposes title, observed facts, interpretation and open questions directly. Use **Edit finding** to switch between saved items. Title and observed-fact changes also update the canvas; source answers and timestamps remain unchanged. **Save finding** confirms a durable save only after the local save queue has drained successfully. Revision conflicts remain visible for recovery. Supporting frames seek to their exact source timestamps; **Replay context** seeks two seconds before the first frame, clamped to the start, leaving playback paused.
 
-The research task and recording purpose are editable under **Research context** in the agent chat popover. Each submitted question retains the task context captured when it was sent.
+The research task and recording purpose are editable under **Research context** in the docked agent panel. Each submitted question retains the task context captured when it was sent. Supporting-frame thumbnails replay the source; their **Pin frame to canvas** buttons save independent evidence objects. A saved frame's button locates its existing object instead of duplicating it. The source dock also displays the current question's actual supporting frames, including uploaded-source frames when available.
 
 ## Portable reports
 

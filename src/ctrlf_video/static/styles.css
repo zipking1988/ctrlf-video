@@ -6,18 +6,26 @@
 }
 /* Shared palette: quiet application chrome, a dark media stage, one action accent. */
 :root {
-  --canvas: #ffffff;
+  --canvas: #faf7f2;
   --surface: #ffffff;
-  --hover: #f0f8f5;
+  --hover: #f4f0e9;
   --bg: var(--canvas);
   --raised: var(--surface);
-  --line: #e2e7ec;
-  --control-border: #a9b4bf;
-  --text: #111722;
-  --muted: #586575;
-  --accent: #086b4c;
-  --accent-hover: #055239;
-  --accent-soft: #e9f7f1;
+  --line: #e5e3dc;
+  --control-border: #b6c0bb;
+  --text: #192b30;
+  --muted: #59686c;
+  --accent: #0b6669;
+  --accent-hover: #084f52;
+  --accent-soft: #e0f1eb;
+  --rail: #084f52;
+  --coral: #ed654b;
+  --coral-ink: #9d3827;
+  --question-fill: #fff0e9;
+  --evidence-fill: #fff7e3;
+  --evidence-border: #d9b361;
+  --finding-fill: #e1f2e9;
+  --finding-border: #75ac99;
   --on-accent: #ffffff;
   --success: #286749;
   --warning: #865915;
@@ -27,9 +35,9 @@
   --backdrop: #26313f66;
   --media-bg: #17191d;
   --media-text: #f4f5f7;
-  --graph-line: #758294;
-  --graph-related: #5b8475;
-  --graph-grid: #ffffff00;
+  --graph-line: #c39449;
+  --graph-related: #4b9684;
+  --graph-grid: #8c9c9a60;
   color-scheme: light;
   font-family: Instrument, "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 16px;

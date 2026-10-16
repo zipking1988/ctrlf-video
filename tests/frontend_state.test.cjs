@@ -317,3 +317,37 @@ test("expanding and hiding the floating source retains playback and draft", asyn
   assert.equal(h.player.currentTime, 10);
   assert.equal(h.get("question").value, "Draft");
 });
+
+test("source library rail opens owned sources without changing the investigation draft or playback", async () => {
+  const h = await harness();
+  h.run("window.CtrlFVideoPersistence = { library(kind) { window.openedLibrary = kind; } }");
+  h.get("question").value = "Keep my research question";
+  h.player.currentTime = 6;
+  h.get("rail-library").click();
+  assert.equal(h.run("window.openedLibrary"), "videos");
+  assert.equal(h.get("question").value, "Keep my research question");
+  assert.equal(h.player.currentTime, 6);
+});
+
+test("agent findings navigation preserves the draft and opens the existing finding editor", async () => {
+  const h = await harness();
+  h.run("window.CtrlFVideoWorkbench = { showPanel(tab) { window.openedPanel = tab; } }");
+  h.get("question").value = "Unsent follow-up";
+  h.get("agent-findings").click();
+  assert.equal(h.run("window.openedPanel"), "findings");
+  assert.equal(h.shell.classList.contains("inspector-collapsed"), false);
+  assert.equal(h.get("inspector-findings-tab").focused, true);
+  assert.equal(h.get("question").value, "Unsent follow-up");
+});
+
+test("closing the docked findings editor returns focus to the visible rail control", async () => {
+  const h = await harness();
+  h.shell.classList.add("fieldnotes");
+  h.shell.classList.remove("inspector-collapsed");
+  h.get("question").value = "Keep this draft";
+  h.run("toggleInspector()");
+  assert.equal(h.shell.classList.contains("inspector-collapsed"),true);
+  assert.equal(h.get("rail-findings").focused,true);
+  assert.notEqual(h.get("toggle-inspector").focused,true);
+  assert.equal(h.get("question").value,"Keep this draft");
+});
