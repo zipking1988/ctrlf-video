@@ -85,6 +85,33 @@ The local Python/ASGI tests exercise the gateway and real workspace together.
 
 ## Configuration boundaries
 
+### Custom domain preparation (October 16)
+
+`ctrlfvideo.com` is delegated to the public Cloud DNS zone `ctrlfvideo-com` in
+this temporary project. Existing root A/MX/SPF records were retained during the
+nameserver change. The domain is **not yet bound to the application**: Google
+requires account ownership verification before creating the Cloud Run mapping.
+The owner account's Search Console verification form failed to open, and its
+existing CLI credentials lack Site Verification API scopes. No ownership bypass,
+new OAuth grant, custom-domain certificate or successful HTTPS test is claimed.
+
+After obtaining the account's DNS TXT verification record, append it alongside
+the existing SPF record, complete Google verification, create the mapping and
+apply exactly the returned A/AAAA records. Wait for the managed certificate to
+be ready before changing the application's canonical origin. Back up private
+configuration and use maintenance plus the release lock while switching the
+backend `CTRLF_PUBLIC_ORIGIN` and frontend environment to the same HTTPS origin.
+Keep the current data/ledger and enforce host, session and CSRF checks.
+
+The publisher reads `CTRLF_PUBLIC_ORIGIN` from the existing Cloud Run service
+instead of assuming the default hostname. Only the existing run.app origin and
+`https://ctrlfvideo.com` are accepted; missing/other origins reject the release
+before backend work. The existing run.app URL stays operational until cutover.
+Domain mapping and DNS remain within the October 19 cleanup window; a custom
+domain does not extend the hosting authorization.
+
+### Component settings
+
 | Component | Required configuration |
 | --- | --- |
 | Frontend | `CTRLF_COMPONENT=frontend`, `CTRLF_PUBLIC_ORIGIN`, `CTRLF_BACKEND_ORIGIN`, private `CTRLF_GATEWAY_TOKEN`, optional `CTRLF_BACKEND_CA_FILE`, `PORT` |

@@ -19,6 +19,7 @@ INSTANCE = "ctrlfvideo-backend"
 SERVICE = "ctrlfvideo-frontend"
 ACCOUNT = "ctrlfvideo-deployer@ctrlfvideo.iam.gserviceaccount.com"
 ORIGIN = "https://ctrlfvideo-frontend-655757141159.asia-northeast1.run.app"
+PUBLIC_ORIGINS = {ORIGIN, "https://ctrlfvideo.com"}
 CUTOFF = 1792414800  # October 19, 2026, 22:00 JST; leaves rollback/cleanup headroom.
 
 
@@ -77,9 +78,11 @@ def frontend_traffic(revisions):
     )
 
 
-def public_check():
+def public_check(origin):
+    if origin not in PUBLIC_ORIGINS:
+        raise RuntimeError("Unapproved public deployment origin")
     for path in ("/", "/gateway/health", "/health", "/api/session"):
-        with urllib.request.urlopen(ORIGIN + path, timeout=30) as response:
+        with urllib.request.urlopen(origin + path, timeout=30) as response:
             body = response.read()
             if response.status != 200:
                 raise RuntimeError("Public deployment check failed")
@@ -102,6 +105,16 @@ def release(image, *, drill=False):
     old = json.loads(
         cloud("run", "services", "describe", SERVICE, f"--region={REGION}", "--format=json")
     )
+    public_origin = next(
+        (
+            item.get("value")
+            for item in old["spec"]["template"]["spec"]["containers"][0].get("env", [])
+            if item["name"] == "CTRLF_PUBLIC_ORIGIN"
+        ),
+        None,
+    )
+    if public_origin not in PUBLIC_ORIGINS:
+        raise RuntimeError("Unapproved public deployment origin")
     traffic = {
         r["revisionName"]: r["percent"] for r in old["status"]["traffic"] if r.get("percent")
     }
@@ -126,7 +139,7 @@ def release(image, *, drill=False):
                 result = remote("drill", sha, destination, digest)
                 if result.get("phase") != "drill_passed":
                     raise RuntimeError("Rollback drill did not complete")
-                public_check()
+                public_check(public_origin)
                 print(
                     "Rollback drill passed; previous code, owned data and verified backup retained."
                 )
@@ -176,7 +189,7 @@ def release(image, *, drill=False):
             if actual != {revision: 100}:
                 raise RuntimeError("Frontend traffic did not reach this release")
             remote("finalize", sha)
-            public_check()
+            public_check(public_origin)
             pending = False
             print("Both services deployed; session, fixture mode and persistence checks passed.")
         except Exception:

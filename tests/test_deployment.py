@@ -245,11 +245,27 @@ def orchestrator(monkeypatch):
         if args[:3] == ("run", "services", "describe"):
             return json.dumps(
                 {
+                    "spec": {
+                        "template": {
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "env": [
+                                            {
+                                                "name": "CTRLF_PUBLIC_ORIGIN",
+                                                "value": "https://ctrlfvideo.com",
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    },
                     "status": {
                         "traffic": traffic,
                         # A no-traffic revision need not update this field.
                         "latestReadyRevisionName": "previous",
-                    }
+                    },
                 }
             )
         if args[:3] == ("run", "revisions", "describe"):
@@ -279,7 +295,9 @@ def orchestrator(monkeypatch):
     monkeypatch.setattr(module, "cloud", cloud)
     monkeypatch.setattr(module, "remote", remote)
     monkeypatch.setattr(module, "run", run)
-    monkeypatch.setattr(module, "public_check", lambda: None)
+    monkeypatch.setattr(
+        module, "public_check", lambda origin: actions.append(("public_check", origin))
+    )
     return module, actions
 
 
@@ -294,6 +312,7 @@ def test_both_components_publish_only_after_backend_verification(orchestrator):
     assert names.index("drill") < names.index("deploy") < names.index("finalize")
     assert not any(a[0] == "rollback" for a in actions)
     assert any(f"--to-revisions={REVISION}=100" in a for a in actions)
+    assert ("public_check", "https://ctrlfvideo.com") in actions
 
 
 @pytest.mark.parametrize("fault", ["frontend_release", "traffic_uncertain", "public_health"])
@@ -319,7 +338,7 @@ def test_frontend_failure_or_interruption_rolls_both_components_back(
         monkeypatch.setattr(
             module,
             "public_check",
-            lambda: (_ for _ in ()).throw(RuntimeError("Injected public failure")),
+            lambda origin: (_ for _ in ()).throw(RuntimeError("Injected public failure")),
         )
     with pytest.raises(RuntimeError):
         module.release(IMAGE)
@@ -353,3 +372,21 @@ def test_deploy_cutoff_denies_cloud_activity(orchestrator, monkeypatch):
     with pytest.raises(RuntimeError, match="window closed"):
         module.release(IMAGE)
     assert not actions
+
+
+@pytest.mark.parametrize("origin", ["https://foreign.example", "http://ctrlfvideo.com", None])
+def test_unknown_or_missing_public_origin_denies_release_before_remote_work(
+    orchestrator, monkeypatch, origin
+):
+    module, actions = orchestrator
+    original = module.cloud
+
+    def cloud(*args):
+        body = json.loads(original(*args))
+        body["spec"]["template"]["spec"]["containers"][0]["env"][0]["value"] = origin
+        return json.dumps(body)
+
+    monkeypatch.setattr(module, "cloud", cloud)
+    with pytest.raises(RuntimeError, match="Unapproved public"):
+        module.release(IMAGE)
+    assert len(actions) == 1  # Only service metadata; no build/source upload/backend work.
