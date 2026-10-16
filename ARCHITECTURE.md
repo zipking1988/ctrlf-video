@@ -33,6 +33,8 @@ Queries bind context to an owned, current video/generation and verified prior an
 
 An empty relevance-selection list falls back to the highest hybrid candidates up to `rerank_k`, before the existing three-window visual-review limit. Sparse descriptions cannot establish visual absence. Invalid relevance or planning indices still fail validation; the fallback does not add model retries or bypass budget admission.
 
+Planning requests use Gemini's structured output with a required `inspect` array of integers, and explicitly separate window selection from answering the user's question. Server-side validation still rejects missing fields, noninteger/out-of-range indices and more than three selections before any visual review. A valid JSON answer to the research question is not accepted as a plan or as evidence. The optional schema is included in the existing request fingerprint and bounded syntax repair; ingest requests are unchanged.
+
 ## Gemini transmission and dispatch
 
 Only `https://generativelanguage.googleapis.com/v1beta` is accepted. Trusted runtime configuration must explicitly set `allow_google_media=true`, supply fixed verified models/revisions, backend key references, conservative per-role cost bounds and valid calibration/cutoff references.

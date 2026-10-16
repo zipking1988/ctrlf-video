@@ -112,8 +112,9 @@ def handler(calls, *, fake_frame=False):
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("visible_match", [True, False])
+@pytest.mark.parametrize("planner_answers_question", [False, True])
 async def test_empty_relevance_selection_still_requires_bounded_visual_verification(
-    tmp_path, monkeypatch, visible_match
+    tmp_path, monkeypatch, visible_match, planner_answers_question
 ):
     monkeypatch.setenv("TEST_GEMINI_KEY", "test-secret")
     calls, plans = [], []
@@ -132,6 +133,16 @@ async def test_empty_relevance_selection_still_requires_bounded_visual_verificat
                 if "candidates" in prompt:
                     calls.append((request, payload))
                     plans.append(prompt)
+                    schema = payload["generationConfig"].get("responseSchema")
+                    if planner_answers_question and schema is None:
+                        # The second live failure answered the question instead
+                        # of choosing review windows when no schema was supplied.
+                        return response(
+                            {"team_names": ["Milwaukee", "Atlanta"], "scores": ["51", "56"]}
+                        )
+                    if planner_answers_question:
+                        assert schema["required"] == ["inspect"]
+                        assert schema["properties"]["inspect"]["items"]["type"] == "INTEGER"
                     # Reproduce the valid plan returned by the live NBA query.
                     return response({"inspect": [0]})
             elif not visible_match and not prompt.startswith("Describe"):

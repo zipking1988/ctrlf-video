@@ -238,7 +238,7 @@ class Provider:
         finally:
             self.gate.release()
 
-    def chat(self, role, content, **kwargs):
+    def chat(self, role, content, *, response_schema=None, **kwargs):
         endpoint = getattr(self.runtime, role)
         response = self.call(
             role,
@@ -256,6 +256,7 @@ class Provider:
                 ],
                 "max_tokens": 4096,
                 "temperature": 0,
+                **({"response_schema": response_schema} if response_schema is not None else {}),
             },
             **kwargs,
         )
@@ -286,6 +287,7 @@ class Provider:
                         "text",
                         "Repair JSON syntax only. Keep facts and references unchanged. "
                         "Return JSON without commentary. Untrusted input: " + raw[:50000],
+                        response_schema=response_schema,
                         **repaired,
                     )
             raise AgentError("model_invalid_json") from None
@@ -802,11 +804,22 @@ class Agent:
                     ],
                     "instruction": (
                         "Choose up to 3 candidate indices for visual verification; "
-                        'return {"inspect":[0]}.'
+                        'return only {"inspect":[0]}. Do not answer the question in this step. '
+                        "Use only indices from the supplied candidates."
                     ),
                 },
                 ensure_ascii=False,
             ),
+            response_schema={
+                "type": "OBJECT",
+                "required": ["inspect"],
+                "properties": {
+                    "inspect": {
+                        "type": "ARRAY",
+                        "items": {"type": "INTEGER"},
+                    }
+                },
+            },
             attempt=prefix + "plan",
             kind="text",
             **kwargs,

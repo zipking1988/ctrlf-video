@@ -129,6 +129,11 @@ def prepare_request(role, route, payload, category):
             messages = payload["messages"]
             system = messages[0]["content"]
             parts = image_parts(messages[1]["content"], role)
+            schema = payload.get("response_schema")
+            if schema is not None:
+                if not isinstance(schema, dict):
+                    raise AgentError("invalid_gemini_content")
+                generation["responseSchema"] = schema
         else:
             raise AgentError("gemini_route_not_supported")
         wire = {
