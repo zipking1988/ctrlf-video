@@ -21,6 +21,11 @@ pushes are authorized for that temporary window. Use keyless main-only federatio
 do not create service-account keys, enable paid model calls, add build servers or
 extend hosting. Preserve the release manager's finite allowance and earlier
 admission cutoff. Final cleanup shares its lock and permanently disables releases.
+The original four-attempt setting was an assistant-chosen setup guard, not a GCP
+quota or an amount derived from the monetary budget. It was revised to 24 total
+attempts on October 16, retaining the four consumed attempts and every existing
+resource/time/model restriction. Do not describe release counts as billing credit
+or claim a verified remaining balance when billing data is unavailable.
 
 ## Read before changing behavior
 

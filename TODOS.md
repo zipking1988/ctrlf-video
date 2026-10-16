@@ -38,7 +38,7 @@ Updated: 2026-10-16. This is the current acceptance backlog, consolidated from o
 - [x] Download a consistent initial local backup; verify its checksum, both SQLite databases, source media and private configuration.
 - [x] Implement test-gated CI/CD, finite main-only deployment access, backend backup/restore checks and failure rollback regressions.
 - [x] Record the successful hosted frontend/backend pipeline, live forced-failure rollback and independently verified local recovery backup; see [deployment evidence](docs/deployment.md#release-process-and-cicd).
-- [ ] Reconcile actual cloud spend before reviewing any further release allowance; the initial four attempts are consumed.
+- [ ] Reconcile actual cloud spend against the JPY 3,000 total; the 24-attempt CI backstop is an engineering setting, not a money meter.
 - [ ] Verify containerized Linux decoding/file/network isolation and resource bounds without disabling protection before using that deployment target.
 - [ ] Validate disk encryption, expiry/deletion, restart recovery, consistent backups and restoration without resurrecting deleted media.
 - [ ] Test bounded concurrent query/ingestion workloads, cancellation/deletion races and capacity release on the target host.

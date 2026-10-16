@@ -37,7 +37,7 @@ def install(username):
         "maintenance": "/run/ctrlfvideo-release-maintenance",
         "disabled": "/etc/ctrlfvideo/deploy-disabled",
         "cutoff_epoch": 1792417500,  # October 19, 22:45 JST: recovery headroom.
-        "max_releases": 4,
+        "max_releases": 24,  # Engineering loop backstop, not a GCP/billing quota.
         "user": "ctrlfvideo",
         "python": PYTHON,
         "uv": "/opt/ctrlfvideo/bootstrap/bin/uv",

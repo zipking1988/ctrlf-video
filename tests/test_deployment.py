@@ -83,7 +83,7 @@ def release(tmp_path):
             "maintenance": str(tmp_path / "maintenance"),
             "disabled": str(settings / "deploy-disabled"),
             "cutoff_epoch": time.time() + 3600,
-            "max_releases": 4,
+            "max_releases": 24,
         }
     )
 
@@ -180,7 +180,7 @@ def test_budget_window_and_serial_release_guards_fail_before_work(release, reaso
     if reason == "cutoff":
         release.config["cutoff_epoch"] = time.time() - 1
     elif reason == "limit":
-        release.state["attempts"] = [1] * 4
+        release.state["attempts"] = [1] * release.config["max_releases"]
     elif reason == "shutdown":
         Path(release.config["disabled"]).touch()
     else:

@@ -94,8 +94,10 @@ owned-investigation check. Pull requests run tests without cloud credentials;
 Markdown-only main pushes skip the pipeline. Credentials are short-lived and
 restricted to this private repository's main workflow.
 
-This temporary setup permits four backend release attempts, including the initial
-rollback drill. New releases close **October 19 at 22:00 JST**, leaving recovery
+This temporary setup permits 24 backend release attempts, including failed
+preparation and rollback drills. This is an operator-chosen loop backstop, not a
+GCP quota or a conversion of the JPY 3,000 budget. New releases close **October 19
+at 22:00 JST**, leaving recovery
 time before cleanup. Automatic releases reject database/ledger/API contract
 changes; those need a reviewed migration. A rollback restores code and keeps the
 current workspace and model ledger. See the
@@ -106,9 +108,11 @@ passed 100 frontend and 195 backend tests; both services now run that tested
 application source. Final verification corrected the frontend revision selection
 and checked 100% traffic, with 27 deployment regressions passing. A live
 forced-failure rollback and independent local backup restoration also passed.
-The initial four release attempts are consumed; further deployments are blocked
-until an operator reviews spending and the remaining authorized window. The app
-remains in fixture mode; actual cloud billing is not yet reconciled.
+Four attempts were consumed during setup. The overly restrictive initial cap of
+four was increased to 24 without resetting history, allowing 20 more attempts in
+the existing window. Instance limits, the JPY 3,000 total and cleanup deadline
+remain unchanged. The app remains in fixture mode; actual cloud billing is not
+yet reconciled, and budget alerts do not enforce a hard spending cutoff.
 
 ```sh
 make test          # backend contracts and Gemini mock transports

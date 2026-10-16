@@ -218,7 +218,7 @@ lint/schema/tests and real Linux media isolation. It then builds/pushes the
 frontend image and uses its digest. On the backend,
 [the release manager](../deploy/gcp/backend_release.py):
 
-1. Reserves one of four release attempts in root-owned durable state, stages a
+1. Reserves one of 24 release attempts in root-owned durable state, stages a
    separate immutable source directory and installs frozen dependencies. It runs
    backend tests as the unprivileged service user on the actual deployment host.
 2. Rejects changes to `workspace.py`, `attempts.py`, `schema.py`, `api.py` or
@@ -249,8 +249,11 @@ rechecks its **22:45 JST** cutoff before switching/finalizing. IAM expires at
 23:00. Final cleanup at 23:15 creates `/etc/ctrlfvideo/deploy-disabled`, stops the
 watchdog, and holds `/run/lock/ctrlfvideo-release.lock` while stopping writes and
 making the final consistent backup. No deployment may restart the backend after
-that marker. A four-attempt allowance includes the forced-failure drill and normal
-release; exhaustion requires explicit operator review under the existing budget.
+that marker. A 24-attempt backstop includes failed preparation, forced-failure
+drills and normal releases; exhaustion requires operator review under the existing
+budget. This is a locally chosen automation-loop bound, not a GCP quota or a
+monetary budget calculation. Deployments reuse the existing VM and capped frontend;
+the attempt count does not measure hosting, storage, network or model charges.
 Billing reports can lag or fail; the budget alert is not a hard supplier cap.
 
 Recovery entry points on the VM (trusted operator only):
@@ -293,12 +296,13 @@ Verified on October 16, 2026:
   configuration and source media. Operational archives/manifests stay ignored
   under `.ctrlf-video-eval/cloud-backups/`, outside Git and CI artifacts.
 
-The initial four-attempt allowance is now exhausted (including preparation failure,
-drill, recovered connection failure and successful release). Further backend
-releases fail closed; review actual spend and the remaining authorized window
-before any operator changes that finite allowance. Tests can still run. Billing
-reconciliation remains unavailable, so this is verified deployment/recovery
-evidence, not a verified final spend or live model-quality result.
+Four attempts were consumed (preparation failure, drill, recovered connection
+failure and successful release). The initial four-attempt operator setting was
+overly restrictive and has been increased to 24, preserving all four records and
+allowing 20 additional attempts within the same authorized test window. No compute
+size, instance cap, model allowance, JPY 3,000 total or deadline is increased.
+Billing reconciliation remains unavailable, so this is verified deployment/recovery
+evidence, not a verified remaining balance or live model-quality result.
 
 ## Primary references
 
