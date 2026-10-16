@@ -110,6 +110,35 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
   };
 }
 
+test("failed source listing shows an in-dialog error and permits refresh without losing the draft", async () => {
+  const h = await harness();
+  h.get("question").value = "Keep this unsent question";
+  h.setOverride(c => c.url === "/api/videos" ? response({ detail: "source_list_unavailable" }, 503) : undefined);
+  await h.window.CtrlFVideoPersistence.library("videos");
+  assert.equal(h.get("workspace-library").open, true);
+  assert.match(h.get("library-notice").textContent, /source_list_unavailable/);
+  assert.equal(typeof h.get("library-refresh").onclick, "function");
+  assert.equal(h.get("question").value, "Keep this unsent question");
+  h.setOverride(null);
+  await h.get("library-refresh").onclick();
+  assert.equal(h.get("library-notice").textContent, "");
+  assert.equal(h.get("library-items").children.length, 3);
+  assert.equal(h.get("question").value, "Keep this unsent question");
+});
+
+test("a stale source-list failure cannot replace the current investigation library notice", async () => {
+  const h = await harness(), pending = deferred();
+  h.setOverride(c => c.url === "/api/videos" ? pending.promise : undefined);
+  const oldLibrary = h.window.CtrlFVideoPersistence.library("videos");
+  await tick();
+  await h.window.CtrlFVideoPersistence.library();
+  pending.resolve(response({ detail: "stale_source_failure" }, 503));
+  await oldLibrary;
+  assert.equal(h.get("library-title").textContent, "Investigations");
+  assert.equal(h.get("library-notice").textContent, "");
+  assert.equal(h.get("library-items").children.length, 2);
+});
+
 for (const { name, resultContext, inputContext, expected } of [
   { name: "completed-result context", resultContext: { task_brief: "", study_type: "ux_research" }, inputContext: {}, expected: { task_brief: "", study_type: "ux_research" } },
   { name: "legacy input-only context", resultContext: {}, inputContext: { task_brief: "Inspect the menu", study_type: "technical_sample" }, expected: { task_brief: "Inspect the menu", study_type: "technical_sample" } },

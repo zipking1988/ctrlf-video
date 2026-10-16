@@ -61,7 +61,7 @@ Checked in the in-app browser against the running application:
 - `make test`: 218 passed, 1 skipped (Linux namespace integration on macOS).
 - `make check`: passed (lint, formatting and contract-export checks).
 - `git diff --check`: passed.
-- Local UI and fixture verification only. No paid Gemini calls, budget changes, resource provisioning, push or deployment performed for this redesign. Broad live evidence quality, real UX-recording value, latency and operating costs remain unverified.
+- The initial visual pass used local fixtures, with no paid Gemini calls, budget changes or resource provisioning. Private-main delivery and CI/CD were subsequently authorized. Broad live evidence quality, real UX-recording value, latency and operating costs remain unverified.
 
 ## Implementation checklist
 
@@ -82,3 +82,11 @@ Reviewed October 16 after the visual implementation. Corrected docked placement 
 Browser verification at 1440 × 900 and 1024 × 768 confirmed nonoverlapping follow-up/pinned cards, frame replay at 00:10, editor close returning focus to the visible Findings rail control, and the playback status remaining inside the compact dock. A synthetic MP4 was uploaded to the local fixture backend and returned to the original saved demo investigation without model analysis. No paid calls were made.
 
 Updated validation: 106 frontend regressions passed; 218 backend tests passed locally with the Linux-only isolation test skipped; lint, format, contract exports, generated bundle/content hashes and whitespace checks passed. The native reviewer and red-team checks ran in the current Codex harness; no separate Claude/outside-model review is claimed.
+
+## Additional independent review and fixes
+
+The independent testing/maintainability reviewers found that the new Sources rail discarded library-load failures. It now uses the existing guarded source-navigation handler. The shared library installs Refresh before its first request, reports failures inside the dialog, and ignores stale errors after a newer library navigation. Failure/retry and stale-response regressions cover these cases while preserving the unsent draft.
+
+The accessibility review found three contrast issues: amber keyboard outlines inherited by the white menu, white text/icons on the expanded menu trigger, and muted playback-recovery text on the teal dock. Menu focus is now teal; the expanded trigger uses coral with dark text/icons; Reload video uses light text and amber hover. Browser inspection verified the computed colors and keyboard focus; local evidence: `.ctrlf-video-eval/fieldnotes/review-menu.png`.
+
+After these fixes, the independent native reviewers and fresh adversarial reviewer reported no remaining actionable findings. Updated checks: 108 frontend tests and 218 backend tests passed, with the macOS Linux-isolation skip unchanged; build, lint/format, contract exports and whitespace checks passed. These reviews use the current Codex harness, not a separately claimed external provider. The real-mode workflow selection, spending approvals, historical reservations and deployment cutoffs remain unchanged.

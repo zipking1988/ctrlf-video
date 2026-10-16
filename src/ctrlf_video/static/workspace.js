@@ -144,6 +144,8 @@
     };
     const body=$("library-items");body.replaceChildren();
     $("workspace-library").showModal();
+    $("library-refresh").onclick=()=>library(kind).catch(e=>libraryNotice(e.message));
+    try {
     if (kind === "videos") {
       body.append(item(demo.name,"18 seconds · public synthetic demo · preset answers",()=>openSource(demo)));
       const data=await api("/api/videos");
@@ -183,7 +185,9 @@
         remove.onclick=()=>confirmDelete(desk,"investigations");row.append(remove);body.append(row);
       }
     }
-    $("library-refresh").onclick=()=>library(kind).catch(e=>libraryNotice(e.message));
+    } catch(error) {
+      if (active()) libraryNotice(error.message);
+    }
   }
   function renameSource(video) {
     $("rename-source-input").value=video.name;

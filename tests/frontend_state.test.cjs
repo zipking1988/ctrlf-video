@@ -321,6 +321,7 @@ test("expanding and hiding the floating source retains playback and draft", asyn
 test("source library rail opens owned sources without changing the investigation draft or playback", async () => {
   const h = await harness();
   h.run("window.CtrlFVideoPersistence = { library(kind) { window.openedLibrary = kind; } }");
+  h.get("open-sources").addEventListener("click", () => h.run('window.CtrlFVideoPersistence.library("videos")'));
   h.get("question").value = "Keep my research question";
   h.player.currentTime = 6;
   h.get("rail-library").click();
