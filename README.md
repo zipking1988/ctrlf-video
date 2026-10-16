@@ -102,7 +102,9 @@ current workspace and model ledger. See the
 [release and recovery guide](docs/deployment.md#release-process-and-cicd).
 
 The [October 16 pipeline](https://github.com/zipking1988/ctrlf-video/actions/runs/38876396945)
-passed 100 frontend and 195 backend tests and deployed both services. A live
+passed 100 frontend and 195 backend tests; both services now run that tested
+application source. Final verification corrected the frontend revision selection
+and checked 100% traffic, with 27 deployment regressions passing. A live
 forced-failure rollback and independent local backup restoration also passed.
 The initial four release attempts are consumed; further deployments are blocked
 until an operator reviews spending and the remaining authorized window. The app

@@ -273,8 +273,15 @@ Verified on October 16, 2026:
   passed 100 frontend tests, asset rebuild checks, lint/schema checks and 195
   backend tests, including real Linux isolation. The full backend suite also
   passed as the unprivileged service user on the GCE host before switching code.
-  Both components deployed commit `712006553cfad5f3725bbc7e84c68bce3382f61b`;
-  public UI, gateway health, fixture-mode health and session checks passed.
+  The backend deployed commit `712006553cfad5f3725bbc7e84c68bce3382f61b`, and
+  its frontend image/revision was created. Public UI, gateway health, fixture-mode
+  health and session checks passed. Final operator verification caught that
+  `latestReadyRevisionName` still named the old serving revision after
+  `--no-traffic`; the tested frontend revision was explicitly promoted to 100%.
+  The publisher now checks that exact revision's readiness and resulting traffic
+  before finalizing. All 27 deployment regressions passed, including stale
+  readiness and traffic-mismatch cases. The deployed application source is
+  unchanged by this publisher correction; no additional backend attempt was used.
 - [The earlier drill](https://github.com/zipking1988/ctrlf-video/actions/runs/38874962485)
   reached a healthy candidate, intentionally failed and recovered the previous
   code with its owned investigation. That run later lost its SSH connection on

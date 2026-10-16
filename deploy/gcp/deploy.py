@@ -134,6 +134,7 @@ def release(image, *, drill=False):
             if result.get("phase") != "pending":
                 raise RuntimeError("Backend release did not reach the guarded pending phase")
             pending = True
+            revision = f"{SERVICE}-ci-{sha[:8]}-{run_id}"
             cloud(
                 "run",
                 "deploy",
@@ -150,11 +151,30 @@ def release(image, *, drill=False):
                 "--concurrency=32",
                 "--timeout=300",
             )
-            service = json.loads(
+            candidate = json.loads(
+                cloud(
+                    "run", "revisions", "describe", revision, f"--region={REGION}", "--format=json"
+                )
+            )
+            if not any(
+                c.get("type") == "Ready" and c.get("status") == "True"
+                for c in candidate["status"].get("conditions", [])
+            ):
+                raise RuntimeError("This release's frontend revision is not ready")
+            frontend_changed = True  # Set before mutation: uncertain API outcomes also roll back.
+            # With --no-traffic, the service's latestReadyRevisionName can retain
+            # the previous serving revision. Promote this exact tested revision.
+            frontend_traffic({revision: 100})
+            serving = json.loads(
                 cloud("run", "services", "describe", SERVICE, f"--region={REGION}", "--format=json")
             )
-            frontend_changed = True  # Set before mutation: uncertain API outcomes also roll back.
-            frontend_traffic({service["status"]["latestReadyRevisionName"]: 100})
+            actual = {
+                r["revisionName"]: r["percent"]
+                for r in serving["status"]["traffic"]
+                if r.get("percent")
+            }
+            if actual != {revision: 100}:
+                raise RuntimeError("Frontend traffic did not reach this release")
             remote("finalize", sha)
             public_check()
             pending = False

@@ -238,6 +238,7 @@ def orchestrator(monkeypatch):
     monkeypatch.setenv("GITHUB_RUN_ID", "123")
     monkeypatch.setattr(module.time, "time", lambda: module.CUTOFF - 3600)
     actions = []
+    traffic = [{"revisionName": "previous", "percent": 100}]
 
     def cloud(*args):
         actions.append(args)
@@ -245,11 +246,18 @@ def orchestrator(monkeypatch):
             return json.dumps(
                 {
                     "status": {
-                        "traffic": [{"revisionName": "previous", "percent": 100}],
-                        "latestReadyRevisionName": "candidate",
+                        "traffic": traffic,
+                        # A no-traffic revision need not update this field.
+                        "latestReadyRevisionName": "previous",
                     }
                 }
             )
+        if args[:3] == ("run", "revisions", "describe"):
+            return json.dumps({"status": {"conditions": [{"type": "Ready", "status": "True"}]}})
+        if args[:3] == ("run", "services", "update-traffic"):
+            name = next(v for v in args if v.startswith("--to-revisions="))
+            revision, percent = name.split("=", 1)[1].rsplit("=", 1)
+            traffic[:] = [{"revisionName": revision, "percent": int(percent)}]
         return ""
 
     def remote(*args):
@@ -276,6 +284,7 @@ def orchestrator(monkeypatch):
 
 
 IMAGE = "asia-northeast1-docker.pkg.dev/ctrlfvideo/ctrlfvideo/frontend@sha256:" + "a" * 64
+REVISION = "ctrlfvideo-frontend-ci-aaaaaaaa-123"
 
 
 def test_both_components_publish_only_after_backend_verification(orchestrator):
@@ -284,6 +293,7 @@ def test_both_components_publish_only_after_backend_verification(orchestrator):
     names = [a[0] for a in actions]
     assert names.index("drill") < names.index("deploy") < names.index("finalize")
     assert not any(a[0] == "rollback" for a in actions)
+    assert any(f"--to-revisions={REVISION}=100" in a for a in actions)
 
 
 @pytest.mark.parametrize("fault", ["frontend_release", "traffic_uncertain", "public_health"])
@@ -297,7 +307,7 @@ def test_frontend_failure_or_interruption_rolls_both_components_back(
     def cloud(*args):
         nonlocal raised
         fail = (fault == "frontend_release" and args[:2] == ("run", "deploy")) or (
-            fault == "traffic_uncertain" and "--to-revisions=candidate=100" in args
+            fault == "traffic_uncertain" and f"--to-revisions={REVISION}=100" in args
         )
         if fail and not raised:
             raised = True
@@ -316,6 +326,25 @@ def test_frontend_failure_or_interruption_rolls_both_components_back(
     assert ("rollback", "a" * 40) in actions
     if fault != "frontend_release":
         assert any("--to-revisions=previous=100" in a for a in actions)
+
+
+@pytest.mark.parametrize("fault", ["not_ready", "traffic_stale"])
+def test_frontend_revision_or_traffic_mismatch_prevents_finalize(orchestrator, monkeypatch, fault):
+    module, actions = orchestrator
+    original = module.cloud
+
+    def cloud(*args):
+        if fault == "not_ready" and args[:3] == ("run", "revisions", "describe"):
+            return json.dumps({"status": {"conditions": [{"type": "Ready", "status": "False"}]}})
+        if fault == "traffic_stale" and args[:3] == ("run", "services", "update-traffic"):
+            return ""  # The API returned without changing serving traffic.
+        return original(*args)
+
+    monkeypatch.setattr(module, "cloud", cloud)
+    with pytest.raises(RuntimeError, match="not ready|did not reach"):
+        module.release(IMAGE)
+    assert ("rollback", "a" * 40) in actions
+    assert not any(a[0] == "finalize" for a in actions)
 
 
 def test_deploy_cutoff_denies_cloud_activity(orchestrator, monkeypatch):
