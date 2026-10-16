@@ -190,8 +190,10 @@ def frames(directory, video_id, metadata, window, count=12, prefix="c"):
             str(start),
             "-i",
             str(directory / "original"),
-            "-t",
-            str(end - start + 1),
+            # Output keeps absolute video PTS after the input seek. A relative
+            # duration here would stop later windows before their first frame.
+            "-to",
+            str(end + 1),
             "-map",
             "0:v:0",
             "-an",

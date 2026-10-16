@@ -45,6 +45,8 @@ The operator takes a consistent, restored-and-verified backup before changing mo
 
 ## October 16 live evidence
 
+- A subsequent user-selected 70.2-second NBA technical sample uploaded and passed preflight, but initial indexing stopped at 1/2 windows with `frame_pts_missing`. The first checkpoint was retained and no question was submitted. Local decoding reproduced the failure on the actual file and on later windows of the committed synthetic clip. The decoder retained absolute PTS while applying a relative output duration; replacing that stop condition with an absolute end time restored both windows locally without model calls. Six decoder regressions cover beginning/middle/tail windows and zero/nonzero source PTS. This is a decoder fix, not a model-quality result; cloud resumption remains to be verified.
+
 - Both embedding task types returned HTTP 200 and 3,072-dimensional vectors. The uploaded clip indexed one window, then a real question completed with schema status `ok`, `visual_vector` provenance, seven observations and one actual cited frame at 00:00.
 - Before the rollover, the cloud ledger recorded nine completed dispatches and JPY 214 reserved from the original JPY 600 allowance, leaving JPY 386 then available. That unused capacity is superseded by v2, not stacked with it. These figures are not settled Gemini charges or the remaining total GCP budget.
 - The source frame visibly contains the box and packing tools. The model called the box centered despite its left-of-center position; the original answer was retained and a human-reviewed finding records this qualification. Contract validation does not prove semantic correctness.
