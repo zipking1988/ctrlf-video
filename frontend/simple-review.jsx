@@ -42,7 +42,6 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
   const details = query ? (
           <details className="simple-answer-details"><summary>Details & save</summary>
             {questionLabel(query.question) !== query.question && <><strong>Full question</strong><p>{query.question}</p></>}
-            {query.response.unresolved.map(text => <p key={text}>{text}</p>)}
             {query.mode === "real" && <p>Sampled visual evidence; audio is not transcribed. Replay the source to check the claim.</p>}
             {["ok","partial"].includes(query.response.status) && <button type="button" className="text-button" onClick={save}>Write a finding</button>}
             <button type="button" className="text-button" onClick={() => ui()?.newQuestion()}>{newQuestionLabel}</button>
@@ -65,6 +64,16 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
         <article className="simple-answer" aria-label="Answer and source citations">
           <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : "Answer"}</span></div>
           <p className="simple-answer-text">{query.response.answer}</p>
+          {!!query.response.unresolved.length && <details className="simple-result-warning">
+            <summary>Still to verify · {query.response.unresolved.length} {query.response.unresolved.length === 1 ? "open point" : "open points"}</summary>
+            {query.response.unresolved.map(text => <p key={text}>{text}</p>)}
+          </details>}
+          {query.response.status === "no_result" && <p className="simple-result-scope">No matching evidence was returned. This does not prove the event never occurred; replay the source or ask about a more specific visible detail.</p>}
+          {query.response.status === "error" && <div className="simple-result-recovery">
+            {query.response.errors.map((error,index) => <div key={index}><p>{error.message}</p><p>{error.suggested_action}</p></div>)}
+            <p>This question did not complete. It cannot anchor a follow-up. Your earlier answers remain available in Details & save.</p>
+            <button type="button" className="outline-button" onClick={() => ui()?.newQuestion()}>Start a new question</button>
+          </div>}
           <div className="simple-citations">
             {moments.map(frame => <button type="button" key={`${frame.uri}:${frame.t}`} onClick={() => replay(frame)} aria-label={`Replay source ${sourceClock(frame.t)}`}>{sourceClock(frame.t)}{icon("play")}</button>)}
             <span>{query.mode === "real" ? "Saved Gemini result" : "Preset demo"} · {({ok:"Cited result",partial:"Partial",error:"Not completed",no_result:"No matching evidence"})[query.response.status]}</span>

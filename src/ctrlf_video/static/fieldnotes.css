@@ -777,3 +777,8 @@ body.recorded-view .research-welcome { display: none; }
 .usage-guide details { border-top: 1px solid var(--line); padding: 14px 0; font-size: 14px; }
 .usage-guide summary { cursor: pointer; font-weight: 600; }
 .usage-guide footer { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.simple-result-warning { margin: 16px 0; padding: 12px 16px; background: #fff3db; border-radius: 8px; color: #514322; font-size: 13px; line-height: 1.6; }
+.simple-result-warning summary { cursor: pointer; font-weight: 600; }
+.simple-result-warning p { margin-top: 10px; }
+.simple-result-scope, .simple-result-recovery { margin: 16px 0; padding: 14px 16px; background: #edf3ef; border-radius: 8px; font-size: 13px; line-height: 1.7; }
+.simple-result-recovery p { margin-bottom: 10px; }
