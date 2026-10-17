@@ -39,18 +39,18 @@ Teams require 2–4 members. Solo registration is allowed, solo participation is
 
 ## Theme decision
 
-**CtrlF Video's chosen direction: Media, Content & Digital Experiences.** Dashboard selection has not been verified. This is our assessment against the [official themes](https://aibuildercup.com/themes.html):
+**Proposed direction: Future of Work & Enterprise Productivity**, following the UX-research product focus. Final dashboard selection has not been verified. Media, Content & Digital Experiences was the earlier proposal. This is our assessment against the [official themes](https://aibuildercup.com/themes.html):
 
 | Official theme | Fit for our current entry |
 | --- | --- |
-| Media, Content & Digital Experiences | Primary: visual content discovery, understanding and evidence review |
-| Future of Work & Enterprise Productivity | Alternative: turning recorded material into usable knowledge and findings |
+| Media, Content & Digital Experiences | Alternative: visual content discovery, understanding and evidence review |
+| Future of Work & Enterprise Productivity | Proposed: turning research recordings into source-linked findings |
 | Manufacturing: Intelligent Operations & Industrial Efficiency | Needs a validated industrial review workflow and footage |
 | Retail & Commerce: Intelligent Customer and Business Experiences | Needs a specific retail operational/customer problem |
 | BFSI: Intelligent Risk, Fraud & Financial Experiences | Needs financial/insurance domain evidence |
 | Sustainability & Social Impact | Needs a demonstrated environmental or societal outcome |
 
-Use the Media theme consistently in the dashboard, deck, demo and [project profile](profile.md).
+Confirm the final category before aligning dashboard, deck, demo and [project profile](profile.md). Do not represent this recommendation as accepted registration.
 
 ## Technical and submission requirements
 
@@ -99,7 +99,7 @@ The themes page contains a separate category list inconsistent with its six main
 This records outstanding verification/work, not completed eligibility or permission to publish/deploy:
 
 - [ ] Verify accepted registration and an eligible 2–4-member roster by the published team deadline.
-- [ ] Verify the dashboard category is Media, Content & Digital Experiences.
+- [ ] Verify the final dashboard category; Future of Work is the current UX-focused recommendation.
 - [ ] Verify submission cutoff time/timezone and any organizer amendments.
 - [ ] Obtain organizer clarification on source lineage and fresh-project eligibility; retain the actual development history.
 - [ ] Review submitted code, dependencies and demo footage rights; obtain authorization before public source release.
@@ -112,8 +112,8 @@ This records outstanding verification/work, not completed eligibility or permiss
 
 The [source-provenance record](docs/provenance.md) places the original design/implementation in October 2–4, inside the published build period. It initially targeted a different event. The ongoing-project exclusion remains unresolved; a separate repository and name do not establish eligibility.
 
-This repository is private and its import commit must remain unpushed until explicitly requested. The public-source requirement needs separate publication authorization. Preserve the original separate workspace and repository.
+This repository remains private. Private review/fix pushes and temporary main CI/CD were subsequently authorized; the original import hold was superseded. The public-source requirement still needs separate publication authorization. Preserve the original separate workspace and repository.
 
-The [Gemini runtime](docs/WORKSPACE_RUNTIME.md) is implemented with mock integration verification; live quality/cost acceptance is pending. The [deployment plan](docs/deployment.md) proposes Cloud Run ingress plus one durable GCE workspace, all on Google Cloud, but is unprovisioned and needs deployment/competition acceptance verification.
+The [Gemini runtime](docs/WORKSPACE_RUNTIME.md) has limited real development-test evidence, including an uploaded synthetic clip and a recorded basketball result. Broad quality/cost acceptance remains pending. Cloud Run ingress plus one durable GCE workspace is deployed temporarily; that fact does not establish competition eligibility. All current model grants are closed. The [October 18 alpha candidate](ALPHA.md) is locally verified and still needs a reviewed deployment attempt after the consumed 25-attempt allowance.
 
 Document preparation does not authorize model spending, budget installation, GCP provisioning, pushes or public publication. [AGENTS.md](AGENTS.md) and the existing runtime/architecture requirements continue to govern implementation.

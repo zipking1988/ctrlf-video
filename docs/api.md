@@ -6,6 +6,8 @@ Updated: 2026-10-14. The FastAPI `/docs` and `/openapi.json` expose concrete inp
 
 `GET /api/session` initializes the `ctrlf_session` HttpOnly/SameSite=Strict cookie and returns the CSRF token. Writes require `X-CTRLF-CSRF` and valid Origin. Every private source/frame/job/query/investigation checks owner and expiry. The public synthetic `demo_parcel` media is the exception within those media routes. The separately selected [recorded-test copy](JUDGE_WALKTHROUGH.md) is served under `/static/judge/`, with no private-media endpoint or anonymous analysis approval. Its versioned public asset map resolves sanitized answer references to the public static JPEG.
 
+The session response advertises `X-CTRLF-Upload-Limit` in bytes: 524288000 for a direct workspace and 31457280 through the gateway. The gateway replaces the backend value with its own enforced cap. This is a UI hint, not authorization; both servers continue enforcing their existing limits. The browser defaults conservatively to 30 MiB when an older deployment omits the header.
+
 | Operation | Purpose |
 | --- | --- |
 | `GET /api/runtime/status` | Owned read-only model/calibration/budget prerequisites |

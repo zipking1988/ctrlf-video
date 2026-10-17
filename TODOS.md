@@ -1,6 +1,15 @@
 # CtrlF Video — Remaining Work
 
-Updated: 2026-10-17. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
+Updated: 2026-10-18. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
+
+## October 18 alpha candidate
+
+- [x] Add a client-facing Quick guide, upload access/retention disclosure and server-advertised upload limits.
+- [x] Fix upload-to-Review refresh, hash navigation, unindexed draft editing and in-dialog rename recovery.
+- [x] Surface unresolved scope and failure recovery beside answers; preserve evidence and model admission gates.
+- [ ] Release the tested candidate under a separately reviewed deployment attempt. The 25-attempt allowance is consumed; do not reset it or bypass the release manager.
+- [ ] Fund any new model trial explicitly and agree client data/retention expectations; anonymous live analysis remains unavailable.
+- [ ] Resolve the submission and UX-validation prerequisites below. See [ALPHA.md](ALPHA.md).
 
 ## First-use-case validation
 
@@ -41,7 +50,7 @@ Updated: 2026-10-17. This is the current acceptance backlog, consolidated from o
 - [x] Download a consistent initial local backup; verify its checksum, both SQLite databases, source media and private configuration.
 - [x] Implement test-gated CI/CD, finite main-only deployment access, backend backup/restore checks and failure rollback regressions.
 - [x] Record the successful hosted frontend/backend pipeline, live forced-failure rollback and independently verified local recovery backup; see [deployment evidence](docs/deployment.md#release-process-and-cicd).
-- [ ] Reconcile actual cloud spend against the JPY 3,000 total; the 24-attempt CI backstop is an engineering setting, not a money meter.
+- [ ] Reconcile actual cloud spend against the JPY 3,000 total; the 25-attempt CI backstop is an engineering setting, not a money meter.
 - [ ] Verify containerized Linux decoding/file/network isolation and resource bounds without disabling protection before using that deployment target.
 - [ ] Validate disk encryption, expiry/deletion, restart recovery, consistent backups and restoration without resurrecting deleted media.
 - [ ] Test bounded concurrent query/ingestion workloads, cancellation/deletion races and capacity release on the target host.

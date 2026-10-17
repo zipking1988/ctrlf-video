@@ -4,6 +4,8 @@
 
 Ask visual questions about footage, follow up on evidence, and arrange questions, frames and conclusions on a spatial canvas linked to a source player. See [profile.md](profile.md) for the product and [hackathon.md](hackathon.md) for event rules.
 
+**Alpha candidate:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. This candidate is not yet a new production deployment or unrestricted live-analysis service.
+
 ## Workspace
 
 The default **Review** view places one video above a compact chat in a single scrolling page. **Timeline** reveals the selected answer's actual cited frames inside the chat; click a timestamp to replay the original source. It is an index of citations, not an exhaustive video breakdown. **Canvas**, research context, findings and report export remain available through the menu. `/#review` opens the workspace directly.
@@ -12,9 +14,11 @@ First-time visitors see a short landing with **Try a real example** and **Upload
 
 **Upload a video** uses the existing upload/preflight path. Existing private recordings, research context and drafts restore directly; the public example does not replace them. **Resume workspace** returns to the restored investigation. `/#start` opens the landing directly, and `/#evidence-chain` reaches its short workflow explanation. The menu retains the synthetic **Demo library**, explicitly labeled as preset answers without model calls.
 
+Before transfer, the upload dialog explains session access, server storage, configured retention and the actual size limit (30 MiB through the cloud gateway, 500 MiB directly). Uploading never starts model analysis. Oversized files are rejected before transfer, and an unsaved/conflicted investigation must recover before upload. Unindexed uploaded recordings can retain editable question drafts without sending them. Entering a recording updates `/#review`, so refresh returns to that investigation.
+
 The landing explains one concrete workflow: ask about visible footage → replay a cited moment → save a finding and export. Approved Gemini analysis searches descriptions of sampled frames and reviews candidate segments; sampling can miss brief events. New analysis of uploaded videos requires an approved session. Each investigation handles one recording. Cross-session aggregation and UX-study usefulness remain unverified; AskTape is only an exploratory working name. Existing exports are Markdown, JSON and HTML.
 
-- **Questions:** ask or follow up below the video, then replay supporting timestamps. In Review, **Details & save** retains the full submitted prompt, unresolved claims and earlier questions. Canvas keeps its research panel. Drafts survive view switching and refresh.
+- **Questions:** ask or follow up below the video, then replay supporting timestamps. In Review, **Still to verify** exposes unresolved claims; **Details & save** retains the full submitted prompt and earlier questions. Canvas keeps its research panel. Drafts survive view switching and refresh.
 - **Saved answers:** Review keeps earlier questions under Details & save. The canvas question area offers up to three existing answers from the current recording, opening their original results without another model request. These are saved results to check, not new analysis or a claim that they are correct. A real result without events cannot anchor a follow-up. When live analysis is unavailable, Review explicitly switches to saved-results mode, hides Send, and offers View saved answers; Enter opens that recovery path while keeping the draft. Progress and recoverable errors appear beside the composer; unavailable model access is explained before a new request is admitted by the UI.
 - **Source player:** watch the recording above the chat. In Canvas, the compact bottom dock can be expanded or hidden while organizing evidence.
 - **Finding editor:** choose **Details & save → Write a finding**, or open a saved finding through the menu. Edit its title, observed facts, interpretation and open questions. Observed facts update the canvas summary while the original answer and evidence remain available.
@@ -83,7 +87,7 @@ Open http://127.0.0.1:8765. Use one API/worker process per storage directory. Lo
 
 ## Try the local demo
 
-1. Open the workspace, or use `/#review` to enter it directly. The default Review view places the video on the left and the question box on the right.
+1. Open the workspace, or use `/#review` to enter it directly. The default Review view places the video above the question box in one scrolling page.
 2. Ask **“When is the package at the center?”** or choose the example question. The synthetic demo uses preset answers without model calls.
 3. Click **00:06 · Watch this moment** in the answer to seek the original video. Play the surrounding footage to check the source.
 4. Optionally expand **Save an observation or follow up → Write a finding**, enter observed facts and open questions, then **Save finding**. Check the save indicator before leaving.
