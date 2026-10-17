@@ -16,6 +16,12 @@
       body: body ? JSON.stringify(body) : undefined });
     const data = response.status === 204 ? null : await response.json();
     if (!response.ok) { const error = new Error(data?.detail || "request_failed"); error.status=response.status; error.data=data; throw error; }
+    if (path === "/api/session") {
+      const limit = Number(response.headers?.get("X-CTRLF-Upload-Limit"));
+      // Older deployments conservatively use the cloud ingress limit.
+      data.upload_max_bytes = Number.isSafeInteger(limit) && limit > 0
+        ? Math.min(limit, 500*1024**2) : 30*1024**2;
+    }
     return data;
   }
   const snapshot = () => ui().snapshot();
@@ -253,17 +259,53 @@
       return await create(video);
     } finally {if (owns(deskId,epoch)) ui().busy(false);}
   }
+  function uploadProblem(file) {
+    if (!session) return "Reconnect to the workspace before uploading.";
+    if (!file || !file.size) return "This file is empty. Choose a playable video.";
+    if (!file.type.startsWith("video/") && !/\.(mp4|mov|webm|mkv|m4v)$/i.test(file.name))
+      return "Choose an MP4, MOV, WebM or MKV video.";
+    if (file.size > session.upload_max_bytes)
+      return `This file is too large. Choose a video up to ${Math.floor(session.upload_max_bytes/1024**2)} MiB, or trim/compress a copy first. Your current investigation is unchanged.`;
+    return "";
+  }
+  function reviewUpload(file) {
+    const problem=uploadProblem(file);
+    if (problem) {ui().notify(problem);return;}
+    const context={id:current?.id,epoch:requestEpoch};
+    $("upload-file-summary").textContent=`${file.name} · ${(file.size/1024**2).toFixed(1)} MiB`;
+    $("upload-access-summary").textContent=session.real_ready
+      ? "Upload checks the file and enables playback. Analysis starts separately from Sources and uses your approved allowance."
+      : "New AI analysis is unavailable for this session. You can upload for playback and keep a question draft. Try the recorded example to explore answers and findings.";
+    $("upload-retention").textContent=`Up to ${Math.floor(session.upload_max_bytes/1024**2)} MiB per file. Stored on this server for ${session.ttl_hours} hours. Access belongs to this browser session; clearing cookies loses access. Export your work before it expires.`;
+    $("upload-confirm").textContent=session.real_ready ? "Upload video" : "Upload for playback";
+    $("upload-confirm").onclick=()=>{
+      $("upload-dialog").close();
+      if (!owns(context.id,context.epoch)) {ui().notify("Your investigation changed. Choose the file again to upload here.");return;}
+      upload(file);
+    };
+    $("upload-cancel").onclick=()=>$("upload-dialog").close();
+    $("upload-dialog").showModal();
+  }
+  let uploading=false;
   async function upload(file) {
-    if (!file.type.startsWith("video/") || file.size > 500*1024**2) {ui().notify("Choose a video no larger than 500 MB .");return;}
+    const problem=uploadProblem(file);
+    if (problem) {ui().notify(problem);return;}
+    if (uploading) {ui().notify("An upload is already in progress. Wait for it to finish before choosing another video.");return;}
+    uploading=true;
     try {
       const deskId=current?.id, epoch=requestEpoch;
       await flush();if (!owns(deskId,epoch)) return;ui().notify(`Uploading ${file.name} · 0%`);
       const result=await new Promise((resolve,reject)=>{
         const xhr=new XMLHttpRequest();xhr.open("POST","/api/videos");
-        xhr.setRequestHeader("Content-Type",file.type);xhr.setRequestHeader("X-CTRLF-CSRF",session.csrf);
+        xhr.setRequestHeader("Content-Type",file.type.startsWith("video/") ? file.type : "application/octet-stream");xhr.setRequestHeader("X-CTRLF-CSRF",session.csrf);
         xhr.setRequestHeader("X-File-Name",encodeURIComponent(file.name));xhr.timeout=180000;
         xhr.upload.onprogress=e=>{if(owns(deskId,epoch) && e.lengthComputable)ui().notify(`Uploading ${file.name} · ${Math.round(e.loaded/e.total*100)}%`);};
-        xhr.onload=()=>{let data;try {data=JSON.parse(xhr.responseText);}catch{reject(new Error("Invalid upload response"));return;}xhr.status===201 ? resolve(data) : reject(new Error(data.detail || "Upload failed"));};
+        xhr.onload=()=>{
+          if (xhr.status===413) {reject(new Error(`The server rejected this file's size. Trim or compress a copy to ${Math.floor(session.upload_max_bytes/1024**2)} MiB or less, then try again.`));return;}
+          if (xhr.status===429) {reject(new Error("Video storage is full. Open Sources and delete a recording you no longer need before uploading again."));return;}
+          let data;try {data=JSON.parse(xhr.responseText);}catch{reject(new Error("The server could not finish the upload. Check Sources before trying again."));return;}
+          xhr.status===201 ? resolve(data) : reject(new Error(data.detail || "Upload failed"));
+        };
         xhr.onerror=()=>reject(new Error("Upload interrupted. The previous investigation is preserved."));xhr.ontimeout=xhr.onerror;xhr.send(file);
       });
       if (!owns(deskId,epoch)) return;
@@ -272,6 +314,7 @@
       ui().notify("Upload complete. Preflight is running; check Sources for progress.");
       ui().showSource();
     }catch(error){ui().notify(error.message);}
+    finally {uploading=false;}
   }
   async function watch(videoId, epoch) {
     const deskId=current?.id;
@@ -421,7 +464,7 @@
       ui().entryReady?.(starter);
     }catch(error){suspended=true;status("Investigation service unavailable","error");ui().notify(error.message);ui().entryFailed?.();}
   }
-  window.CtrlFVideoPersistence={flush,upload,ask,library,openDemo:()=>openSource(demo).catch(e=>ui().notify(e.message)),
+  window.CtrlFVideoPersistence={flush,upload,reviewUpload,ask,library,openDemo:()=>openSource(demo).catch(e=>ui().notify(e.message)),
     captureContext:()=>current ? {id:current.id,epoch:requestEpoch} : null,
     isCurrent:context=>!!context && owns(context.id,context.epoch),
     newInvestigation:()=>create(currentVideo).catch(e=>ui().notify(e.message))};

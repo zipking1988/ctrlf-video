@@ -758,3 +758,11 @@ body.recorded-view .research-welcome { display: none; }
 .compact-welcome .welcome-actions .welcome-secondary img { filter: none; }
 .example-report-dialog dt { font-size: 12px; font-weight: 600; margin-top: 14px; }
 .example-report-dialog dd { margin: 5px 0 0; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+.upload-dialog { width: min(640px, calc(100vw - 64px)); padding: 28px; }
+.upload-dialog header { gap: 24px; align-items: flex-start; }
+.upload-dialog #upload-file-summary { display: block; overflow-wrap: anywhere; margin: 8px 0 16px; }
+.upload-dialog p { margin: 12px 0; }
+.upload-dialog #upload-access-summary { padding: 14px 16px; border-radius: 8px; background: #edf3ef; color: #173d3d; }
+.upload-dialog footer { display: flex; justify-content: flex-end; margin-top: 24px; }
+.upload-dialog .primary-button { padding: 12px 20px; background: #084f52; color: white; border-radius: 8px; font-weight: 600; }
+.upload-dialog .primary-button:hover { background: #063d40; }

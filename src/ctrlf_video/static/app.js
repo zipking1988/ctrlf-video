@@ -995,7 +995,7 @@ $("rail-video").addEventListener("click", () => {
 });
 $("file-input").addEventListener("change", () => {
   const file = $("file-input").files[0];
-  if (file) window.CtrlFVideoPersistence?.upload(file);
+  if (file) window.CtrlFVideoPersistence?.reviewUpload(file);
   $("file-input").value = "";
 });
 $("restore-demo").addEventListener("click", () => {

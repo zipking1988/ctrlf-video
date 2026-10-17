@@ -16,14 +16,14 @@
     />
     <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
-    <link rel="stylesheet" href="/static/fieldnotes.css?v=8415b1d20dee" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=fb0be085188d" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
     <script src="/static/investigation-canvas.js?v=07916e301039" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
     <script src="/static/workbench.js?v=f9cb94de6d79" defer></script>
-    <script src="/static/workspace.js?v=c708f16d0a74" defer></script>
-    <script src="/static/app.js?v=1327f951954e" defer></script>
+    <script src="/static/workspace.js?v=63932b8edd69" defer></script>
+    <script src="/static/app.js?v=fd2e23281e3c" defer></script>
   </head>
   <body>
     <a id="skip-link" href="#welcome-title" class="skip-link">Skip to main content</a>
@@ -566,7 +566,15 @@
         second synthetic video and preset answers; no model calls.
       </p>
     </dialog>
-    <dialog id="workspace-library" class="workspace-library">
+    <dialog id="upload-dialog" class="workspace-library upload-dialog" aria-labelledby="upload-title" aria-describedby="upload-access-summary">
+      <header><div><span class="eyebrow">YOUR RECORDING</span><h2 id="upload-title">Before you upload</h2></div><button id="upload-cancel" class="icon-button" type="button" aria-label="Cancel upload">×</button></header>
+      <strong id="upload-file-summary"></strong>
+      <p id="upload-access-summary"></p>
+      <p>Use a recording you have permission to process. The original stays on this server. If you start approved analysis later, sampled JPEG frames and text go to Google Gemini. Audio is not transcribed.</p>
+      <p id="upload-retention"></p>
+      <footer><button id="upload-confirm" class="primary-button" type="button">Upload video</button></footer>
+    </dialog>
+    <dialog id="workspace-library" class="workspace-library" aria-labelledby="library-title">
       <header><div><span class="eyebrow">CTRLF VIDEO / WORKSPACE</span><h2 id="library-title">Investigations</h2></div><button id="close-library" class="icon-button" aria-label="Close library">×</button></header>
       <p id="library-intro"></p><div class="library-toolbar"><button id="library-add" class="outline-button">New investigation</button><button id="library-refresh" class="text-button">Refresh</button></div>
       <div id="library-items" class="library-items"></div><p id="library-notice" role="status"></p>

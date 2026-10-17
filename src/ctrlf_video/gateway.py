@@ -210,6 +210,10 @@ def create_gateway(*, transport=None, serve_frontend=False):
                         .encode("latin-1")
                     )
             result.raw_headers.append((key, value))
+        if path == "api/session" and response.status_code == 200:
+            # Advertise the actual ingress cap before the browser transmits a file.
+            # The backend's larger local limit must not override this gateway.
+            result.headers["X-CTRLF-Upload-Limit"] = str(MAX_BODY_BYTES)
         return result
 
     return app

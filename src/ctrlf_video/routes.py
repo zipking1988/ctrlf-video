@@ -235,6 +235,7 @@ def register(app, settings, root, runtime=None, transport=None):
                 max_age=ws.ttl,
             )
         response.headers["Cache-Control"] = "no-store"
+        response.headers["X-CTRLF-Upload-Limit"] = str(MAX_UPLOAD)
         blockers = runtime.blockers() if runtime else ["model_endpoints_missing"]
         if settings.mode != "real":
             blockers.append("fixture_mode_no_model_requests")
