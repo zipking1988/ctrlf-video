@@ -7,7 +7,7 @@
   const demo = {id:"demo_parcel",name:"Package positions · Synthetic demo",metadata:{duration:18,audio:false},job:{state:"ready"}};
   const labels = { queued:"Awaiting preflight", probing:"Checking source", captioning:"Describing frames", indexing:"Indexing", ready:"Ready for questions", failed:"Processing failed", cancelled:"Cancelled", awaiting_configuration:"Awaiting configuration" };
   let session, current, currentVideo = demo, suspended = true, saving = null, lastSaved = "", lastSavedEdits = "", timer;
-  let conflict = false, requestEpoch = 0, activeRequest = null, libraryEpoch = 0;
+  let conflict = false, requestEpoch = 0, activeRequest = null, libraryEpoch = 0, renameEpoch = 0;
   const owns = (id, epoch) => current?.id === id && requestEpoch === epoch;
   function status(text, kind="") { $("save-state").textContent = text; $("save-state").dataset.state = kind; }
   async function api(path, method="GET", body) {
@@ -212,14 +212,26 @@
     }
   }
   function renameSource(video) {
+    const token=++renameEpoch, deskId=current?.id, epoch=requestEpoch;
+    const active=()=>token===renameEpoch && owns(deskId,epoch) && $("rename-source-dialog").open;
     $("rename-source-input").value=video.name;
+    $("rename-source-notice").textContent="";
+    $("rename-source-save").disabled=false;
     $("rename-source-form").onsubmit=async event=>{
       event.preventDefault();
+      const name=$("rename-source-input").value.trim();
+      if (!name) {$("rename-source-notice").textContent="Enter a source name before saving.";$("rename-source-input").focus();return;}
+      if ($("rename-source-save").disabled) return;
+      $("rename-source-save").disabled=true;
+      $("rename-source-notice").textContent="Saving name…";
       try {
-        const result=await api(`/api/videos/${video.id}`,"PATCH",{name:$("rename-source-input").value});
+        const result=await api(`/api/videos/${video.id}`,"PATCH",{name});
+        if (!owns(deskId,epoch)) return;
         if(currentVideo.id===video.id) {currentVideo={...currentVideo,name:result.name};ui().renameSource(result.name);}
+        if (!active()) return;
         $("rename-source-dialog").close();await library("videos");
-      } catch(error) {libraryNotice(error.message);}
+      } catch(error) {if(active()) $("rename-source-notice").textContent="Could not rename this source. Your name is kept; check the connection and try again.";}
+      finally {if(token===renameEpoch) $("rename-source-save").disabled=false;}
     };
     $("rename-source-cancel").onclick=()=>$("rename-source-dialog").close();
     $("rename-source-dialog").showModal();$("rename-source-input").focus();

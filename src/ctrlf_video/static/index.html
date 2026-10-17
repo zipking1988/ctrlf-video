@@ -22,7 +22,7 @@
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
     <script src="/static/workbench.js?v=f9cb94de6d79" defer></script>
-    <script src="/static/workspace.js?v=63932b8edd69" defer></script>
+    <script src="/static/workspace.js?v=413606893730" defer></script>
     <script src="/static/app.js?v=1269f8410887" defer></script>
   </head>
   <body>
@@ -579,7 +579,7 @@
       <p id="library-intro"></p><div class="library-toolbar"><button id="library-add" class="outline-button">New investigation</button><button id="library-refresh" class="text-button">Refresh</button></div>
       <div id="library-items" class="library-items"></div><p id="library-notice" role="status"></p>
     </dialog>
-    <dialog id="rename-source-dialog" class="delete-dialog"><h2>Rename source</h2><form id="rename-source-form"><label for="rename-source-input">Source name</label><input id="rename-source-input" required maxlength="180"><div class="library-toolbar"><button id="rename-source-cancel" type="button" class="outline-button">Cancel</button><button type="submit" class="outline-button">Save name</button></div></form></dialog>
+    <dialog id="rename-source-dialog" class="delete-dialog" aria-labelledby="rename-source-title"><h2 id="rename-source-title">Rename source</h2><form id="rename-source-form"><label for="rename-source-input">Source name</label><input id="rename-source-input" required maxlength="180" aria-describedby="rename-source-notice"><p id="rename-source-notice" role="status"></p><div class="library-toolbar"><button id="rename-source-cancel" type="button" class="outline-button">Cancel</button><button id="rename-source-save" type="submit" class="outline-button">Save name</button></div></form></dialog>
     <dialog id="delete-dialog" class="delete-dialog"><h2>Confirm deletion</h2><p id="delete-description"></p><div><button id="delete-cancel" class="outline-button">Keep</button><button id="delete-confirm" class="outline-button danger">Delete</button></div></dialog>
     <div
       id="announcement"
