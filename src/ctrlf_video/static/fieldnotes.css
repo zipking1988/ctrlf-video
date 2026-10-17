@@ -406,6 +406,8 @@
 .fieldnotes.canvas-first.review-desk .composer-context label { max-width: 100%; }
 .fieldnotes.canvas-first.review-desk .composer-area textarea { min-height: 50px; height: 50px; font-size: 13px; line-height: 1.5; resize: vertical; max-height: 140px; }
 .fieldnotes.canvas-first.review-desk .composer-tools { align-self: end; width: 40px; height: 40px; }
+.fieldnotes.canvas-first.review-desk:not(.review-first) .composer-keyboard-hint,
+.fieldnotes.canvas-first.review-desk:not(.review-first) #send-question > span { display: none; }
 .fieldnotes.canvas-first.review-desk #send-question { width: 40px; height: 40px; background: var(--coral); border-color: var(--coral); border-radius: 9px; }
 .fieldnotes.canvas-first.review-desk #send-question:hover:not(:disabled) { background: #b6422d; border-color: #b6422d; }
 .fieldnotes.canvas-first.review-desk #send-question:disabled { opacity: .45; }
