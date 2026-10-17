@@ -1097,7 +1097,10 @@ window.CtrlFVideoSessionUI = {
     $("welcome-retry").hidden = false;
   },
   entered() {
-    if (entryConnected && !$("research-welcome").hidden) showWelcome(false, true);
+    if (entryConnected && !$("research-welcome").hidden) {
+      history.replaceState(null, "", "/#review");
+      showWelcome(false, true);
+    }
   },
   snapshot: () => ({ ...window.CtrlFVideoWorkbench.getSnapshot(), canvas: investigation?.snapshot(),
     ui: { sourceOpen: !document.querySelector(".agent-shell").classList.contains("source-collapsed"),
