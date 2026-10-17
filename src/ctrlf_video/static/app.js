@@ -54,6 +54,23 @@ $("open-welcome").addEventListener("click", () => {
 });
 $("review-home").addEventListener("click", event => { event.preventDefault(); $("open-welcome").click(); });
 $("welcome-retry").addEventListener("click", () => window.location.reload());
+for (const id of ["welcome-guide", "open-usage-guide"]) {
+  $(id).addEventListener("click", () => {
+    $("guide-demo").disabled = !entryConnected || !demo?.scenarios?.length;
+    $("usage-guide").showModal();
+  });
+}
+$("close-usage-guide").addEventListener("click", () => $("usage-guide").close());
+$("guide-example").addEventListener("click", () => {
+  $("usage-guide").close();
+  window.location.hash = "#example";
+});
+$("guide-demo").addEventListener("click", () => {
+  $("usage-guide").close();
+  history.replaceState(null, "", "/#review");
+  showWelcome(false);
+  openDemoLibrary();
+});
 window.addEventListener("hashchange", () => {
   if (!entryConnected || window.CtrlFVideoRecordedExample?.active()) return;
   const route = window.location.hash;

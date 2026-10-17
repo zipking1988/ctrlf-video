@@ -141,6 +141,7 @@ function WorkspaceNavigation() {
               Question details<small>Inspect the selected question</small>
             </span>
           </button>
+          <button className="workspace-menu-item" onClick={() => run(() => document.getElementById("open-usage-guide").click())}>{icon("list")}<span>Quick guide<small>Start, check evidence, save and export</small></span></button>
           <button className="workspace-menu-item" onClick={() => run(() => document.getElementById("open-agent-setup").click())}>{icon("code")}<span>Model setup<small>Readiness and approved budgets</small></span></button>
           <p className="menu-section-label">Investigation actions</p>
           <button className="workspace-menu-item" onClick={() => run(() => document.getElementById("export-report").click())}>

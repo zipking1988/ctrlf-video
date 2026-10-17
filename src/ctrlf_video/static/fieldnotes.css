@@ -766,3 +766,14 @@ body.recorded-view .research-welcome { display: none; }
 .upload-dialog footer { display: flex; justify-content: flex-end; margin-top: 24px; }
 .upload-dialog .primary-button { padding: 12px 20px; background: #084f52; color: white; border-radius: 8px; font-weight: 600; }
 .upload-dialog .primary-button:hover { background: #063d40; }
+.welcome-nav button { font: inherit; color: inherit; cursor: pointer; }
+.usage-guide { width: min(720px, calc(100vw - 64px)); max-height: calc(100dvh - 64px); overflow-y: auto; }
+.usage-guide header { align-items: flex-start; gap: 24px; }
+.usage-guide p { margin: 12px 0; }
+.guide-steps { display: grid; gap: 18px; margin: 24px 0; padding-left: 24px; }
+.guide-steps li { padding-left: 8px; }
+.guide-steps li::marker { color: #0b6565; font-weight: 600; }
+.guide-steps p { margin: 6px 0 0; }
+.usage-guide details { border-top: 1px solid var(--line); padding: 14px 0; font-size: 14px; }
+.usage-guide summary { cursor: pointer; font-weight: 600; }
+.usage-guide footer { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
