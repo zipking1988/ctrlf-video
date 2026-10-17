@@ -4,6 +4,7 @@ import asyncio
 import base64
 import hashlib
 import json
+import logging
 import math
 import os
 import re
@@ -19,6 +20,17 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from ctrlf_video.attempts import AttemptLedger, BudgetDenied
 from ctrlf_video.media import frames
 from ctrlf_video.schema import Answer, hms
+
+log = logging.getLogger(__name__)
+
+
+def provider_error(body: bytes) -> str:
+    """Google's error status/message for operators; never the request or key."""
+    try:
+        error = json.loads(body)["error"]
+        return f"{error.get('status', '')}: {str(error.get('message', ''))[:300]}"
+    except (ValueError, KeyError, TypeError):
+        return "unparsed error body"
 
 
 class AgentError(ValueError):
@@ -209,6 +221,13 @@ class Provider:
                                 json=request_payload,
                                 headers=headers,
                             ) as response:
+                                if response.status_code >= 400:
+                                    log.warning(
+                                        "Gemini %s HTTP %s %s",
+                                        role,
+                                        response.status_code,
+                                        provider_error((await response.aread())[:4096]),
+                                    )
                                 response.raise_for_status()
                                 body = bytearray()
                                 async for chunk in response.aiter_bytes():
@@ -231,7 +250,9 @@ class Provider:
                 self.ledger.transition(attempt, "completed")
                 self.check()
                 return result
-            except (httpx.HTTPError, ValueError, TimeoutError, HTTPException):
+            except (httpx.HTTPError, ValueError, TimeoutError, HTTPException) as error:
+                reason = str(error) if isinstance(error, AgentError) else type(error).__name__
+                log.warning("Gemini %s attempt outcome unknown: %s", role, reason)
                 if self.ledger.read_attempt(attempt, owner)["state"] == "dispatched":
                     self.ledger.transition(attempt, "unknown")
                 raise AgentError("model_unknown") from None

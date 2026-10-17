@@ -650,3 +650,28 @@ def test_template_is_valid_but_blocked_and_gemini_is_the_only_provider(monkeypat
         "embed", "/embeddings", {"model": "test", "input": ["one", "two"]}, "ingest"
     )
     assert len(wire["requests"]) == 2
+
+
+def test_gemini_failure_logs_provider_status_without_key_or_payload(tmp_path, monkeypatch, caplog):
+    def respond(req):
+        return httpx.Response(
+            400, json={"error": {"status": "INVALID_ARGUMENT", "message": "Bad field x"}}
+        )
+
+    p = provider(tmp_path, monkeypatch, respond)
+    approve(p.ledger, "owner")
+    with caplog.at_level("WARNING", logger="ctrlf_video.agent"):
+        with pytest.raises(AgentError, match="model_unknown"):
+            p.chat("text", "private question text", **kwargs())
+    assert "400" in caplog.text and "INVALID_ARGUMENT" in caplog.text
+    assert "Bad field x" in caplog.text
+    assert "test-secret" not in caplog.text and "private question text" not in caplog.text
+
+
+def test_gemini_incomplete_response_logs_reason(tmp_path, monkeypatch, caplog):
+    p = provider(tmp_path, monkeypatch, lambda req: response({"inspect": [0]}, "MAX_TOKENS"))
+    approve(p.ledger, "owner")
+    with caplog.at_level("WARNING", logger="ctrlf_video.agent"):
+        with pytest.raises(AgentError, match="model_unknown"):
+            p.chat("text", "{}", **kwargs())
+    assert "gemini_incomplete_response" in caplog.text
