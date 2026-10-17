@@ -54,6 +54,18 @@ $("open-welcome").addEventListener("click", () => {
 });
 $("review-home").addEventListener("click", event => { event.preventDefault(); $("open-welcome").click(); });
 $("welcome-retry").addEventListener("click", () => window.location.reload());
+window.addEventListener("hashchange", () => {
+  if (!entryConnected || window.CtrlFVideoRecordedExample?.active()) return;
+  const route = window.location.hash;
+  if (route === "#review") {
+    showWelcome(false, true);
+    setWorkspaceView("review");
+  } else if (route === "#start" || route === "#evidence-chain") {
+    $("welcome-resume").hidden = false;
+    showWelcome(true, route === "#start");
+    if (route === "#evidence-chain") $("evidence-chain").scrollIntoView({block:"start"});
+  }
+});
 
 function setSourceOpen(open) {
   document
