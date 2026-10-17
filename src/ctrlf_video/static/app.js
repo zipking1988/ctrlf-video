@@ -249,6 +249,9 @@ function showSavedAnswers(open = true) {
 }
 function updateSend() {
   const unavailable = analysisUnavailable();
+  // A saved recording can keep a draft before analysis. Submission remains
+  // independently gated below, and durable snapshots already retain the draft.
+  if (activeVideo) $("question").disabled = false;
   $("composer-unavailable").hidden = !unavailable;
   $("send-question").hidden = unavailable;
   if (!unavailable) showSavedAnswers(false);
@@ -942,6 +945,10 @@ setSourceOpen(
 $("question-form").addEventListener("submit", (event) => {
   event.preventDefault();
   if (analysisUnavailable()) { showSavedAnswers(); return; }
+  if (activeVideo && localMode) {
+    notice("Your draft is kept. Analysis must finish before asking this question. Open Sources to check progress.");
+    return;
+  }
   if (!$("send-question").disabled) ask($("question").value.trim());
 });
 $("open-saved-answers").addEventListener("click", () => showSavedAnswers(
@@ -1154,8 +1161,8 @@ window.CtrlFVideoSessionUI = {
       localMode = video.job?.state !== "ready";
       window.CtrlFVideoWorkbench.source(localMode);
       window.CtrlFVideoWorkbench.describe(video);
-      $("question").disabled = localMode;
-      $("question").placeholder = localMode ? "Source analysis is incomplete." : "What would you like to find in this video?";
+      $("question").disabled = false;
+      $("question").placeholder = localMode ? "Keep a question draft while analysis is unavailable…" : "What would you like to find in this video?";
       $("video-heading").textContent = video.name;
       $("attached-source-name").textContent = video.name;
       $("mode-label").textContent = "Uploaded source";

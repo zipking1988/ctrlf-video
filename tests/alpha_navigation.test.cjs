@@ -46,3 +46,18 @@ test("initial restoration preserves an explicitly requested Home route",()=>{
   assert.equal(h.get("research-welcome").hidden,false);
   assert.equal(h.shell.inert,true);
 });
+
+test("unindexed uploaded recordings allow drafts without admitting questions",()=>{
+  const h=appHarness();
+  h.get("question").disabled=true;
+  h.get("question").value="Where does the checkout error appear?";
+  h.run("activeVideo={id:'uploaded'};localMode=true;liveAccess=true;demo={};updateSend()");
+  assert.equal(h.get("question").disabled,false);
+  assert.equal(h.get("send-question").disabled,true);
+  h.get("question-form").listeners.submit[0]({preventDefault(){}});
+  assert.match(h.get("composer-feedback").textContent,/Analysis must finish/);
+  assert.equal(h.get("question").value,"Where does the checkout error appear?");
+  h.run("liveAccess=false;updateSend()");
+  assert.equal(h.get("question").disabled,false);
+  assert.equal(h.get("send-question").hidden,true);
+});
