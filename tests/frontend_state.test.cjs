@@ -138,6 +138,7 @@ async function harness(readyState = 1, width = 1440) {
   };
   const context = vm.createContext({
     document,
+    history: {replaceState(_state, _title, url) { context.currentRoute = url; }},
     window: {
       innerWidth: width,
       matchMedia: () => ({ matches: true }),
@@ -209,6 +210,19 @@ test("explicit review entry opens the video and questions for a first visit", as
   h.run('window.location = { hash: "#review" }; window.CtrlFVideoSessionUI.entryReady(true)');
   assert.equal(h.get("research-welcome").hidden, true);
   assert.equal(h.shell.inert, false);
+});
+
+test("home and resume keep the visible screen aligned with its reload route", async () => {
+  const h = await harness();
+  h.run('window.CtrlFVideoSessionUI.entryReady(false)');
+  h.get("open-welcome").click();
+  assert.equal(h.run("currentRoute"), "/#start");
+  assert.equal(h.get("research-welcome").hidden, false);
+  h.get("welcome-resume").click();
+  assert.equal(h.run("currentRoute"), "/#review");
+  assert.equal(h.get("research-welcome").hidden, true);
+  assert.equal(h.shell.inert, false);
+  assert.equal(h.get("skip-link").href, "#question");
 });
 
 test("evidence deep link shows the landing after restoration and opens the demo from its final step", async () => {
@@ -467,4 +481,24 @@ test("closing the docked findings editor returns focus to the visible rail contr
   assert.equal(h.get("rail-findings").focused,true);
   assert.notEqual(h.get("toggle-inspector").focused,true);
   assert.equal(h.get("question").value,"Keep this draft");
+});
+
+test("unavailable live analysis replaces the inert send affordance with saved-result recovery", async () => {
+  const {get, run} = await harness();
+  get("question").value = "which team is green ?";
+  run('activeVideo={id:"video-A"}; window.CtrlFVideoSessionUI.access(false)');
+  assert.equal(get("send-question").hidden, true);
+  assert.equal(get("send-question").disabled, true);
+  assert.equal(get("composer-unavailable").hidden, false);
+  get("question-form").dispatch("submit");
+  assert.match(get("composer-feedback").textContent, /Your draft is kept/);
+  assert.equal(get("question-shortcuts").classList.contains("review-saved-open"), true);
+  assert.equal(get("open-saved-answers").getAttribute("aria-expanded"), "true");
+  assert.equal(get("question").value, "which team is green ?");
+  get("open-saved-answers").click();
+  assert.equal(get("question-shortcuts").classList.contains("review-saved-open"), false);
+  run('window.CtrlFVideoSessionUI.access(true)');
+  assert.equal(get("composer-unavailable").hidden, true);
+  assert.equal(get("send-question").hidden, false);
+  assert.equal(get("send-question").disabled, false);
 });

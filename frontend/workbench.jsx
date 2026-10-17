@@ -7,6 +7,9 @@ import React, {
 import { createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
 import { openFinding, saveFinding } from "./finding-editor-actions.mjs";
+import { savedAnswersForSource, questionLabel } from "./question-shortcuts.mjs";
+import SimpleReview from "./simple-review.jsx";
+import RecordedExample from "./recorded-example.jsx";
 
 const store = window.CtrlFVideoWorkbenchModel.createStore();
 window.CtrlFVideoWorkbench = store;
@@ -98,6 +101,8 @@ function WorkspaceNavigation() {
           <button className="workspace-menu-item" onClick={() => run(() => ui()?.review())}>
             {icon("play")}<span>Review video<small>Ask a question and replay cited moments</small></span>
           </button>
+          <button className="workspace-menu-item" onClick={() => run(() => ui()?.newQuestion())}>{icon("plus")}<span>New question<small>Keep your draft and clear follow-up context</small></span></button>
+          <button className="workspace-menu-item" onClick={() => run(() => ui()?.recordingContext())}>{icon("paperclip")}<span>Recording context<small>Task and recording purpose</small></span></button>
           <button
             className="workspace-menu-item"
             onClick={() => run(() => ui()?.canvas())}
@@ -110,11 +115,11 @@ function WorkspaceNavigation() {
           </button>
           <button
             className="workspace-menu-item"
-            onClick={() => run(() => ui()?.toggleSource())}
+            onClick={() => run(() => ui()?.showSource())}
           >
             {icon("folder-open")}
             <span>
-              Source video<small>Show or hide the player</small>
+              Source video<small>Return to the recording</small>
             </span>
           </button>
           <button
@@ -159,9 +164,9 @@ function WorkspaceNavigation() {
               Demo library<small>Explore six synthetic demo paths</small>
             </span>
           </button>
-          <a className="workspace-menu-item" href="/static/judge/index.html">
+          <a className="workspace-menu-item" href="#example" onClick={()=>setOpen(false)}>
             {icon("play")}
-            <span>Real test walkthrough<small>Replay recorded Gemini evidence and export your finding</small></span>
+            <span>Recorded example<small>Replay real evidence and try a source-linked finding</small></span>
           </a>
           <button
             className="workspace-menu-item"
@@ -320,14 +325,14 @@ function AgentConversation() {
   return <section className="agent-conversation" aria-label="Agent conversation">
     {state.records.length > 1 && <QuestionHistory records={state.records} selectedId={selected.id} />}
     <div className="agent-user"><span className="speaker-label">Your question</span><p>{query.question}</p></div>
-    <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>Answer</strong><small>{query.mode === "real" ? "From sampled source frames" : "Synthetic demo · preset answer"}</small></div></div>
+    <div className="partner-identity"><span className="partner-mark">{icon("chats-circle")}</span><div><strong>{response.status === "error" ? "Question not completed" : "Answer"}</strong><small>{response.status === "error" ? "No usable evidence was returned" : query.mode === "real" ? "From sampled source frames" : "Synthetic demo · preset answer"}</small></div></div>
     <div className="agent-assistant">
     <p className="agent-answer">{response.answer}</p>
     <p className="agent-disclosure">{query.mode === "real" ? labels[response.status] : "Synthetic demo · preset result"}</p>
-    <details className="agent-activity"><summary>{frames.length} supporting {frames.length === 1 ? "frame" : "frames"} {icon("paperclip")}</summary>
+    {!!frames.length && <details className="agent-activity"><summary>{frames.length} supporting {frames.length === 1 ? "frame" : "frames"} {icon("paperclip")}</summary>
       <p>{query.mode === "real" ? `${response.trace?.visible?.segments_reviewed ?? 0} segments reviewed. These frames support this answer; they do not establish what happened between samples.` : "This example uses preset answers and synthetic source frames. No model request was made."}</p>
       <button className="text-button" onClick={() => ui()?.openInspector("context")}>Inspect evidence details</button>
-    </details>
+    </details>}
     {!!frames.length && <div className="agent-frames" aria-label="Supporting source frames"><p className="replay-instruction">Click a timestamp to watch that moment.</p>{frames.map(frame => {
       const saved = state.pins.find(pin => pin.kind === "evidence" && pin.frame.uri === frame.uri && pin.frame.t === frame.t);
       return <div className="agent-frame-row" key={frame.uri}>
@@ -337,13 +342,31 @@ function AgentConversation() {
     })}</div>}
     {!!response.unresolved.length && <section className="agent-unresolved" aria-label="What remains unknown"><h3>Still to verify</h3>{response.unresolved.map(text => <p key={text}>{text}</p>)}</section>}
     </div>
-    <details className="agent-result-actions"><summary>Save an observation or follow up</summary>{["ok", "partial"].includes(response.status) && <button className="save-finding-action" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>{icon("stack")}Write a finding</button>}<button className="text-button" disabled={state.local} onClick={() => ui()?.continueFrom(selected.id)}>Follow up on this answer {icon("arrow-right")}</button></details>
+    {response.status === "error" ? <div className="failed-question-recovery"><p>Open a saved answer above, or start a new question about something visible. This result cannot be used as follow-up evidence.</p><button className="outline-button" onClick={() => ui()?.newQuestion()}>Start a new question {icon("arrow-right")}</button></div> : <details className="agent-result-actions"><summary>Save an observation or follow up</summary>{["ok", "partial"].includes(response.status) && <button className="save-finding-action" onClick={() => { const pin = ui()?.saveConclusion(selected.id, query); if (pin) { ui()?.openInspector("findings"); window.dispatchEvent(new CustomEvent("ctrlf-video-edit-finding", {detail:pin.id})); } }}>{icon("stack")}Write a finding</button>}<button className="text-button" disabled={state.local || (query.mode === "real" && !response.events.length)} onClick={() => ui()?.continueFrom(selected.id)}>Follow up on this answer {icon("arrow-right")}</button></details>}
+  </section>;
+}
+function QuestionShortcuts() {
+  const state = useDesk();
+  const answers = savedAnswersForSource(state);
+  if (!answers.length) return null;
+  return <section className="question-shortcuts" aria-label="Saved answers for this video">
+    <div className="question-shortcuts-heading"><strong>Start with this video</strong><span>Saved answers · no new analysis</span></div>
+    <div className="question-shortcuts-list">{answers.map(record => <button type="button" key={record.id} title={record.query.question} onClick={() => {
+      ui()?.select(record.id);
+      document.getElementById("agent-conversation-root").scrollIntoView({block:"start"});
+    }}>
+      <span>{questionLabel(record.query.question)}</span>{icon("arrow-right")}
+    </button>)}</div>
   </section>;
 }
 function QuestionHelp() {
   const state = useDesk();
   const demo = !state.sourceInfo?.id || state.sourceInfo.id === "demo_parcel";
   return <p className="question-help">{state.local ? "Analysis required. Check status in Sources." : demo ? "Preset demo · No model calls." : "Sampled frames · Check cited moments · No audio transcription."}</p>;
+}
+function ConversationSurface() {
+  const state = useDesk();
+  return <><div className="canvas-conversation"><AgentConversation /></div><SimpleReview state={state} ui={ui} icon={icon}/></>;
 }
 function SourceReviewHelp() {
   const state = useDesk();
@@ -1079,7 +1102,10 @@ createRoot(document.getElementById("research-task")).render(<ResearchTask />);
 
 createRoot(document.getElementById("composer-source")).render(<ComposerSource />);
 
-createRoot(document.getElementById("agent-conversation-root")).render(<AgentConversation />);
+createRoot(document.getElementById("agent-conversation-root")).render(<ConversationSurface />);
 createRoot(document.getElementById("source-evidence-strip")).render(<SourceEvidenceStrip />);
 createRoot(document.getElementById("question-help")).render(<QuestionHelp />);
+createRoot(document.getElementById("question-shortcuts")).render(<QuestionShortcuts />);
 createRoot(document.getElementById("review-source-help")).render(<SourceReviewHelp />);
+
+createRoot(document.getElementById("recorded-example-root")).render(<RecordedExample icon={icon}/>);

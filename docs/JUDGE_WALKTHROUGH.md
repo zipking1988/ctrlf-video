@@ -1,8 +1,9 @@
 # Recorded-test walkthrough
 
-The public entry is `/static/judge/index.html`, linked from the landing's
-**Explore real test results** action and the workspace menu. It serves a curated
-recorded sample directly through the existing static frontend. It needs neither
+The public entry is `/#example`, linked from the landing's **Try a real example**
+action and the workspace menu. It opens a curated recorded sample in the same
+application, using the shared video/chat component. The former
+`/static/judge/index.html` redirects to this route. It needs neither
 an original browser session nor a private source's retention window. It does not
 run new model requests, enroll visitors, change a budget, share arbitrary user
 investigations or extend hosting beyond October 19, 2026.
@@ -10,7 +11,7 @@ investigations or extend hosting beyond October 19, 2026.
 ## Visitor journey
 
 1. Read the saved real Gemini scoreboard question and its `partial` answer.
-2. Click **00:01.001 · Check the source**. The public copy of the original
+2. Click **00:01.001**. The public copy of the original
    basketball source seeks to 1.001 seconds, paused. Play surrounding footage to
    verify Milwaukee 51 / Atlanta 56.
 3. Write a finding, or copy the existing human review into an editable draft.
@@ -22,12 +23,14 @@ investigations or extend hosting beyond October 19, 2026.
    link; JSON retains structured provenance. HTML embeds the evidence JPEG for
    offline inspection. Original-video playback still requires the public
    deployment. There is no native PDF report export.
-6. Expand **Six attempts. Including the failures.** The development summary
+6. Expand **Real test results & limitations** The development summary
    retains errors, false person matches, the wrong-time summary and the two
    manually checked partial results. It is not a held-out accuracy benchmark.
 
-The walkthrough is a dedicated browser-local experience using the same report
-renderers as the private workspace. It is not an anonymous live Gemini session
+The walkthrough is an isolated browser-local mode using the same Review component
+and report renderers as the private workspace. Before switching, pending private
+workspace edits are flushed; the example never replaces the private investigation.
+**Home** returns to the landing, and **Upload video** returns to the private upload path. It is not an anonymous live Gemini session
 or a cloud-saved investigation. It does not offer arbitrary new questions:
 new analysis still requires explicit session funding.
 
@@ -82,4 +85,5 @@ remains partial. This sports clip does not validate UX research usefulness.
 Run `npm test`, `npm run build`, and the Python judge/gateway/ownership regressions.
 The build updates hashes for the walkthrough and shared report renderer. Browser
 verification covers a fresh page, timestamp replay, finding edits, save/reload,
-disabled export after unsaved edits, downloads and clear/reset.
+disabled export after unsaved edits, downloads, legacy redirects and private-workspace return.
+The previous standalone UI scripts are not loaded by the compatibility entry.

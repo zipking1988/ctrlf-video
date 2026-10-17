@@ -16,14 +16,14 @@
     />
     <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
-    <link rel="stylesheet" href="/static/fieldnotes.css?v=821b9a272fa4" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=8415b1d20dee" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
-    <script src="/static/investigation-canvas.js?v=7b3a7fdc7962" defer></script>
+    <script src="/static/investigation-canvas.js?v=07916e301039" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
-    <script src="/static/workbench.js?v=1724561b6841" defer></script>
-    <script src="/static/workspace.js?v=0a6b48f341ab" defer></script>
-    <script src="/static/app.js?v=f5934c91be66" defer></script>
+    <script src="/static/workbench.js?v=f9cb94de6d79" defer></script>
+    <script src="/static/workspace.js?v=c708f16d0a74" defer></script>
+    <script src="/static/app.js?v=2da230151ce4" defer></script>
   </head>
   <body>
     <a id="skip-link" href="#welcome-title" class="skip-link">Skip to main content</a>
@@ -31,89 +31,48 @@
       <h1>CtrlF Video</h1>
       <p>This workspace needs a desktop browser.</p>
     </div>
-    <section id="research-welcome" class="research-welcome" aria-labelledby="welcome-title">
+    <section id="research-welcome" class="research-welcome compact-welcome" aria-labelledby="welcome-title">
       <div class="welcome-stage">
         <header class="welcome-header">
           <a href="/" class="welcome-brand">CtrlF Video<span>Ctrl+F for video</span></a>
           <nav class="welcome-nav" aria-label="Product navigation">
-            <button id="welcome-resume" type="button" hidden>Open workspace</button>
-            <a href="/static/judge/index.html">Real test results</a>
+            <button id="welcome-resume" type="button" hidden>Resume workspace</button>
             <a href="#evidence-chain">How it works</a>
             <a href="/docs">API docs</a>
           </nav>
         </header>
         <div class="welcome-content">
           <div class="welcome-intro">
-            <span class="welcome-kicker">FOR UX RESEARCHERS</span>
-            <h1 id="welcome-title" tabindex="-1">Turn a UX recording into findings you can verify.</h1>
-            <p>Ask visual questions, replay timestamped evidence and export source-linked findings.</p>
+            <span class="welcome-kicker">QUESTIONS. VIDEO. EVIDENCE.</span>
+            <h1 id="welcome-title" tabindex="-1">Find the moment.<br />Check the source.</h1>
+            <p>Ask about your video, replay cited moments, and save findings with evidence.</p>
             <div class="welcome-actions">
-              <a href="/static/judge/index.html" class="welcome-primary">Explore real test results <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></a>
-              <button id="welcome-demos" class="welcome-secondary" type="button" disabled>Explore synthetic demo <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></button>
-              <button id="welcome-upload" class="welcome-secondary" type="button" disabled><img src="/static/icons/folder-open.svg" width="20" height="20" alt="" /> Upload a recording</button>
+              <a href="#example" class="welcome-primary">Try a real example <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></a>
+              <button id="welcome-upload" class="welcome-secondary" type="button" disabled><img src="/static/icons/folder-open.svg" width="20" height="20" alt="" /> Upload a video</button>
             </div>
-            <p class="welcome-access">Real test walkthrough uses saved Gemini results.<br />Synthetic demo uses preset answers.<br />New analysis requires an approved session.</p>
+            <p class="welcome-access">Example: saved Gemini result. No sign-in or model call.<br />New analysis of your uploads requires an approved session.</p>
             <p id="welcome-notice" role="status">Connecting to your workspace…</p>
             <button id="welcome-retry" class="text-button" type="button" hidden>Reload to reconnect</button>
-            <p class="welcome-stack">Built with Gemini · Deployed on Google Cloud</p>
           </div>
           <figure class="welcome-product">
-            <a href="/static/landing/workspace-demo.png" aria-label="View the full-size product screenshot">
-              <img src="/static/landing/workspace-demo.png" width="1280" height="800" fetchpriority="high" alt="Actual CtrlF Video workspace: a question about the package connects to the source frame at 00:06 and a researcher-saved finding. The source and answers are explicitly labeled synthetic demo." />
+            <a href="#example" aria-label="Open the recorded example in the video workspace">
+              <img src="/static/judge/basketball/frames/scoreboard-1-001.jpg" width="1280" height="720" fetchpriority="high" alt="Real basketball source frame with the broadcast scoreboard. Open the example to inspect its saved answer and replay this citation." />
+              <div class="welcome-example-result"><span>REAL GEMINI TEST · SAVED RESULT</span><strong>“What does the scoreboard show?”</strong><p>Milwaukee 51 · Atlanta 56 <time>00:01.001</time></p></div>
             </a>
-            <figcaption>Actual product screenshot · Synthetic demo, preset answers</figcaption>
+            <figcaption>Actual source frame · Partial result · Replay and verify it yourself</figcaption>
           </figure>
         </div>
+        <section id="evidence-chain" class="welcome-how-row" aria-labelledby="welcome-proof-title">
+          <h2 id="welcome-proof-title">From a question to something you can check.</h2>
+          <ol><li><span>01</span> Ask about what’s visible</li><li><span>02</span> Replay the cited moment</li><li><span>03</span> Save a finding & export</li></ol>
+          <p>Built with Gemini · Deployed on Google Cloud. Sampled frames can miss brief events. Audio transcription is unavailable.</p>
+        </section>
       </div>
-      <section id="evidence-chain" class="welcome-proof" aria-labelledby="welcome-proof-title">
-        <div class="welcome-proof-heading">
-          <div>
-            <span class="welcome-proof-kicker">HOW IT WORKS</span>
-            <h2 id="welcome-proof-title">Ask what happened.<br />Find where it happened.</h2>
-          </div>
-          <div class="welcome-proof-intro">
-            <p class="welcome-how">Find the moment you need without scrubbing the whole recording. With approved Gemini analysis, ask a visual question and get relevant moments to replay, check and save as evidence.</p>
-            <p class="welcome-example-label">Synthetic source · Preset answers · No model calls in this example.</p>
-          </div>
-        </div>
-        <ol class="welcome-chain">
-          <li class="welcome-chain-question">
-            <div class="welcome-step-heading"><span class="welcome-step">01</span><h3>Ask a question</h3></div>
-            <blockquote>“When is the package at the center?”</blockquote>
-            <p>Describe the moment you’re looking for in plain language.</p>
-            <span class="welcome-object-label">Question <img src="/static/icons/arrow-right.svg" width="18" height="18" alt="" /></span>
-          </li>
-          <li class="welcome-chain-evidence">
-            <div class="welcome-step-heading"><span class="welcome-step">02</span><h3>Find relevant moments</h3></div>
-            <figure>
-              <img class="welcome-source-frame" src="/static/demo/frames/6.jpg" width="1598" height="900" loading="lazy" alt="Actual frame at 00:06 of the synthetic source: a package centered on a workbench." />
-              <figcaption>Source frame at <time datetime="PT6S">00:06</time></figcaption>
-            </figure>
-            <p>Gemini searches descriptions of sampled frames, then reviews relevant segments. Open a cited timestamp to check the source.</p>
-            <span class="welcome-object-label">Source evidence <img src="/static/icons/arrow-right.svg" width="18" height="18" alt="" /></span>
-          </li>
-          <li class="welcome-chain-finding">
-            <div class="welcome-step-heading"><span class="welcome-step">03</span><h3>Replay and save</h3></div>
-            <blockquote>“At 00:06, the package is at the center of the workbench.”</blockquote>
-            <p>Replay the surrounding footage, check what happened and save your finding with its source.</p>
-            <span class="welcome-object-label">Finding · Linked to 00:06</span>
-          </li>
-        </ol>
-        <p class="welcome-evidence-limit">Gemini analyzes sampled frames and relevant segments; brief events can be missed. This preset example demonstrates the workflow, not model accuracy.</p>
-        <div class="welcome-proof-action">
-          <p><strong>See the evidence chain in action.</strong><span>Follow a question from source frame to saved finding.</span></p>
-          <button id="welcome-proof-demos" class="welcome-primary" type="button" disabled>Explore synthetic demo <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></button>
-        </div>
-        <footer class="welcome-footer">
-          <p>Designed for desktop UX recording review.</p>
-          <p>Demo: 18-second synthetic video · No model calls.<br />Recording upload and playback are available. Audio transcription is unavailable.</p>
-        </footer>
-      </section>
     </section>
     <input id="file-input" type="file" accept="video/*" hidden />
     <div class="agent-shell workbench-shell review-desk canvas-first fieldnotes review-first inspector-collapsed" inert>
       <header class="studio-header">
-        <a class="brand" href="/" aria-label="CtrlF Video Home" title="Ctrl+F for video">CtrlF Video</a>
+        <a id="review-home" class="brand" href="/" aria-label="CtrlF Video Home" title="Ctrl+F for video">CtrlF Video</a>
         <div id="project-title"></div>
         <button id="save-state" class="save-state" type="button" aria-live="polite">Connecting to workspace…</button>
         <button id="resume-query" class="outline-button" type="button" hidden>Resume query</button>
@@ -135,8 +94,9 @@
         </button>
         <button id="export-report" class="outline-button">Export report</button>
         <button id="workspace-demos" class="outline-button" type="button" disabled>Demo library</button>
+        <div id="review-menu-slot"></div>
       </header>
-      <nav class="studio-rail" aria-label="Workspace navigation">
+      <nav id="workspace-rail" class="studio-rail" aria-label="Workspace navigation">
         <button class="rail-brand" id="open-welcome" type="button" aria-label="Open CtrlF Video start page">CtrlF<br />Video</button>
         <button id="rail-review" class="rail-button active" type="button" aria-label="Review video and ask questions" aria-pressed="true"><img class="icon" src="/static/icons/play.svg" alt="" /><span>Review</span></button>
         <button
@@ -316,6 +276,7 @@
               <source src="/demo/video" type="video/mp4" /></video
             ><span id="video-watermark">Synthetic demo</span>
           </div>
+          <div id="review-source-meta"></div>
           <div class="player-footer">
             <span id="seek-status">Select evidence to replay the source</span
             ><button id="reload-video" class="text-button" hidden>
@@ -405,11 +366,16 @@
         aria-label="Evidence details and finding editor"
       ></aside>
       <p id="form-notice" class="form-notice" role="status" hidden></p>
-      <section id="agent-chat" class="agent-chat" aria-label="Research agent" tabindex="0">
+      <section id="agent-chat" class="agent-chat" aria-label="Video chat" tabindex="0">
         <header class="agent-chat-heading"><span>Ask about this video</span><button id="agent-findings" class="agent-findings-button">Findings</button><button id="collapse-agent" class="icon-button" aria-label="Minimize agent chat"><img class="icon" src="/static/icons/x.svg" alt="" /></button></header>
         <div id="research-task"></div>
         <div id="agent-conversation-root"></div>
       <section class="composer-area" aria-label="Ask about the recording">
+        <div id="composer-unavailable" class="composer-unavailable" hidden>
+          <div><strong>Live questions are off</strong><p>This workspace replays saved results. You can keep a draft, but it will not be sent.</p></div>
+          <button id="open-saved-answers" type="button" aria-expanded="false" aria-controls="question-shortcuts">View saved answers</button>
+        </div>
+        <div id="question-shortcuts"></div>
         <form id="question-form">
           <div class="composer-context">
             <label id="composer-label" for="question">Question</label
@@ -428,7 +394,7 @@
             rows="2"
             maxlength="1000"
             placeholder="What would you like to find in this video?"
-            aria-describedby="composer-parent question-help composer-keyboard-hint"
+            aria-describedby="composer-parent question-help composer-keyboard-hint composer-feedback composer-unavailable"
           ></textarea>
           <div class="composer-tools">
             <span id="composer-keyboard-hint" class="composer-keyboard-hint" title="Shift + Enter starts a new line">Enter to ask</span>
@@ -455,6 +421,7 @@
             </button>
           </div>
         </form>
+        <p id="composer-feedback" class="composer-feedback" role="status" aria-live="polite" hidden></p>
         <div id="question-help"></div>
       </section>
       </section>
@@ -628,5 +595,6 @@
       <footer><button id="refresh-agent-setup" class="outline-button" type="button">Check again</button>
         <span class="muted-text">Checks do not call models, provision GPU or approve spending.</span></footer>
     </dialog>
+    <div id="recorded-example-root"></div>
   </body>
 </html>

@@ -108,11 +108,18 @@
     button.onclick=()=>Promise.resolve(action()).catch(error=>libraryNotice(error.message));row.append(button);return row;
   }
   function libraryNotice(message) { $("library-notice").textContent=message; }
+  async function refreshAccess() {
+    const next=await api("/api/session");
+    if (session?.owner_id && next.owner_id!==session.owner_id) throw new Error("session_expired_reload");
+    session=next;
+    ui().access?.(session.real_ready);
+  }
   async function showRuntime() {
     const dialog=$("agent-setup-dialog"), button=$("refresh-agent-setup");
     if(!dialog.open) dialog.showModal();
     button.disabled=true;$("agent-setup-summary").textContent="Reading local configuration…";
     try {
+      await refreshAccess();
       const data=await api("/api/runtime/status");
       const provider="Gemini · AI Builder Cup";
       $("agent-setup-summary").textContent=data.dispatch_prerequisites_met
@@ -323,16 +330,21 @@
   }
   async function ask(question) {
     if (suspended || !current || currentVideo.job?.state!=="ready") return;
+    if (session.real_ready === false) {
+      ui().notify("New analysis is unavailable in this workspace. Open a saved answer or replay the video; your draft is kept.");
+      return;
+    }
     if (activeRequest?.state!=="unknown" && activeRequest) {
       $('resume-query').hidden=false;ui().notify("Query running. Resume the current request rather than submitting it again.");return;
     }
     const desk=current,epoch=requestEpoch;
-    const context=ui().currentContext();
+    const candidate=ui().currentContext();
+    const context=candidate?.mode === "real" && !candidate.response?.events?.length ? null : candidate;
     const parentTurn=context?.mode==="real" ? store().getSnapshot().records.find(r=>r.query.id===context.id)?.id || null : null;
     const body={investigation_id:desk.id,request_id:crypto.randomUUID().replaceAll("-",""),
       generation:store().getSnapshot().epoch,question,parent_request_id:context?.mode==="real" ? context.id : null,
       task_brief:store().getSnapshot().taskBrief,study_type:store().getSnapshot().studyType};
-    ui().busy(true);
+    ui().busy(true,"Checking your question… Your draft is kept while this runs.");
     let pending=null;
     try {
       await flush(); if (!owns(desk.id,epoch)) return;
@@ -342,6 +354,7 @@
       if (prepared.kind!=="ready") {ui().notify(prepared.message);return;}
       pending={desk:desk.id,id:body.request_id,state:"running"};activeRequest=pending;
       status("Finding evidence…");
+      ui().notify("Finding evidence in the video… This may take a moment. Your draft is kept.");
       let data;
       for (let i=0;i<15;i++) {
         try {data=await api("/api/chat","POST",body);}catch(error){if(error.data?.kind==="query_control") {data=error.data;}else if(error.data?.response) {data=error.data;} else throw error;}
@@ -356,7 +369,12 @@
         if (!store().getSnapshot().records.some(r=>r.query.id===data.id)) ui().answer({...data,parentTurn},question);
         ui().notify("");await flush();if (!owns(desk.id,epoch)) return;
       } else {$('resume-query').hidden=false;ui().notify("Query running; your question is preserved. Resume this request rather than submitting it again.");}
-    }catch(error){if(owns(desk.id,epoch)){if(activeRequest===pending && pending) $('resume-query').hidden=false;ui().notify(`${error.message} · Your question is preserved.`);status("Search incomplete","error");}}
+    }catch(error){if(owns(desk.id,epoch)){if(activeRequest===pending && pending) $('resume-query').hidden=false;
+      const message = ["context_has_no_verified_anchor","invalid_context_anchor"].includes(error.message)
+        ? "That previous answer has no usable evidence. Choose New question or open an answer with a source citation."
+        : error.message === "real_blocked" ? "New analysis is unavailable. Open a saved answer or check Model setup."
+        : "The question could not complete. Check the connection and analysis availability before trying again.";
+      ui().notify(`${message} Your draft is kept.`);status("Search incomplete","error");}}
     finally {if(owns(desk.id,epoch)) ui().busy(false);}
   }
   async function stopRequest() {
@@ -369,6 +387,7 @@
     if(!ui()?.ready())return;
     try {
       session=await api("/api/session");
+      ui().access?.(session.real_ready);
       let id;try{id=localStorage.getItem("ctrlf-video-current");}catch{}
       const desks=(await api("/api/investigations")).items;
       suspended=false;

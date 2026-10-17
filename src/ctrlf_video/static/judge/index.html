@@ -1,60 +1,6 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#084f52" />
-  <meta name="description" content="Explore a saved real Gemini test. Replay source citations, write your own finding and export its evidence report. No sign-in or model call required." />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; media-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'" />
-  <title>Real test walkthrough · CtrlF Video</title>
-  <link rel="icon" href="/static/icons/play.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/static/judge/styles.css?v=3686205b266a" />
-  <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
-  <script src="/static/judge/model.js?v=f8102dd7c66b" defer></script>
-  <script src="/static/judge/app.js?v=702180b020b4" defer></script>
-</head>
-<body>
-  <a class="skip" href="#main">Skip to walkthrough</a>
-  <header class="site-header"><a class="brand" href="/">CtrlF Video<span>Ctrl+F for video</span></a><nav aria-label="Main"><a href="/#review">Open workspace <span aria-hidden="true">↗</span></a></nav></header>
-  <main id="main">
-    <section class="intro"><div><p class="eyebrow">REAL TEST WALKTHROUGH</p><h1>Check the answer.<br />Keep the evidence.</h1><p class="intro-copy">Replay a cited moment, write a finding and export its sources.</p></div><p class="record-label"><strong>Saved real Gemini result</strong><span>17 October 2026 · Basketball technical sample</span><span>No sign-in. No new analysis or model charges.</span></p></section>
-    <ol class="steps" aria-label="Walkthrough steps"><li><a href="#answer"><span>01</span> Read the result</a></li><li><a href="#source"><span>02</span> Replay the evidence</a></li><li><a href="#finding"><span>03</span> Write a finding → export report</a></li></ol>
-    <p id="load-status" class="notice" role="status">Loading the recorded test…</p>
-    <div id="walkthrough" hidden>
-      <div class="review-grid">
-        <section class="source-column" id="source" aria-labelledby="source-title">
-          <div class="section-top"><p class="eyebrow">ORIGINAL SOURCE</p><span id="source-duration"></span></div>
-          <h2 id="source-title">Basketball technical sample</h2>
-          <video id="source-video" controls playsinline preload="metadata" poster="/static/judge/basketball/frames/scoreboard-1-001.jpg" aria-label="Original basketball source video"></video>
-          <p id="playback-status" class="muted" role="status">Click the timestamp below to check the original video.</p>
-          <button id="replay" class="citation" type="button"><img src="/static/judge/basketball/frames/scoreboard-1-001.jpg" alt="Source frame at 00:01.001, showing the broadcast scoreboard" /><span><strong>00:01.001 <span aria-hidden="true">↗</span></strong><span>Replay this moment in the original source</span><small>Milwaukee 51 · Atlanta 56</small></span></button>
-          <div class="source-note"><h3>What this proves</h3><p>The cited point supports the visible scores. Play before and after it to check the context. Sampled review can miss other moments.</p><a id="source-credit" href="https://www.youtube.com/watch?v=WZwbp2nNFhY" target="_blank" rel="noopener noreferrer">Original published source <span aria-hidden="true">↗</span></a></div>
-        </section>
-        <section class="result-column" id="answer" aria-labelledby="answer-title">
-          <div class="section-top"><p class="eyebrow">RECORDED QUESTION</p><span class="status">Partial result</span></div>
-          <h2 id="answer-title">What does the scoreboard show?</h2><p id="question" class="question"></p>
-          <article class="answer"><p class="eyebrow">GEMINI ANSWER · SAVED RESULT</p><p id="answer-text"></p><button id="answer-replay" class="text-action" type="button">00:01.001 · Check the source <span aria-hidden="true">→</span></button></article>
-          <section class="uncertainty" aria-label="Unresolved model claims"><h3>Still to verify</h3><ul id="unresolved"></ul><p>Human review checked this point citation and original playback. This is not exhaustive review or a measured accuracy score.</p></section>
-          <a class="button next-step" href="#finding">Write your finding <span aria-hidden="true">↓</span></a>
-        </section>
-      </div>
-      <section class="finding-section" id="finding" aria-labelledby="finding-title">
-        <div class="finding-intro"><p class="eyebrow">YOUR TURN</p><h2 id="finding-title">Turn the evidence<br />into a finding.</h2><p>Write what you checked. Keep interpretations and open questions separate.</p><button id="use-example" type="button" class="text-action">Use the existing reviewer's observation <span aria-hidden="true">→</span></button><p class="muted">This copies a saved human review into your draft. You can edit it.</p></div>
-        <form id="finding-form">
-          <label>Finding title<input id="finding-name" name="title" maxlength="200" required placeholder="e.g. Scores visible at 00:01.001" /></label>
-          <label>Observed facts<textarea id="observation" name="observation" maxlength="2000" rows="4" required placeholder="What did you verify in the original source?"></textarea></label>
-          <label>Open questions<textarea id="open-questions" name="openQuestions" maxlength="2000" rows="3" placeholder="What does this evidence leave unresolved?"></textarea></label>
-          <details><summary>Interpretation / hypothesis <span class="muted">optional</span></summary><label class="interpretation-label">Possible meaning<textarea id="interpretation" name="interpretation" maxlength="2000" rows="3" placeholder="A hypothesis, not an observed fact."></textarea></label></details>
-          <div class="form-actions"><button id="save-finding" class="button" type="submit">Save finding <span aria-hidden="true">→</span></button><span id="save-status" class="muted" role="status">Saved findings stay in this browser only.</span></div>
-          <div class="report-action"><div><h3>Your finding, with its sources.</h3><p>Preview and download Markdown, JSON or HTML.</p></div><button id="open-report" class="button outline" type="button" disabled>Export report <span aria-hidden="true">↗</span></button></div>
-          <p class="privacy-note">Your notes are not sent to the server. This walkthrough does not open your private workspace or run new questions. <button id="reset-finding" type="button" class="text-action">Clear my saved finding</button></p>
-        </form>
-      </section>
-      <details class="test-history"><summary><span><span class="eyebrow">TEST HISTORY</span><strong>Six attempts. Including the failures.</strong></span><span aria-hidden="true">+</span></summary><p>One 70.2-second sports clip, tested across development fixes. Repeated prompts are not independent tests. A model's “ok” status is not proof of semantic correctness.</p><div class="table-scroll"><table><thead><tr><th>Attempt</th><th>Task</th><th>Model status</th><th>Human review</th></tr></thead><tbody id="history"></tbody></table></div></details>
-      <footer class="page-footer"><p><strong>Technical sample, not a UX study.</strong> Cross-session aggregation, audio transcription and native PDF report export are not built.</p><p id="copy-disclosure"></p><p>Public demo media: permission confirmed by the project owner. Availability is limited to the current hosting window; the saved finding remains local.</p><a href="/#review">Continue to the full workspace <span aria-hidden="true">↗</span></a></footer>
-    </div>
-  </main>
-  <dialog id="report-dialog" aria-labelledby="report-title"><header><div><p class="eyebrow">FINDING + SOURCE EVIDENCE</p><h2 id="report-title">Your investigation report</h2></div><button id="close-report" type="button" class="close" aria-label="Close report">×</button></header><div id="report-preview"></div><div class="export-actions"><button id="download-md" class="button outline" type="button">Markdown</button><button id="download-json" class="button outline" type="button">JSON</button><button id="download-html" class="button" type="button">HTML with evidence image</button></div><p id="export-status" class="muted" role="status">Includes the original model result, uncertainty and your saved finding.</p></dialog>
-  <noscript><p class="notice">Enable JavaScript for the editable walkthrough. The <a href="/static/judge/basketball/source.mp4#t=1.001">public original video</a> and <a href="/static/judge/basketball/results.json">recorded results</a> remain directly available.</p></noscript>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; base-uri 'none'; form-action 'none'"/>
+<title>Recorded example · CtrlF Video</title><script src="/static/judge/redirect.js?v=7c0f8b483f70" defer></script></head>
+<body><p>The recorded example is now part of CtrlF Video.</p><a href="/#example">Open the saved real Gemini result</a>
+<noscript><p>Enable JavaScript for the editable example. You can still <a href="/static/judge/basketball/source.mp4#t=1.001">replay the source video</a> and <a href="/static/judge/basketball/results.json">read the recorded result</a>.</p></noscript></body></html>

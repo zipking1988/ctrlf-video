@@ -405,6 +405,19 @@ test('Shift removing a nonprimary selection keeps follow-up anchored to the rema
  assert.equal(ctx.selected,'B');assert.equal(elements.get('composer-label').textContent,'Follow-up');assert.equal(elements.get('composer-label').title,'B');assert.equal(elements.get('composer-parent').textContent,'Following question: B');assert.deepEqual([...selectedIds],['B']);
 });
 
+test('selecting a real answer without events starts a new question rather than an invalid follow-up',()=>{
+ const fs=require('node:fs'),vm=require('node:vm');
+ const source=fs.readFileSync(require.resolve('../src/ctrlf_video/static/investigation-canvas.js'),'utf8');
+ const chooser=source.slice(source.indexOf('    function choose('),source.indexOf('    function clearScope('));
+ const elements=new Map(),$=id=>{if(!elements.has(id))elements.set(id,{});return elements.get(id);};
+ const records=new Map([['failed',{query:{id:'failed',question:'Who scored?',mode:'real',response:{status:'error',events:[]}},select:{setAttribute(){}}}]]);
+ const ctx=vm.createContext({records,selectedIds:new Set(),$,model:{expandPath(){}},detailFocus:null,selected:null,callbacks:{select(){}},draw(){},clearScope(){}});
+ vm.runInContext(chooser,ctx);vm.runInContext("choose('failed')",ctx);
+ assert.equal(elements.get('composer-label').textContent,'New question');
+ assert.equal(elements.get('clear-context').hidden,true);
+ assert.match(elements.get('composer-parent').textContent,/no evidence/);
+});
+
 
 test('aligning a folded parent ignores selected hidden children and preserves their relative positions',()=>{
  const m=createModel();m.add('parent',null);m.add('child','parent');m.add('other',null);

@@ -4,6 +4,9 @@ const player = $("player");
 let demo = null;
 let activeVideo = null;
 let realBusy = false;
+let liveAccess = null;
+let composerMessage = "";
+let savedAnswerNotice = "";
 let localUrl = null;
 let localMode = false;
 let mediaReady = false;
@@ -21,9 +24,10 @@ let entryConnected = false;
 function showWelcome(show, focus = false) {
   $("research-welcome").hidden = !show;
   document.querySelector(".agent-shell").inert = show;
-  $("skip-link").href = show ? "#welcome-title" : "#question";
+  const recordedActive = window.CtrlFVideoRecordedExample?.active();
+  if (!recordedActive) $("skip-link").href = show ? "#welcome-title" : "#question";
   if (show) player.pause();
-  if (focus) {
+  if (focus && !recordedActive) {
     const target = show ? $("welcome-title") : $("question").disabled ? $("chat-content") : $("question");
     target.focus();
   }
@@ -31,7 +35,7 @@ function showWelcome(show, focus = false) {
 
 $("welcome-upload").addEventListener("click", () => $("file-input").click());
 $("review-upload").addEventListener("click", () => $("file-input").click());
-const welcomeDemoButtons = [$("welcome-demos"), $("welcome-proof-demos")];
+const welcomeDemoButtons = [$("welcome-demos"), $("welcome-proof-demos")].filter(Boolean);
 for (const control of welcomeDemoButtons) {
   control.addEventListener("click", () => {
     showWelcome(false);
@@ -39,11 +43,16 @@ for (const control of welcomeDemoButtons) {
   });
 }
 $("workspace-demos").addEventListener("click", openDemoLibrary);
-$("welcome-resume").addEventListener("click", () => showWelcome(false, true));
+$("welcome-resume").addEventListener("click", () => {
+  history.replaceState(null, "", "/#review");
+  showWelcome(false, true);
+});
 $("open-welcome").addEventListener("click", () => {
+  history.replaceState(null, "", "/#start");
   $("welcome-resume").hidden = !entryConnected;
   showWelcome(true, true);
 });
+$("review-home").addEventListener("click", event => { event.preventDefault(); $("open-welcome").click(); });
 $("welcome-retry").addEventListener("click", () => window.location.reload());
 
 function setSourceOpen(open) {
@@ -187,6 +196,8 @@ function announce(message) {
   $("announcement").textContent = message;
 }
 function notice(message) {
+  composerMessage = message;
+  updateComposerFeedback();
   $("form-notice").textContent = message;
   $("form-notice").hidden = !message;
   $("welcome-notice").textContent = message;
@@ -204,9 +215,44 @@ function button(label, className, action) {
   element.addEventListener("click", action);
   return element;
 }
+function analysisUnavailable() { return !!activeVideo && liveAccess === false; }
+function showSavedAnswers(open = true) {
+  const root = $("question-shortcuts");
+  root.classList.toggle("review-saved-open", open);
+  $("open-saved-answers").setAttribute("aria-expanded", String(open));
+  $("open-saved-answers").textContent = open ? "Hide saved answers" : "View saved answers";
+  if (!open) {
+    if (composerMessage === savedAnswerNotice) composerMessage = "";
+    savedAnswerNotice = "";
+    updateComposerFeedback();
+    return;
+  }
+  const first = root.querySelector("button");
+  savedAnswerNotice = first
+    ? "Live questions are off. Your draft is kept. Choose a saved answer to replay its evidence."
+    : "No saved answers are available for this recording yet. Live questions are off; your draft is kept.";
+  composerMessage = savedAnswerNotice;
+  updateComposerFeedback();
+  if (first) { root.scrollIntoView({block:"nearest"}); first.focus(); }
+}
 function updateSend() {
+  const unavailable = analysisUnavailable();
+  $("composer-unavailable").hidden = !unavailable;
+  $("send-question").hidden = unavailable;
+  if (!unavailable) showSavedAnswers(false);
   $("send-question").disabled =
-    !demo || localMode || realBusy || !$("question").value.trim();
+    !demo || localMode || realBusy || (activeVideo && liveAccess === false) || !$("question").value.trim();
+  $("send-question").querySelector("span").textContent = realBusy ? "Working…" : activeVideo && liveAccess === false ? "Unavailable" : "Ask";
+  $("composer-keyboard-hint").textContent = activeVideo && liveAccess === false ? "Draft only · analysis unavailable" : "Enter to ask";
+  $("question-form").setAttribute("aria-busy", String(realBusy));
+  updateComposerFeedback();
+}
+function updateComposerFeedback() {
+  const message = composerMessage || (activeVideo && liveAccess === false
+    ? "New analysis is unavailable in this workspace. You can play the video and open saved answers."
+    : "");
+  $("composer-feedback").textContent = message;
+  $("composer-feedback").hidden = !message;
 }
 function seek(seconds, trigger = document.activeElement) {
   if (!Number.isFinite(seconds) || seconds < 0 || (mediaReady && seconds > player.duration)) return;
@@ -639,6 +685,8 @@ function setWorkspaceView(view, focus = false) {
   const review = view === "review";
   const shell = document.querySelector(".agent-shell");
   shell.classList.toggle("review-first", review);
+  shell.classList.remove("review-context-open");
+  (review ? $("review-menu-slot") : $("workspace-rail")).append($("workspace-navigation"));
   $("rail-review").classList.toggle("active", review);
   $("rail-canvas").classList.toggle("active", !review);
   $("rail-review").setAttribute("aria-pressed", String(review));
@@ -783,6 +831,7 @@ function locateOnCanvas(id) {
 }
 window.CtrlFVideoUI = {
   select: (id) => {
+    notice("");
     investigation?.choose(id);
     investigation?.reveal(id);
   },
@@ -801,9 +850,16 @@ window.CtrlFVideoUI = {
   demos: openDemoLibrary,
   openInspector,
   toggleSource: () => $("rail-source").click(),
+  showSource: () => { setSourceOpen(true); player.scrollIntoView({block:"center"}); },
   canvas: () => $("rail-canvas").click(),
   review: () => setWorkspaceView("review", true),
   sources: () => $("open-sources").click(),
+  recordingContext: () => {
+    setWorkspaceView("review");
+    document.querySelector(".agent-shell").classList.add("review-context-open");
+    $("research-task").querySelector("details").open = true;
+    $("research-task").scrollIntoView({block:"center"});
+  },
   newQuestion: () => {
     setWorkspaceView("review", true);
     $("clear-context").click();
@@ -873,8 +929,12 @@ setSourceOpen(
 );
 $("question-form").addEventListener("submit", (event) => {
   event.preventDefault();
+  if (analysisUnavailable()) { showSavedAnswers(); return; }
   if (!$("send-question").disabled) ask($("question").value.trim());
 });
+$("open-saved-answers").addEventListener("click", () => showSavedAnswers(
+  $("open-saved-answers").getAttribute("aria-expanded") !== "true",
+));
 $("question").addEventListener("input", updateSend);
 $("question").addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
@@ -1054,7 +1114,12 @@ window.CtrlFVideoSessionUI = {
   restoreDraft(value) { $("question").value = value; updateSend(); },
   currentContext: () => investigation?.context()?.query || null,
   ready: () => !!demo,
-  busy(value) { realBusy = value; updateSend(); },
+  access(ready) { liveAccess = ready; updateSend(); },
+  busy(value, message) {
+    realBusy = value;
+    if (value && message) composerMessage = message;
+    updateSend();
+  },
   clear: clearChat,
   notify: notice,
   answer(query, submittedDraft) {

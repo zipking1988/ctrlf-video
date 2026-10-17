@@ -867,10 +867,11 @@
       selected = id;
       callbacks.select(record.query.response, record.history);
       const scope = records.get(record.query.sourceTurn)?.query || record.query;
-      $("composer-label").textContent = "Follow-up";
-      $("composer-label").title = scope.question;
-      $("composer-parent").textContent = `Following question: ${scope.question}`;
-      $("clear-context").hidden = false;
+      const followable = scope.mode !== "real" || !!scope.response?.events?.length;
+      $("composer-label").textContent = followable ? "Follow-up" : "New question";
+      $("composer-label").title = followable ? scope.question : "";
+      $("composer-parent").textContent = followable ? `Following question: ${scope.question}` : "The previous answer has no evidence to follow up on. Start a new question.";
+      $("clear-context").hidden = !followable;
       for (const [key, value] of records)
         value.select.setAttribute("aria-pressed", String(key === id));
       if (focus) $("question").focus();
@@ -1454,9 +1455,10 @@
       clearScope,
       context: () => {
         const record = selected ? records.get(selected) : null;
-        return record?.query.sourceTurn
+        const context = record?.query.sourceTurn
           ? records.get(record.query.sourceTurn) || record
           : record;
+        return context?.query.mode === "real" && !context.query.response?.events?.length ? null : context;
       },
       reveal,
       remove: (id) => {

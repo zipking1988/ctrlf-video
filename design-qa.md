@@ -1,3 +1,128 @@
+# Private-main release review — October 17
+
+final result: passed
+
+Reviewed the complete pending simple Review, composer recovery and unified-entry changes against private `main`. Corrected two accessibility defects: coexisting private/public timelines now have player-specific IDs, and the recorded example's Skip link focuses its player without changing the application route and exiting the example. Reopening the example clears stale playback status. A rendered-component regression covers distinct timeline IDs in empty and answered states. Browser verification confirmed `#example` remains active after Skip, focus reaches `example-player`, the public Timeline controls `example-player-cited-timeline`, and replay reaches 1.000999s for citation 1.001s (readyState 4). Evidence: ignored `.ctrlf-video-eval/unified-entry/release-review.jpg`.
+
+141 frontend and 233 backend tests passed, with one Linux namespace test skipped locally on macOS. Build, lint/format/contracts and diagnostic-template evaluation completed. `make agent-check` correctly exits 2 in this unconfigured local fixture, with zero model requests; it is not a new-analysis acceptance result. No source/model schema, private API guard, financial ledger, grants or cutoff was changed. The existing cloud release state reports 24/24 attempts consumed; deployment requires separate review of that guard. This local review does not claim a completed production deployment.
+
+---
+
+# Unified landing and recorded example — October 17
+
+final result: passed
+
+Scope: simplify the entry after the user questioned three different pages. The current rendered landing is the before-state; the user's selected simple Review (option 3, `exec-36afa9ec-45e7-4acb-8233-0088b3a0b71c.png`) remains the video/chat reference. This is a refinement of the existing app, not a new scaffold or a claim of pixel fidelity to a new image. The compact warm-paper landing, two primary actions and real source preview are intentional changes. Local preview: http://127.0.0.1:8879/#start.
+
+Visual evidence is in ignored `.ctrlf-video-eval/unified-entry/`: `before.jpg`, `landing-final.jpg`, `example-final.jpg`, `finding-final.jpg`, `report-final.jpg`, `example-short.jpg`, `comparison.jpg` and `comparison-focused.jpg`. Before/after landing captures are matched at 1016 × 988 CSS/image pixels, density 1, initial page position. The combined comparison is 2032 × 1020 with a 32px label strip; the focused hero/actions comparison is 2032 × 600. Both were opened and inspected together. No density normalization was needed. The short desktop check is 896 × 640; its temporary viewport override was reset.
+
+The landing now explains the workflow in one sentence and three short steps. Try a real example opens `/#example` using the shared SimpleReview component; Upload a video retains the existing private upload path. The old judge entry redirects to the same example, preserving old external links and the visitor finding storage key. Typography remains Instrument Sans; dark teal, warm paper and sage stay consistent with Review. The actual source frame has its original 16:9 aspect ratio, visible provenance, timestamp and partial-result disclosure. No generated evidence, invented result or unsupported new-analysis promise was added.
+
+Browser findings corrected during this pass: the older, more specific private shell CSS defeated the new visibility rule and left one extra viewport above the example; the state-specific selector now hides it. Returning from a direct example entry now explicitly restores the private workspace's visibility and skip link. The menu closes when its example link is selected. Home and Resume update the address to match the visible screen, so reload returns to the correct route. Final visual comparisons show no remaining actionable P0/P1/P2 issue in this scope.
+
+Interaction verification: landing → recorded example; actual citation replay requested 1.001s and reached 1.000999s with readyState 4; Timeline opens/closes the real citation list. The user can copy the existing human review, save a browser-local finding, reload it and open the report. Editing disables export until saved. The downloaded HTML was inspected: embedded JPEG, public source replay at `#t=1.001`, authored observation and sampling uncertainty are present. Report replay returns to the original video. A private unsent draft survived an example round trip; the temporary QA draft was then restored to its original empty value and flushed. Legacy entry redirected to `/#example`. At 896 × 640 the answer and actions are reachable by scrolling and scrollWidth equals clientWidth (896). Final browser warning/error log was empty.
+
+Validation: `npm run build` passed with bundle/legal notices and content hashes retained; 140 frontend tests and 233 backend tests passed. One Linux namespace integration test is skipped on macOS. Ruff lint/format, schema-export checks and `git diff --check` passed. The public example remains a saved partial result; arbitrary live questions still need approved funding. No paid model calls, cloud changes, commit, push or deployment were performed. The local fixture server remains running for review.
+
+---
+
+# Unavailable composer recovery — October 17
+
+final result: passed
+
+Scoped fix to the existing selected/refined Review, after the user reported clicking the composer had no effect. Source evidence: the browser annotation and `.ctrlf-video-eval/simple-review-design/polish-final.jpg`. Implementation: http://localhost:8897/#review. Browser evidence: `unavailable-fixed.jpg`, 1016 × 988 CSS/image pixels, density 1, same basketball result and retained draft. The implementation capture is scrolled to show the entire recovery flow. This is an intentional unavailable-state change, not a new visual direction.
+
+Root cause: `/api/session.real_ready` is false in the isolated fixture workspace. The native Send button was disabled, while Review CSS hid its Unavailable text and left only a gray arrow. The submission handler also ignored Enter silently. The funding gate was correct; the affordance and recovery were not.
+
+The fix replaces the arrow with a visible Live questions are off explanation and a working View saved answers toggle. Enter invokes the same recovery without dispatching analysis. Saved answers reopen original records and retain the typed draft. Normal enabled workspaces retain the existing Send path. A regression failed before the fix and passes after it.
+
+Visual checks: existing Instrument Sans, warm paper/teal/sage tokens and licensed icons retained; the 760px alignment, compact border hierarchy and source aspect ratio are unchanged. The status box clearly distinguishes a retained draft from a dispatched question; recovery uses a labeled keyboard-focusable button. Actual model answers and evidence are unchanged. Browser verification confirmed the active toggle, Enter recovery, unchanged draft, source replay at 1.000999s for citation 1.001s and readyState 4. No P0/P1/P2 issue remains in this scoped unavailable state. A full model answer remains outside this local fixture’s capability; no live-analysis success is claimed.
+
+Validation: 134 frontend tests passed; 230 backend tests passed, 1 Linux namespace test skipped on macOS; lint/format/contracts, build and whitespace checks passed. No model request, new spending grant, push or deployment. The fixture DB retains two canonical query rows.
+
+---
+
+# Simple Review — elegance and balance refinement, October 17
+
+final result: passed
+
+Refines the user-selected option 3 in response to “more elegant and more balance more react.” The selected source image remains `/Users/zip/.codex/generated_images/01a1456f-6908-7612-af76-92d8053b646a/exec-36afa9ec-45e7-4acb-8233-0088b3a0b71c.png`. This iteration uses the rendered selected implementation as the matched before-state: `.ctrlf-video-eval/simple-review-design/polish-before.jpg`. Local implementation: http://localhost:8897/#review.
+
+## Comparison and findings
+
+Full comparison: `polish-comparison.jpg`; focused chat/timeline comparison: `polish-chat-comparison.jpg`. Both were generated from the actual before/after screenshots and opened together for visual assessment. Before and after: 1016 × 988 CSS px and image px, density 1, expanded timeline, same actual basketball result, draft and video timestamp. No density correction. The focused crop examines typography, question bubble, citations and timeline. Final default state: `polish-final.jpg`; expanded state: `polish-open.jpg`; shorter desktop: `polish-short-desktop.jpg` at 896 × 640. The viewport override was reset.
+
+The earlier full-width question bubble and nested answer frame made the conversation feel like stacked forms. The requested refinement changes these to a compact right-aligned bubble and a borderless answer; it intentionally differs from the initial image’s containers. A 760px reading column, 68px header, 16px answer body with 1.7 line-height, 24–28px major gaps, and softer media corners establish a consistent rhythm. Timeline count and Answer label clarify roles. No new actionable P0/P1/P2 finding was found in the matched final comparison. Expanded details and long answers remain naturally scrollable; they are not compressed to fit one viewport.
+
+## Fidelity surfaces and interactions
+
+- **Typography:** existing Instrument Sans and fallbacks retained; clearer answer hierarchy, more readable body, tabular citation digits. Actual model answer and full prompt retained. The narrower reading width and revised spacing are user-requested changes.
+- **Layout:** video and chat share 760px alignment; compact question bubble, no answer-card nesting. Timeline remains inside the answer and collapses by default. Input stays in natural document flow, never over evidence. At 896 × 640 the page reaches the input at y516.89 after scrolling; document width is exactly 896.
+- **Color/tokens:** existing warm paper, dark teal and pale sage palette; lighter border hierarchy and subtle video/input shadows. Keyboard focus remains visible on buttons and through an explicit dark teal form outline when the textarea receives keyboard focus.
+- **Assets:** supplied real video/frame and existing licensed icons only. Original media aspect ratios preserved. No new imagery, generated evidence or icon artwork introduced.
+- **Copy:** actual saved answer, sampled-evidence scope and unavailable-analysis message preserved. Timeline count reflects deduplicated citations, not generated chapters. Error answers have a distinct Question not completed label.
+- **React/feedback:** React state controls the timeline and a ref restores trigger focus. Selected-question changes reset details via a stable identity key. The 240ms reveal, hover and press feedback use CSS without adding an animation dependency. Reduced-motion CSS disables these transitions. Escape in the timeline closes it and restores focus; verified in-browser.
+- **Playback/persistence:** timeline replay requested 1.001s and reached 1.000999s, readyState 4. Draft survives refresh and viewport checks. Prior verified finding/report workflow is unchanged by this refinement. Final browser warning/error log: empty. No paid model request, budget grant, push or deployment.
+
+Build, 133 frontend regressions, lint/format/contracts and whitespace checks passed. Backend code did not change in this refinement; the preceding 230-pass/1-skip backend result remains the relevant check. Local fixture quality is not a model-quality claim. Reduced-motion handling was reviewed in CSS; no separate OS preference test or complete accessibility certification is claimed.
+
+- [x] Refine the selected visual direction without adding product complexity.
+- [x] Inspect matched full and focused before/after comparisons.
+- [x] Verify timeline replay, Escape/focus, scrolling and retained draft.
+- [x] Rebuild generated assets and retain licenses.
+- [x] Leave the local preview available; no deployment.
+
+---
+
+# Simple Review — selected option 3, October 17
+
+final result: passed
+
+## Target and evidence
+
+The user selected the third displayed image: `/Users/zip/.codex/generated_images/01a1456f-6908-7612-af76-92d8053b646a/exec-36afa9ec-45e7-4acb-8233-0088b3a0b71c.png`. Implementation: http://localhost:8897/#review in the existing application, using an isolated fixture workspace and a previously published real Gemini basketball result. No live model request was made.
+
+Evidence is under `.ctrlf-video-eval/simple-review-design/` (ignored): `selected.png`, `implementation-final-wide.jpg`, `comparison-wide.jpg`, `comparison-chat.jpg`, `desktop-896x640.jpg` and `preview-current.jpg`. The full-view and focused comparisons were opened together and visually reviewed. Source: 1487 × 1058 px. Main screenshot: 1488 × 1056 px, CSS viewport 1488 × 1056, density 1; the source was normalized with aspect-preserving padding, not stretched. Additional desktop viewport: 896 × 640. Temporary viewport override was reset before handoff.
+
+## Findings and iterations
+
+| Earlier issue | Severity | Fix and post-fix evidence |
+| --- | --- | --- |
+| Long prompt and duplicated saved-question controls pushed the composer below the main composition | P2 | Keep the actual question sentence visible, preserve the full prompt and history under Details & save, and remove the duplicate shortcut row from Review. See final full and focused comparisons. |
+| A sticky composer experiment covered the expanded timeline | P1 | Removed sticky positioning. Video, chat, timeline and composer now share one natural page scroll. Final timeline bottom 946.95px and composer top 968.95px at the main viewport. |
+| An additional details row consumed unnecessary vertical space | P2 | Place Details & save in the citation metadata row. Final composer is 66px high, bottom 1034.95px at the 1056px viewport. |
+
+No actionable P0/P1/P2 visual issue remains in the checked desktop scope. Longer real answers and expanded details intentionally increase document height. Mobile remains outside this edition’s scope.
+
+## Required fidelity surfaces
+
+- **Typography:** existing locally served Instrument Sans and language fallbacks retained. Thin header, readable question/answer body and smaller citation/status metadata follow the selected hierarchy. Full submitted prompts and real model answers are preserved; the generated mock’s shortened answer is not substituted for evidence.
+- **Spacing/layout:** 60px header; centered 820px column; 16:9 video above chat. Filename and Timeline button sit under the player. Timeline is a collapsible attachment inside the answer. Rail, hero, research setup and canvas tools are removed from the default Review view and remain reachable through the menu. Single-page scrolling reaches the composer at 896 × 640 with no horizontal overflow (document width 896px).
+- **Colors/tokens:** warm paper, dark teal text, pale sage question/timeline surfaces and fine borders match the selected direction. Native video controls and keyboard outlines remain. Status labels convey meaning in addition to color.
+- **Images/icons:** real source video and decoded cited frame retained, with original aspect ratio and source URI. The timeline thumbnail uses a true 16:9 crop instead of the illustration’s wide crop. Existing licensed icon set and font notices retained. No generated footage, invented evidence or replacement asset was added.
+- **Copy/content:** the actual recorded answer and millisecond citation are shown. Details retain uncertainty and audio limitations. Timeline explicitly lists cited points and does not claim an exhaustive video breakdown. Current unavailable analysis is clearly disclosed beside the input. QA title and retained typed draft differ intentionally from the mock.
+
+## Interaction checks
+
+- Expanded/collapsed Timeline; close restores focus to its trigger. Clicking its cited row seeks the real video to 1.000999 seconds (requested 1.001), readyState 4.
+- Saved a researcher-authored finding, observed successful persistence, refreshed and confirmed it in the report. Report includes source ID, original question, 00:00:01.001 evidence reference, observed facts and unresolved scope.
+- Recording context opens on demand. Canvas/Review round trip preserves the draft. Refresh retains the saved finding, selected question and typed draft.
+- 896 × 640 page scroll reaches the composer: its input moves from y815 to y541 without an inner chat scrollbar or horizontal overflow.
+- Browser warning/error log was empty at final check. Existing regressions cover funding admission, stale navigation, failed context anchors and preserved drafts. No new model requests were admitted.
+- The disposable one-hour QA fixture expired during the longer review; its isolated video, desk and canonical saved results were restored and extended one hour. No production data, ownership rules or spending grant changed. Save failure remained visible and retry succeeded after restoration.
+
+## Validation and limits
+
+Frontend regressions: 133 passed. Backend regressions: 230 passed, 1 skipped (Linux namespace integration on macOS). Lint/format/contracts and generated frontend build passed. Final whitespace check is recorded with the task evidence. The implementation is local and uncommitted; no push or deployment is claimed. Broad model quality, complete-video event breakdown, real UX research value and accessibility certification remain unverified.
+
+- [x] Implement selected one-column video/chat layout.
+- [x] Retain real citations, finding/report, canvas and persistence workflows.
+- [x] Inspect matched full-view and focused comparisons after fixes.
+- [x] Verify desktop scrolling, keyboard return focus and draft retention.
+- [x] Rebuild generated assets and retain notices.
+
+---
+
 # Review and private-main release preparation — October 17, 2026
 
 Reviewed the pending scrolling/history implementation and the completed NBA test documentation before the user-authorized private-main release. Testing, maintainability, performance, design and simplification specialists and a fresh native adversarial reviewer found no actionable code defects. The review traced selection through the spatial engine and store, checked retained drafts and mounted History focus, inspected inherited CSS and accepted comparison images, and verified the 12-record bound. Generated code is verified by rebuilding; test/fixture payloads were reviewed in summary mode in the adversarial pass. This is native review in the current Codex harness; no external-provider review is claimed.

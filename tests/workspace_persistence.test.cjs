@@ -76,7 +76,7 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
     calls.push(call);
     const special = override?.(call);
     if (special !== undefined) return special;
-    if (url === "/api/session") return response({ csrf: "csrf", ttl_hours: 24, real_ready: realReady });
+    if (url === "/api/session") return response({ csrf: "csrf", owner_id: "owner-A", ttl_hours: 24, real_ready: realReady });
     if (url === "/api/investigations" && call.method === "GET") return response({ items: [...desks.values()] });
     if (url === "/api/investigations" && call.method === "POST") {
       const desk = { id: "new-demo", video: call.body.video_id, title: call.body.title, revision: 1, state: {} };
@@ -104,7 +104,7 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
   });
   // Expose closure entry points in the VM only; production source is unchanged.
   const source = fs.readFileSync(require.resolve("../src/ctrlf_video/static/workspace.js"), "utf8")
-    .replace("window.CtrlFVideoPersistence={flush,", "window.testWorkspace={start,openDesk,openSource,recover,confirmDelete,get:()=>({current,currentVideo,activeRequest,requestEpoch})}; window.CtrlFVideoPersistence={flush,");
+    .replace("window.CtrlFVideoPersistence={flush,", "window.testWorkspace={start,openDesk,openSource,recover,confirmDelete,showRuntime,get:()=>({current,currentVideo,activeRequest,requestEpoch})}; window.CtrlFVideoPersistence={flush,");
   vm.runInContext(source, sandbox);
   ready = true; await window.testWorkspace.start();
   return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers, entries,
@@ -378,7 +378,8 @@ test("new recovered results preserve drafts, restore the submitted parent and pe
 
 test("selection changes while asking do not rewrite the actual parent or next draft", async () => {
   const h = await harness(), query = deferred();
-  h.store.record("task-1", answer("first")); h.setContext(answer("first"));
+  const parent = answer("first"); parent.response.events=[{start:1,end:2,evidence:[{t:1,uri:"/frame.jpg"}]}];
+  h.store.record("task-1", parent); h.setContext(parent);
   h.get("question").value = "submitted";
   h.setOverride(c => c.url === "/api/chat" ? query.promise : undefined);
   const pending = h.window.CtrlFVideoPersistence.ask("submitted"); await tick();
@@ -386,6 +387,23 @@ test("selection changes while asking do not rewrite the actual parent or next dr
   query.resolve(response(answer("completed"))); await pending;
   assert.equal(h.calls.find(c => c.url === "/api/chat").body.parent_request_id, "first");
   assert.equal(h.answers[0].parentTurn, "task-1"); assert.equal(h.get("question").value, "next question draft");
+});
+
+test("a failed answer cannot become the parent of the next question", async () => {
+  const h=await harness(), failed=answer("failed");
+  failed.response.status="error"; h.setContext(failed);
+  h.setOverride(c=>c.url==="/api/chat" ? response(answer("new-result")) : undefined);
+  await h.window.CtrlFVideoPersistence.ask("What team is visible?");
+  assert.equal(h.calls.find(c=>c.url==="/api/chat/prepare").body.parent_request_id,null);
+  assert.equal(h.calls.find(c=>c.url==="/api/chat").body.parent_request_id,null);
+});
+
+test("unfunded new analysis is explained without creating another failed request", async () => {
+  const h=await harness({realReady:false}); h.get("question").value="Keep my question";
+  await h.window.CtrlFVideoPersistence.ask("Keep my question");
+  assert.equal(h.calls.some(c=>c.url.startsWith("/api/chat")),false);
+  assert.match(h.get("notice").textContent,/New analysis is unavailable/);
+  assert.equal(h.get("question").value,"Keep my question");
 });
 
 test("a fresh root question does not gain a parent from the old selected record", async () => {
@@ -485,7 +503,10 @@ test("app answers keep edits made while busy and recovery preserves an existing 
     fetch: async () => response({ queries: [] }), Event: class {}, URL: {}, navigator: {},
   });
   vm.runInContext(fs.readFileSync(require.resolve("../src/ctrlf_video/static/app.js"), "utf8"), sandbox); await tick();
-  vm.runInContext('activeVideo={id:"video-A"}; window.CtrlFVideoSessionUI.busy(true)', sandbox);
+  vm.runInContext('activeVideo={id:"video-A"}; window.CtrlFVideoSessionUI.busy(true,"Checking your question…")', sandbox);
+  assert.equal(get("question-form").attributes["aria-busy"],"true");
+  assert.equal(get("composer-feedback").textContent,"Checking your question…");
+  assert.equal(get("composer-feedback").hidden,false);
   get("question").value = "next draft";
   vm.runInContext(`window.CtrlFVideoSessionUI.answer(${JSON.stringify(answer("done"))},"submitted")`, sandbox);
   assert.equal(get("question").value, "next draft"); assert.notEqual(get("question").disabled, true);
@@ -566,4 +587,36 @@ test("opening a named finding clears a filter that would otherwise select the wr
   openFinding("finding-2", value => { editingId = value; }, value => { filter = value; });
   assert.equal(visiblePins(pins, filter).find(pin => pin.id === editingId)?.id, "finding-2");
   assert.equal(filter, "all");
+});
+
+
+test("refreshing model setup updates live access and admission without losing the draft", async () => {
+  for (const ready of [true, false]) {
+    const h = await harness({realReady: !ready});
+    const access = [];
+    h.ui.access = value => access.push(value);
+    h.get("question").value = "Which team is green?";
+    h.setOverride(c => c.url === "/api/session" ? response({csrf:"csrf",owner_id:"owner-A",real_ready:ready,ttl_hours:24})
+      : c.url === "/api/runtime/status" ? response({dispatch_prerequisites_met:ready,checks:[],models:[]})
+      : c.url === "/api/chat" ? response(answer(c.body.request_id)) : undefined);
+    await h.window.testWorkspace.showRuntime();
+    assert.deepEqual(access,[ready]);
+    assert.equal(h.get("question").value,"Which team is green?");
+    assert.equal(h.calls.some(c => c.url === "/api/chat"),false);
+    await h.window.CtrlFVideoPersistence.ask("Which team is green?");
+    assert.equal(h.calls.some(c => c.url === "/api/chat/prepare"),ready);
+  }
+});
+
+test("readiness refresh cannot replace an expired owner beneath an open investigation", async () => {
+  const h = await harness({realReady:false});
+  const access=[];h.ui.access=value=>access.push(value);
+  h.get("question").value="Keep this draft";
+  h.setOverride(c=>c.url === "/api/session" ? response({csrf:"new",owner_id:"owner-B",real_ready:true}) : undefined);
+  await h.window.testWorkspace.showRuntime();
+  assert.deepEqual(access,[]);
+  assert.equal(h.get("question").value,"Keep this draft");
+  assert.match(h.get("agent-setup-summary").textContent,/session_expired_reload/);
+  await h.window.CtrlFVideoPersistence.ask("Keep this draft");
+  assert.equal(h.calls.some(c=>c.url==="/api/chat/prepare"),false);
 });

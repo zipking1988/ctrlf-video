@@ -23,7 +23,12 @@ async def test_public_judge_replays_without_backend_cookie_or_approval(monkeypat
         ) as visitor:
             page = await visitor.get("/static/judge/index.html")
             assert page.status_code == 200
-            assert "Saved real Gemini result" in page.text
+            assert "/#example" in page.text
+            assert "/static/judge/redirect.js" in page.text
+            root = await visitor.get("/")
+            assert root.status_code == 200
+            assert 'href="#example"' in root.text
+            assert "recorded-example-root" in root.text
             assert "set-cookie" not in page.headers
             data = (await visitor.get("/static/judge/basketball/results.json")).json()
             assert data["query"]["response"]["status"] == "partial"
