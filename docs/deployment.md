@@ -262,7 +262,7 @@ lint/schema/tests and real Linux media isolation. It then builds/pushes the
 frontend image and uses its digest. On the backend,
 [the release manager](../deploy/gcp/backend_release.py):
 
-1. Reserves one of 24 release attempts in root-owned durable state, stages a
+1. Reserves a finite release attempt in root-owned durable state, stages a
    separate immutable source directory and installs frozen dependencies. It runs
    backend tests as the unprivileged service user on the actual deployment host.
 2. Rejects changes to `workspace.py`, `attempts.py`, `schema.py`, `api.py` or
@@ -293,12 +293,19 @@ rechecks its **22:45 JST** cutoff before switching/finalizing. IAM expires at
 23:00. Final cleanup at 23:15 creates `/etc/ctrlfvideo/deploy-disabled`, stops the
 watchdog, and holds `/run/lock/ctrlfvideo-release.lock` while stopping writes and
 making the final consistent backup. No deployment may restart the backend after
-that marker. A 24-attempt backstop includes failed preparation, forced-failure
+that marker. The release-attempt backstop includes failed preparation, forced-failure
 drills and normal releases; exhaustion requires operator review under the existing
 budget. This is a locally chosen automation-loop bound, not a GCP quota or a
 monetary budget calculation. Deployments reuse the existing VM and capped frontend;
 the attempt count does not measure hosting, storage, network or model charges.
 Billing reports can lag or fail; the budget alert is not a hard supplier cap.
+
+On October 17, all 24 attempts were consumed. The user explicitly authorized one
+additional attempt for reviewed commit `49bb911`, changing only the root-owned
+`max_releases` setting from 24 to 25 under the shared release lock. All prior
+release records and other configuration were checked unchanged. The JPY 3,000
+total, model restrictions and October 19 cutoffs remain unchanged; this count is
+not billing credit. Any further attempt after number 25 needs a new review.
 
 Recovery entry points on the VM (trusted operator only):
 

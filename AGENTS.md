@@ -27,6 +27,13 @@ attempts on October 16, retaining the four consumed attempts and every existing
 resource/time/model restriction. Do not describe release counts as billing credit
 or claim a verified remaining balance when billing data is unavailable.
 
+On 2026-10-17, after all 24 release attempts were consumed, the user explicitly
+authorized exactly one additional attempt for the reviewed `49bb911` release.
+The cumulative release limit is now 25, retaining all 24 prior records. This
+does not reset history, add model calls or change the JPY 3,000 total budget,
+October 19 cutoffs or any other restriction. Further attempts after 25 is
+consumed require a new review; this is not a standing increase allowance.
+
 The user subsequently explicitly requested real Gemini uploads on ctrlfvideo.com within the same JPY 3,000 total. This supersedes the earlier paid-call hold for this limited test. The operator allocated a shared JPY 600 maximum, 40 model attempts and six primary calls to matching deployment/session ledgers, including calibration and smoke tests. No public automatic enrollment, budget resets or extra allowance is authorized. Model validity ends October 19 at 22:00 JST ahead of cleanup. Keep the key backend-only and preserve all reservations across deployments/rollback; see [live test limits](docs/LIVE_GEMINI_TEST.md). On the same day, the user explicitly requested billing reconciliation and additional video tests within the unchanged JPY 3,000 total. The project-specific budget reported JPY 0 (reporting lag applies). The revised allocation is JPY 1,500 infrastructure/pending costs, JPY 1,200 cumulative models and JPY 300 buffer. Preserve JPY 225 prior calibration and JPY 214 v1 reservations; revoke old unused funding and install a fresh JPY 761 v2 grant, 48 calls/eight primary, for the same owner/deployment. Ready v1 indices may be explicitly allowed for query-only reuse; new work charges v2. No deadline, model bound or public enrollment changes. See the live test document for the audit and limits.
 
 ## Read before changing behavior
