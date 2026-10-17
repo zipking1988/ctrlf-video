@@ -19,13 +19,13 @@ function appHarness() {
     };
   }
   const get = id => {if(!ids.has(id))ids.set(id,element());return ids.get(id);};
-  const shell = element(), routes=[];
+  const shell = element(), routes=[], events=new Map();
   const context=vm.createContext({document:{getElementById:get,querySelector:()=>shell,querySelectorAll:()=>[],createElement:element},
-    window:{addEventListener(){},innerWidth:1280,location:{hash:"#start"},matchMedia:()=>({matches:true})},
+    window:{addEventListener(name,fn){events.set(name,fn);},innerWidth:1280,location:{hash:"#start"},matchMedia:()=>({matches:true})},
     history:{replaceState(_state,_title,url){routes.push(url);}},
     fetch:()=>new Promise(()=>{}),console});
   vm.runInContext(fs.readFileSync("src/ctrlf_video/static/app.js","utf8"),context);
-  return {get,shell,routes,run:code=>vm.runInContext(code,context)};
+  return {get,shell,routes,run:code=>vm.runInContext(code,context),navigate:hash=>{context.window.location.hash=hash;events.get("hashchange")();}};
 }
 
 test("opening an uploaded investigation from Home changes the route so refresh restores work",()=>{
@@ -45,6 +45,19 @@ test("initial restoration preserves an explicitly requested Home route",()=>{
   h.run("window.CtrlFVideoSessionUI.entryReady(false)");
   assert.equal(h.get("research-welcome").hidden,false);
   assert.equal(h.shell.inert,true);
+});
+
+test("hash navigation changes the visible surface without clearing the draft",()=>{
+  const h=appHarness();
+  h.run("window.CtrlFVideoSessionUI.entryReady(true)");
+  h.get("question").value="Keep this question";
+  h.navigate("#review");
+  assert.equal(h.get("research-welcome").hidden,true);
+  assert.equal(h.shell.inert,false);
+  h.navigate("#start");
+  assert.equal(h.get("research-welcome").hidden,false);
+  assert.equal(h.shell.inert,true);
+  assert.equal(h.get("question").value,"Keep this question");
 });
 
 test("unindexed uploaded recordings allow drafts without admitting questions",()=>{
