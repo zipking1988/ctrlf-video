@@ -4,10 +4,10 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 function uploadHarness(limit=30*1024**2,ready=false) {
-  const ids=new Map(),notices=[];
+  const ids=new Map(),notices=[],renames=[];
   const get=id=>{if(!ids.has(id))ids.set(id,{textContent:"",focus(){},showModal(){this.open=true;},close(){this.open=false;}});return ids.get(id);};
   const sandbox=vm.createContext({document:{getElementById:get},
-    window:{addEventListener(){},CtrlFVideoSessionUI:{ready:()=>false,notify:text=>notices.push(text)}},
+    window:{addEventListener(){},CtrlFVideoSessionUI:{ready:()=>false,notify:text=>notices.push(text),renameSource:name=>renames.push(name)}},
     fetch:async()=>({ok:true,status:200,headers:{get:()=>String(limit)},json:async()=>({})}),
     XMLHttpRequest:class {constructor(){throw Error("Unexpected file transmission");}},
   });
@@ -15,7 +15,7 @@ function uploadHarness(limit=30*1024**2,ready=false) {
     "window.testUpload={seed:s=>{session=s;current={id:'desk'};},problem:uploadProblem,renameSource,api};window.CtrlFVideoPersistence={flush,");
   vm.runInContext(source,sandbox);
   sandbox.window.testUpload.seed({upload_max_bytes:limit,ttl_hours:24,real_ready:ready});
-  return {get,notices,helpers:sandbox.window.testUpload,ui:sandbox.window.CtrlFVideoPersistence,setFetch:fn=>{sandbox.fetch=fn;}};
+  return {get,notices,renames,helpers:sandbox.window.testUpload,ui:sandbox.window.CtrlFVideoPersistence,setFetch:fn=>{sandbox.fetch=fn;}};
 }
 
 test("cloud upload limit is applied before any file transmission",async()=>{
@@ -88,4 +88,20 @@ test("late rename failure cannot replace a newly opened source dialog",async()=>
   assert.equal(h.get("rename-source-notice").textContent,"");
   assert.equal(h.get("rename-source-input").value,"New.mp4");
   assert.equal(h.get("rename-source-save").disabled,false);
+});
+
+test("late rename success cannot replace the source name during a newer rename",async()=>{
+  const h=uploadHarness();let resolve;
+  h.setFetch(()=>new Promise(yes=>{resolve=yes;}));
+  h.helpers.renameSource({id:"demo_parcel",name:"Original.mp4"});
+  h.get("rename-source-input").value="Old rename";
+  const pending=h.get("rename-source-form").onsubmit({preventDefault(){}});
+  h.get("rename-source-dialog").close();
+  h.helpers.renameSource({id:"demo_parcel",name:"Original.mp4"});
+  h.get("rename-source-input").value="New rename";
+  resolve({ok:true,status:200,json:async()=>({name:"Old rename"})});
+  await pending;
+  assert.deepEqual(h.renames,[]);
+  assert.equal(h.get("rename-source-dialog").open,true);
+  assert.equal(h.get("rename-source-input").value,"New rename");
 });

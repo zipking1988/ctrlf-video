@@ -21,8 +21,9 @@ Screenshots and logs are private local artifacts in `.ctrlf-video-eval/alpha-202
 
 ## Checks
 
-- Frontend: **154 passed** (`npm test`).
+- Frontend: **155 passed** (`npm test`), including delayed rename success/failure isolation.
 - Backend: **234 passed, 1 skipped** (`make test`); the skip is Linux namespace integration on macOS.
+- Private pull-request [Linux CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39044981822) passed for code candidate `92e4ed3`: **154 frontend and 235 backend tests passed**, including Linux media isolation and deployment recovery regressions. This was a test-only run; it did not deploy.
 - `npm run build` succeeded; generated bundle and asset hashes included.
 - `make check` passed lint, formatting and exported-contract drift checks.
 - `make preflight` confirmed fixture tools/contracts with zero model requests.
@@ -36,4 +37,4 @@ The QA skill's provisional UI score is **89 → 100 for the tested categories on
 
 No paid model requests, spending approvals, cloud deployment, budget increase, new resources, public source release or hackathon submission ran in this pass. The most recent successful hosted CI is `49bb911`; the local changes require a newly reviewed release attempt after the consumed 25-attempt allowance. The JPY 3,000 ceiling and October 19 cutoffs remain unchanged.
 
-Linux runtime isolation must be checked by the existing CI/target-host process. This macOS pass does not establish target-host load, billing, broad Gemini accuracy, UX-recording usefulness, client privacy/commercial terms, or long-term service availability. Registration/category/source-lineage and public-source prerequisites remain open. See [alpha handoff](../ALPHA.md) and [remaining work](../TODOS.md).
+Linux namespace isolation passed on the CI runner. This does not establish containerized deployment isolation, target-host load, billing, broad Gemini accuracy, UX-recording usefulness, client privacy/commercial terms, or long-term service availability. Registration/category/source-lineage and public-source prerequisites remain open. See [alpha handoff](../ALPHA.md) and [remaining work](../TODOS.md).

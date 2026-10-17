@@ -1,6 +1,6 @@
 # AI Builder Cup 2026 — Rules and CtrlF Video Entry
 
-Verified: 2026-10-14. This is a sourced preparation summary, not organizer approval or a replacement for the official terms. Recheck the registered dashboard and organizer updates before submission.
+Full rules review: 2026-10-14. Public overview/timeline and FAQ rechecked October 18, 2026 (JST); they still list October 18 as the prototype deadline without an exact hour or timezone. This is a sourced preparation summary, not organizer approval or a replacement for the official terms. Recheck the registered dashboard and organizer updates before submission.
 
 ## Event and sources
 

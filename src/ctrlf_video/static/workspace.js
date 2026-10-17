@@ -226,7 +226,7 @@
       $("rename-source-notice").textContent="Saving name…";
       try {
         const result=await api(`/api/videos/${video.id}`,"PATCH",{name});
-        if (!owns(deskId,epoch)) return;
+        if (token!==renameEpoch || !owns(deskId,epoch)) return;
         if(currentVideo.id===video.id) {currentVideo={...currentVideo,name:result.name};ui().renameSource(result.name);}
         if (!active()) return;
         $("rename-source-dialog").close();await library("videos");
