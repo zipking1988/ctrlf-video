@@ -41,3 +41,15 @@ def test_invalid_duration(duration):
 def test_invalid_scene_boundaries(scenes):
     with pytest.raises(ValueError):
         plan_windows(130, scenes)
+
+
+def test_linux_sandbox_command_uses_absolute_bwrap_for_execv(tmp_path, monkeypatch):
+    from ctrlf_video import media
+
+    monkeypatch.setattr(media.platform, "system", lambda: "Linux")
+    monkeypatch.setattr(
+        media.shutil, "which", lambda name: "/usr/bin/bwrap" if name == "bwrap" else None
+    )
+    command = media.sandbox_command(tmp_path, ["ffprobe", "x"])
+    assert command[0] == "/usr/bin/bwrap"
+    assert command[-2:] == ["ffprobe", "x"]
