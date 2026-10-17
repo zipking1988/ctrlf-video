@@ -304,9 +304,11 @@
     if (problem) {ui().notify(problem);return;}
     if (uploading) {ui().notify("An upload is already in progress. Wait for it to finish before choosing another video.");return;}
     uploading=true;
+    const deskId=current?.id, epoch=requestEpoch;
     try {
-      const deskId=current?.id, epoch=requestEpoch;
-      await flush();if (!owns(deskId,epoch)) return;ui().notify(`Uploading ${file.name} · 0%`);
+      const saved=await flush();if (!owns(deskId,epoch)) return;
+      if (!saved) {ui().notify("Save your investigation before uploading. Use the save indicator to recover a conflict or reconnect; your current edits are kept.");return;}
+      ui().notify(`Uploading ${file.name} · 0%`);
       const result=await new Promise((resolve,reject)=>{
         const xhr=new XMLHttpRequest();xhr.open("POST","/api/videos");
         xhr.setRequestHeader("Content-Type",file.type.startsWith("video/") ? file.type : "application/octet-stream");xhr.setRequestHeader("X-CTRLF-CSRF",session.csrf);
@@ -325,7 +327,7 @@
       if (!await create(video)) return;
       ui().notify("Upload complete. Preflight is running; check Sources for progress.");
       ui().showSource();
-    }catch(error){ui().notify(error.message);}
+    }catch(error){if(owns(deskId,epoch)) ui().notify(error.message);}
     finally {uploading=false;}
   }
   async function watch(videoId, epoch) {

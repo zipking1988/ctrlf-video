@@ -42,6 +42,12 @@ test("local cap, retention and explicit analysis are described without dispatchi
   assert.equal(h.get("upload-confirm").textContent,"Upload video");
 });
 
+test("an unsaved or suspended investigation cannot begin file transmission",async()=>{
+  const h=uploadHarness();
+  await h.ui.upload({name:"clip.mp4",type:"video/mp4",size:1024});
+  assert.match(h.notices.at(-1),/Save your investigation before uploading/);
+});
+
 test("untrusted upload hints cannot raise limits and invalid files never open upload",async()=>{
   for(const limit of [0,-1,NaN,Infinity]) assert.equal((await uploadHarness(limit).helpers.api("/api/session")).upload_max_bytes,30*1024**2);
   assert.equal((await uploadHarness(1024**4).helpers.api("/api/session")).upload_max_bytes,500*1024**2);
