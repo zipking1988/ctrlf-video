@@ -29,6 +29,7 @@ Updated: 2026-10-19. This is the current acceptance backlog, consolidated from o
 ## Whole-video product value
 
 - [x] Prepare and browser-check the October 19 local continuing-conversation UI: visible chronological turns, original saved replies, prior-turn follow-ups, retained draft and stable expanded replies. 181 frontend tests pass; no new model calls or deployment. The public saved example remains explicitly separate.
+- [x] Fix the subsequent timeline/composer annotations locally: drag-to-pan, native ruler scrubbing, explicit unindexed status/acknowledgement and a current-source marker for duplicate names. 187 frontend and 270 backend tests pass (one platform skip); the pending-state browser check uses a labeled read-only UI simulation. No new model call or deployment.
 - [ ] Deploy the reviewed conversation UI only under a separate finite release authorization; all 31 current attempts are consumed. Visual-analysis accuracy and genuine five-minute acceptance remain open.
 
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.

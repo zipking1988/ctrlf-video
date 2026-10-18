@@ -180,7 +180,7 @@
       for (const video of data.items) {
         const job=video.job;
         const jobLabel=job?.state === "awaiting_configuration" && session.real_ready ? "Ready to analyze" : labels[job?.state] || "Uploaded";
-        const row=item(video.name,`${Math.round(video.bytes/1024/1024)} MB · ${jobLabel}${job?.total ? ` · ${job.completed}/${job.total} windows` : ""}`,()=>openSource(video));
+        const row=item(video.name,`${Math.round(video.bytes/1024/1024)} MB · ${jobLabel}${job?.total ? ` · ${job.completed}/${job.total} windows` : ""}${video.id===currentVideo?.id ? " · Current source" : ""}`,()=>openSource(video));
         if (job?.state==="failed" && job.error) {
           const detail=document.createElement("p");detail.className="library-job-error";
           detail.textContent=`Processing stopped: ${job.error}. Completed windows are retained; review the error before retrying.`;

@@ -22,6 +22,10 @@ whole-video breakdown is one turn in this conversation. The public recorded
 example remains a saved-result walkthrough. This UI work adds no model call or
 release; all 31 deployment attempts are consumed.
 
+The local candidate also supports dragging the example timeline to pan or seek.
+An unindexed source shows an explicit analysis-status action beside the kept
+question draft; opening status never starts analysis or submits the question.
+
 ## Workspace
 
 The default **Review** view places one video above a compact chat in a single scrolling page. **Timeline** reveals the selected answer's actual cited frames inside the chat; click a timestamp to replay the original source. It is an index of citations, not an exhaustive video breakdown. **Canvas**, research context, findings and report export remain available through the menu. `/#review` opens the workspace directly.

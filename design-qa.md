@@ -516,3 +516,22 @@ Browser-checked: open original saved answer; inspect full prompt; choose its fol
 - [x] Fix visible text clipping and compare actual screenshots.
 - [x] Build and run relevant frontend regressions.
 - [ ] Production deployment: not authorized beyond the consumed 31 attempts.
+
+## October 19 timeline drag and question-status annotation fixes
+
+final result: passed (scoped local interaction QA; production unchanged)
+
+Source of truth: the user's two annotated production screenshots: the existing
+example canvas and the uploaded-but-unindexed question composer. Preserve their
+layout, typography, original source frames, prepared-review attribution and
+model-admission boundary.
+
+- Integrated local example: `.ctrlf-video-eval/timeline-feedback-20261019/01-timeline-before-drag.png` and `02-timeline-drag-section05.png`, both 2614×1344 at the same scroll/viewport. Actual pointer drag moves the video from 0 to 53.200 seconds, selects section 05 and displays its linked evidence. Existing 1200px canvas/reading-column relationship, colors, fonts and frames remain intact. These are interaction before/after states, not a claim of comparing two code versions.
+- Narrow desktop canvas: `03-panned-desktop-column.png`, 1280×720 viewport with the actual component constrained to 760px. Dragging a thumbnail pans to later cards without selecting it. A later ordinary click selects section 05; native keyboard End selects section 06 and seeks to 70.200 seconds. Native range step is 0.1 seconds; no invented event boundary is implied.
+- Pending composer: `04-question-feedback.png`, 1280×720, actual app/React/CSS running with a prominently labeled read-only UI simulation. No grant is installed; model/API writes are unavailable. Arrow and Enter open a simulated status dialog; closing it retains the exact draft and an acknowledgement that the question was not sent. Pending/running/stopped wording was checked. The real production Sources dialog was separately inspected read-only: two identically named sources await analysis (0/1), while an earlier source is ready (2/2). No Start analysis action was taken.
+- Visual correction during QA: adding the range made the last tick cease to be `:last-child`; changed this selector to `:last-of-type` so the ending time remains inside the board.
+- Source-list marker: a regression verifies exactly the current recording is labeled Current source when two upload names match. Production has not received this marker.
+- Keyboard/focus: native range focus outline, keyboard seeking and Enter status action checked. Mouse drag preserves later normal clicks and keyboard activation; native touch is left to browser scrolling (no physical touch-device acceptance claimed).
+- Checks: regression failures reproduced before fixes; 187 frontend tests pass, 270 backend tests pass with one Linux-only isolation skip on macOS; build, lint/format, contract checks and whitespace checks pass. Generated bundle and HTML hashes rebuilt, existing third-party notices preserved.
+- No remaining actionable P0/P1/P2 issue found in this scoped desktop pass. Full accessibility, physical touch, browser console telemetry and paid-model accuracy are not claimed. These changes do not resolve the existing five-minute source or model-quality acceptance gaps.
+- Release: local candidate only. All authorized 31 deployment attempts remain consumed; private main and production are unchanged. No model call, grant, budget, release-count or cutoff change.

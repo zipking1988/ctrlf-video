@@ -39,6 +39,19 @@ This remains a labeled prepared review, not new model analysis. The change is
 part of the reviewed attempt-30 candidate, following separate authorization for
 one additional deployment; the earlier 29 attempts remain consumed.
 
+The October 19 local annotation fix adds mouse dragging to pan this example
+canvas, with a movement threshold that prevents a dragged card from being
+selected on release. The native range on the ruler supports pointer seeking and
+keyboard navigation; scrubbing selects the corresponding chapter and source
+evidence. Native touch scrolling remains available. This is an undeployed UI
+candidate, alongside the continuing conversation change.
+
+For an uploaded source awaiting indexing, the composer now states whether
+preflight/analysis is pending, running or stopped. Its status action and Enter
+open Sources with immediate acknowledgement while keeping the question unsent.
+Sources identifies the current recording even when names match. Starting
+analysis remains a separate explicit action with the existing admission gates.
+
 The next local pass carries the canvas into actual model results. Whole-video
 answers open with their own source timeline and selected evidence; generated
 prose stays available under Read generated summary. The timeline derives positions

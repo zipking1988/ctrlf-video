@@ -150,6 +150,20 @@ test("preflight distinguishes preview mode, blocked sessions and explicitly star
   }
 });
 
+test("source status identifies the current recording when uploaded names are identical", async () => {
+  const h=await harness({job:"awaiting_configuration"});
+  for(const video of h.videos.values()) video.name="Same recording.mp4";
+  h.get("question").value="Keep this question";
+  const before=h.calls.length;
+  await h.window.CtrlFVideoPersistence.library("videos");
+  const rows=h.get("library-items").children.slice(1);
+  assert.match(rows[0].children[0].children[1].textContent,/Current source/);
+  assert.ok(!rows[1].children[0].children[1].textContent.includes("Current source"));
+  assert.equal(h.get("question").value,"Keep this question");
+  assert.ok(h.calls.slice(before).every(c=>c.method==="GET" || c.method==="PUT"));
+  assert.equal(h.calls.slice(before).some(c=>/\/analyze|\/chat/.test(c.url)),false);
+});
+
 test("prepared example question transfers only as a draft into the new owned investigation", async () => {
   const h=await harness();
   h.get("question").value="Existing private draft";

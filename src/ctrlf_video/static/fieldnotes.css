@@ -505,6 +505,10 @@
 .question-shortcuts-list .icon { flex-shrink: 0; width: 16px; height: 16px; }
 .composer-feedback { margin: 12px 0 0; padding: 10px 12px; border-left: 3px solid var(--accent); background: #eaf1eb; color: var(--text); font-size: 12px; line-height: 1.55; }
 .composer-feedback[hidden] { display: none; }
+.composer-analysis { display: flex; align-items: center; gap: 16px; padding: 14px; margin-top: 12px; border: 1px solid #c3d3c7; border-radius: 8px; background: #edf3eb; }
+.composer-analysis[hidden] { display: none; }
+.composer-analysis p { flex: 1; margin: 0; font-size: 13px; line-height: 1.6; }
+.composer-analysis button { flex-shrink: 0; font-size: 12px; }
 .fieldnotes.canvas-first.review-desk.review-first #send-question { width: auto; min-width: 78px; }
 .failed-question-recovery { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
 .failed-question-recovery p { font-size: 13px; line-height: 1.6; color: var(--muted); margin-bottom: 12px; }
@@ -861,12 +865,21 @@ body.recorded-view .research-welcome { display: none; }
 .clip-timeline-toolbar time { color: #183e3a; font-variant-numeric: tabular-nums; }
 .clip-timeline-help { font-size: 11px; color: #526663; margin: 0; padding: 0 20px 14px; }
 .clip-timeline-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-color: #91ada2 #e5ede7; border-block: 1px solid #d6e1d8; background: #eef3ed; }
+.clip-timeline-scroll, .clip-timeline-scroll .clip-moment { cursor: grab; }
+.clip-timeline-scroll[data-dragging="true"], .clip-timeline-scroll[data-dragging="true"] * { cursor: grabbing; user-select: none; }
+.clip-timeline-scroll .clip-moment img { user-select: none; }
+.clip-timeline-scrubber { position: absolute; inset: auto 0 -10px; width: 100%; height: 20px; margin: 0; padding: 0; appearance: none; background: transparent; cursor: ew-resize; z-index: 2; }
+.clip-timeline-scrubber::-webkit-slider-runnable-track { height: 2px; background: #b7cbbf; }
+.clip-timeline-scrubber::-webkit-slider-thumb { appearance: none; height: 14px; width: 14px; margin-top: -6px; background: #b96743; border: 2px solid #fffdf8; border-radius: 50%; box-shadow: 0 0 0 1px #b96743; }
+.clip-timeline-scrubber::-moz-range-track { height: 2px; background: #b7cbbf; }
+.clip-timeline-scrubber::-moz-range-thumb { height: 10px; width: 10px; background: #b96743; border: 2px solid #fffdf8; border-radius: 50%; }
+.clip-timeline-scrubber:focus-visible { outline: 2px solid #0b625d; outline-offset: 3px; }
 .clip-timeline-board { min-width: 1180px; padding: 16px 24px 20px; box-sizing: border-box; }
 .clip-timeline-ruler { height: 30px; position: relative; border-bottom: 1px solid #b7cbbf; }
 .clip-timeline-ruler time { position: absolute; top: 0; font-size: 10px; line-height: 1.5; color: #526663; font-variant-numeric: tabular-nums; }
 .clip-timeline-ruler time::after { content: ''; position: absolute; top: 23px; left: 0; height: 7px; border-left: 1px solid #b7cbbf; }
-.clip-timeline-ruler time:last-child { transform: translateX(-100%); }
-.clip-timeline-ruler time:last-child::after { left: auto; right: 0; }
+.clip-timeline-ruler time:last-of-type { transform: translateX(-100%); }
+.clip-timeline-ruler time:last-of-type::after { left: auto; right: 0; }
 .clip-timeline-tracks { position: relative; }
 .clip-track-label { display: block; padding: 12px 0 9px; font-size: 9px; letter-spacing: .1em; font-weight: 650; color: #526e63; }
 .clip-track-label small { font-size: 10px; font-weight: 400; letter-spacing: 0; margin-left: 10px; }

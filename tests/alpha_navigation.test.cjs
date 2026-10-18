@@ -66,11 +66,37 @@ test("unindexed uploaded recordings allow drafts without admitting questions",()
   h.get("question").value="Where does the checkout error appear?";
   h.run("activeVideo={id:'uploaded'};localMode=true;liveAccess=true;demo={};updateSend()");
   assert.equal(h.get("question").disabled,false);
-  assert.equal(h.get("send-question").disabled,true);
+  assert.equal(h.get("send-question").disabled,false);
+  assert.equal(h.get("send-question").getAttribute("aria-label"),"Check analysis status; question is not sent");
+  assert.equal(h.get("composer-analysis").hidden,false);
+  assert.match(h.get("composer-analysis-message").textContent,/has not started/);
+  h.run("window.CtrlFVideoPersistence={library(kind){window.checkedLibrary=kind;},ask(){throw Error('Must not send an unindexed question');}}");
   h.get("question-form").listeners.submit[0]({preventDefault(){}});
-  assert.match(h.get("composer-feedback").textContent,/Analysis must finish/);
+  assert.match(h.get("composer-feedback").textContent,/not been sent/);
+  assert.equal(h.run("window.checkedLibrary"),"videos");
   assert.equal(h.get("question").value,"Where does the checkout error appear?");
   h.run("liveAccess=false;updateSend()");
   assert.equal(h.get("question").disabled,false);
   assert.equal(h.get("send-question").hidden,true);
+  assert.equal(h.get("composer-analysis").hidden,true);
+});
+
+test("analysis status action explains active and failed indexing without sending the draft",()=>{
+  const h=appHarness();
+  h.get("question").value="Keep my follow-up";
+  h.run("activeVideo={id:'uploaded',job:{state:'indexing'}};localMode=true;liveAccess=true;demo={};updateSend()");
+  assert.match(h.get("composer-analysis-message").textContent,/running/);
+  h.run("activeVideo.job.state='failed';updateSend()");
+  assert.match(h.get("composer-analysis-message").textContent,/stopped/);
+  h.run("localMode=false;updateSend()");
+  assert.equal(h.get("composer-analysis").hidden,true);
+  assert.equal(h.get("send-question").getAttribute("aria-label"),"Send question");
+  assert.equal(h.get("question").value,"Keep my follow-up");
+});
+
+test("a delayed analysis-status error cannot overwrite another source's feedback",async()=>{
+  const h=appHarness();
+  h.run("activeVideo={id:'uploaded'};localMode=true;liveAccess=true;demo={};window.CtrlFVideoPersistence={library(){return new Promise((_,reject)=>window.rejectStatus=reject);}};checkComposerAnalysis();activeVideo={id:'another'};notice('Other source feedback');window.rejectStatus(Error('offline'))");
+  await new Promise(setImmediate);
+  assert.equal(h.get("composer-feedback").textContent,"Other source feedback");
 });

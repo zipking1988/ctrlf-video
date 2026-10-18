@@ -245,6 +245,27 @@ function button(label, className, action) {
   return element;
 }
 function analysisUnavailable() { return !!activeVideo && liveAccess === false; }
+function analysisPending() { return !!activeVideo && localMode && !analysisUnavailable(); }
+function analysisPendingMessage() {
+  const state = activeVideo?.job?.state;
+  if (["queued", "probing"].includes(state)) return "Checking your video. Your question is saved as a draft; it has not been sent.";
+  if (["captioning", "indexing"].includes(state)) return "Video analysis is running. Your question is saved as a draft; it has not been sent.";
+  if (["failed", "cancelled"].includes(state)) return "Video analysis stopped. Open analysis status to review the reason. Your question has not been sent.";
+  return "Video analysis has not started. Open analysis status, then choose Start analysis. Your question has not been sent.";
+}
+function checkComposerAnalysis() {
+  const source = activeVideo;
+  const message = "Your question has not been sent. Opening analysis status… Your draft is kept.";
+  notice(message);
+  announce(message);
+  // Opening Sources is read-only. Starting paid analysis remains an explicit
+  // action with the existing consent, funding and unknown-attempt gates.
+  Promise.resolve(window.CtrlFVideoPersistence?.library("videos")).then(() => {
+    if (activeVideo === source) notice("Analysis status opened. Your question has not been sent; your draft is kept. Return here after analysis is ready.");
+  }).catch(error => {
+    if (activeVideo === source) notice(`Could not open analysis status: ${error.message}. Your draft is kept.`);
+  });
+}
 function showSavedAnswers(open = true) {
   const root = $("question-shortcuts");
   root.classList.toggle("review-saved-open", open);
@@ -266,16 +287,21 @@ function showSavedAnswers(open = true) {
 }
 function updateSend() {
   const unavailable = analysisUnavailable();
+  const pending = analysisPending();
   // A saved recording can keep a draft before analysis. Submission remains
   // independently gated below, and durable snapshots already retain the draft.
   if (activeVideo) $("question").disabled = false;
   $("composer-unavailable").hidden = !unavailable;
+  $("composer-analysis").hidden = !pending;
+  $("composer-analysis-message").textContent = pending ? analysisPendingMessage() : "";
   $("send-question").hidden = unavailable;
   if (!unavailable) showSavedAnswers(false);
   $("send-question").disabled =
-    !demo || localMode || realBusy || (activeVideo && liveAccess === false) || !$("question").value.trim();
-  $("send-question").querySelector("span").textContent = realBusy ? "Working…" : activeVideo && liveAccess === false ? "Unavailable" : "Ask";
-  $("composer-keyboard-hint").textContent = activeVideo && liveAccess === false ? "Draft only · analysis unavailable" : "Enter to ask";
+    !demo || (localMode && !pending) || realBusy || unavailable || !$("question").value.trim();
+  $("send-question").setAttribute("aria-label", pending ? "Check analysis status; question is not sent" : "Send question");
+  $("send-question").title = pending ? "Check analysis status; your question stays a draft" : realBusy ? "A question is already running; your new draft is kept" : "Send question";
+  $("send-question").querySelector("span").textContent = realBusy ? "Working…" : unavailable ? "Unavailable" : pending ? "Status" : "Ask";
+  $("composer-keyboard-hint").textContent = unavailable ? "Draft only · analysis unavailable" : pending ? "Enter to check analysis · draft kept" : "Enter to ask";
   $("question-form").setAttribute("aria-busy", String(realBusy));
   updateComposerFeedback();
 }
@@ -983,11 +1009,12 @@ $("question-form").addEventListener("submit", (event) => {
   event.preventDefault();
   if (analysisUnavailable()) { showSavedAnswers(); return; }
   if (activeVideo && localMode) {
-    notice("Your draft is kept. Analysis must finish before asking this question. Open Sources to check progress.");
+    checkComposerAnalysis();
     return;
   }
   if (!$("send-question").disabled) ask($("question").value.trim());
 });
+$("composer-analysis-status").addEventListener("click", checkComposerAnalysis);
 $("open-saved-answers").addEventListener("click", () => showSavedAnswers(
   $("open-saved-answers").getAttribute("aria-expanded") !== "true",
 ));

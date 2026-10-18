@@ -1,11 +1,47 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {sourceClock} from './review-timeline.mjs';
 
 const clock = time => sourceClock(time).slice(0, -4);
 
+// Mouse dragging pans the canvas; touch retains the browser's native scrolling.
+// Capture only after movement so a normal click still reaches its evidence card.
+export function timelinePan() {
+  let gesture = null, moved = false;
+  const finish = event => {
+    if (gesture?.id !== event.pointerId) return;
+    gesture = null;
+    delete event.currentTarget.dataset.dragging;
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+  return {
+    onPointerDown(event) {
+      moved = false;
+      if (event.pointerType !== 'mouse' || !event.isPrimary || event.button !== 0 || event.target.closest('input, a') || event.currentTarget.scrollWidth <= event.currentTarget.clientWidth) return;
+      gesture = {id:event.pointerId,x:event.clientX,scroll:event.currentTarget.scrollLeft};
+    },
+    onPointerMove(event) {
+      if (gesture?.id !== event.pointerId) return;
+      const delta = event.clientX - gesture.x;
+      if (!moved && Math.abs(delta) < 6) return;
+      if (!moved) event.currentTarget.setPointerCapture(event.pointerId);
+      moved = true;
+      event.currentTarget.dataset.dragging = 'true';
+      event.currentTarget.scrollLeft = gesture.scroll - delta;
+      event.preventDefault();
+    },
+    onPointerUp:finish,
+    onPointerCancel:finish,
+    onLostPointerCapture:finish,
+    onClickCapture(event) {
+      if (moved && event.detail !== 0) { event.preventDefault(); event.stopPropagation(); }
+    },
+  };
+}
+
 export default function ClipTimeline({review, docs, seek, citations, onAsk, onSave, savedIds}) {
   const [selectedId, setSelectedId] = useState('chapter-0');
   const [playhead, setPlayhead] = useState(0);
+  const pan = useMemo(timelinePan, []);
   const duration = review.source.duration;
   const chapters = docs.filter(doc => doc.start !== undefined);
   const findings = docs.filter(doc => doc.start === undefined)
@@ -30,16 +66,26 @@ export default function ClipTimeline({review, docs, seek, citations, onAsk, onSa
     seek(doc.start ?? review.points[doc.points[0]].t);
   }
 
+  function scrub(time) {
+    setPlayhead(time);
+    const chapter = chapters.find(doc => time >= doc.start && (time < doc.end || doc.end === duration && time === duration));
+    if (chapter) setSelectedId(chapter.id);
+    seek(time);
+  }
+
   return <section className="clip-timeline" aria-label="Source timeline and linked findings">
     <header className="clip-timeline-toolbar">
-      <div><strong>Clip timeline</strong><span>6 sections · 3 findings</span></div>
+      <div><strong>Clip timeline</strong><span>{chapters.length} sections · {findings.length} findings</span></div>
       <span>Player <time>{sourceClock(playhead)}</time> / {clock(duration)}</span>
     </header>
-    <p className="clip-timeline-help" id="clip-timeline-help">Select a section or finding to seek the source and inspect its evidence. Scroll sideways to explore the timeline.</p>
-    <div className="clip-timeline-scroll" tabIndex={0} role="region" aria-label="Scrollable clip timeline" aria-describedby="clip-timeline-help">
+    <p className="clip-timeline-help" id="clip-timeline-help">Drag the time ruler to seek and inspect a section. Drag the cards sideways to pan, or select any section or finding. Arrow keys move the focused time ruler.</p>
+    <div className="clip-timeline-scroll" tabIndex={0} role="region" aria-label="Scrollable clip timeline" aria-describedby="clip-timeline-help" {...pan}>
       <div className="clip-timeline-board">
         <div className="clip-timeline-ruler" aria-label="Source time in seconds">
           {[0, 10, 20, 30, 40, 50, 60, duration].map(time => <time key={time} style={{left: position(time)}}>{clock(time)}</time>)}
+          <input className="clip-timeline-scrubber" type="range" min="0" max={duration} step="0.1" value={playhead}
+            aria-label="Seek clip timeline" aria-valuetext={`${sourceClock(playhead)} of ${sourceClock(duration)}`}
+            onChange={event => scrub(Number(event.target.value))} />
         </div>
         <div className="clip-timeline-tracks">
           <div className="clip-playhead" aria-hidden="true" style={{left: position(playhead)}} />
@@ -51,7 +97,7 @@ export default function ClipTimeline({review, docs, seek, citations, onAsk, onSa
                 aria-label={`Inspect section ${index + 1}: ${doc.title}, ${clock(doc.start)} to ${sourceClock(doc.end)}`}
                 onClick={() => inspect(doc)}>
                 <span className="clip-moment-time"><span>{String(index + 1).padStart(2, '0')}</span><time>{clock(doc.start)}–{clock(doc.end)}</time></span>
-                <img src={review.points[doc.points[0]].image} alt="" loading="lazy" />
+                <img src={review.points[doc.points[0]].image} alt="" loading="lazy" draggable={false} />
                 <strong>{doc.title}</strong>
               </button>
             </li>)}</ol>
