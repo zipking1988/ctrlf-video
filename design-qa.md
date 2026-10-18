@@ -557,3 +557,23 @@ establish factual model accuracy, update the original failed query, make a model
 request or alter the deployed release. Checks: 188 frontend tests and 279 backend tests pass (one platform skip), with
 build, lint/format and unchanged contract exports passing. Attempt 33 remains
 unauthorized.
+
+## October 19 release-33 production verification
+
+Reviewed `6d96727` is deployed under the separate release-33 authorization, with
+188 frontend / 280 Linux backend CI tests passing. Exact serving assets match.
+No layout change. The single authorized actual lead-change question displayed
+elapsed waiting feedback and returned a real partial answer with 21 replayable
+references. The previous eight questions retain their original results, including
+the failed lead-change attempt; the new answer creates turn nine. The existing
+Follow up on this answer control focuses the contextual composer without sending
+another model request. Source replay at 00:08.008 visibly shows 51–59 after decode.
+
+Actual proof: `release33/live-question-progress.png`,
+`release33/live-answer-and-followup.png` and
+`release33/live-answer-replay-confirmed.png` under the ignored private evaluation
+folder. The 675-file backup and both databases restore successfully. The one
+question reserved JPY 109 across five calls; no reindex or extra question ran.
+The model omits the intermediate 62→61 and 64 changes, so full accuracy remains
+failed. Native console/navigation telemetry and genuine five-minute acceptance
+remain unverified. All 33 releases are consumed; no attempt 34 is authorized.

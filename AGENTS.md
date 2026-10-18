@@ -1,12 +1,29 @@
 # Working on CtrlF Video
 
+On October 19 the user subsequently explicitly authorized reviewed `6d96727`
+for private main, exactly one additional deployment (33 cumulative), and one
+fresh retest of “How does the lead change?” within the existing model grant.
+The JPY 5,000 aggregate, sole model grant, all 32 prior releases/reservations
+and every original cutoff remain unchanged. CI 39143419258 deployed `6d96727`
+successfully after 188 frontend and 280 Linux backend tests. All 33 attempts
+are consumed; all prior records and financial rows survived deployment. A local
+backup restore verified 675 files and two databases. The one authorized fresh
+question returned a real partial answer with four events and 21 actual-frame
+references, using five completed calls / JPY 109 reservation and no reindexing.
+V4 now reserves JPY 1,145, 33/60 calls and 2/8 primary calls; remaining capacity
+is JPY 855, 27 calls and six primary calls. The answer still misses the 62→61
+score revision and intermediate 64, so accuracy acceptance remains failed.
+The original failed query is unchanged; no further paid retest was submitted.
+No attempt 34, extra retest, new funding or deadline extension is authorized.
+
 On October 19 the user explicitly authorized the private-main push of reviewed
 `95d0842` and exactly one further deployment, 32 cumulative. Preserve all 31
 preceding release records, the JPY 5,000 aggregate, sole existing model grant,
 historical reservations and all original cutoffs. Only the trusted release pin
 and maximum changed for this attempt. CI 39141774133 deployed it successfully
-after 187 frontend and 271 Linux backend tests passed. All 32 releases are used;
-no attempt 33, new funding or deadline extension is authorized.
+after 187 frontend and 271 Linux backend tests passed. At that point all 32
+releases were used; the later separate release-33 authorization above supersedes
+that count, without new funding or deadline extension.
 
 The user subsequently explicitly authorized exactly one further deployment, 31
 cumulative, and the private-main push of reviewed `9ad193d`. It deployed through

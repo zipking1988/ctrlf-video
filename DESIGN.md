@@ -4,6 +4,13 @@ Updated: 2026-10-19. Current direction: the user selected the first colorful con
 
 October 18 alpha hardening retains the selected layout. Quick guide is available from the landing and workspace menu. A pre-transfer upload dialog explains playback-only access, configured retention, media transmission and the enforced upload cap. Unindexed uploaded recordings retain editable drafts; submission stays gated. Home/Review hashes track the visible view and survive refresh. Partial answers expose a separate Still to verify disclosure beside the answer; failed and empty results show recovery/scope without hiding it behind save controls. Rename errors remain in the active dialog. These are local candidate changes; deployment and live model authorization remain separate.
 
+Release 33 (`6d96727`) preserves this layout and adds strict per-observation
+format recovery plus final-error draft retention. Its single authorized real
+retest returned a partial answer with 21 source links and a contextual follow-up
+composer, retaining all nine conversation turns. Source replay works; model
+accuracy still misses intermediate score changes. No prepared answer substitutes
+for a live response.
+
 ## October 18 whole-video review update
 
 Real whole-video answers now expose their own model-produced event observations

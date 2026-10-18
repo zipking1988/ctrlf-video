@@ -37,11 +37,15 @@ A pending query uses HTTP 202 with a bounded polling delay; unknown uses 409 and
 
 Cloud Run `K_SERVICE` cannot start a stateful workspace. Run the stateless gateway there and use one durable backend. See [API](api.md), [runtime](WORKSPACE_RUNTIME.md), [deployment](deployment.md) and [ARCHITECTURE](../ARCHITECTURE.md).
 
-October 19 local format-recovery candidate: the recorded lead-change failure used
-`frame_id` for an array where the model contract requires `frame_ids`. The local
+October 19 format recovery, deployed as separately authorized release 33
+(`6d96727`): the recorded lead-change failure used `frame_id` for an array where
+the model contract requires `frame_ids`. The
 validator accepts only that exact array variant, still checks every ID against
 actual sampled frames, preserves the original model response, and discloses the
 format correction. Conflicting/foreign references and invalid statements are
 excluded as whole observations; valid neighboring observations remain partial.
-An entirely invalid batch retains `invalid_observations`. This candidate is not
-part of deployed release 32 and adds no automatic model retry.
+An entirely invalid batch retains `invalid_observations`. This adds no automatic
+model retry. The one authorized fresh query returned
+a real partial result with no contract errors; its model used canonical keys.
+The earlier singular-key failure remains preserved and its recovery is verified
+by unchanged-response offline replay and regression tests, not that fresh result.

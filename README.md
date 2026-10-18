@@ -6,20 +6,25 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 **Desktop alpha:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. Main CI records the deployed revision. New live analysis still requires a funded session; this is a supervised alpha, not production acceptance.
 
-October 19 update: reviewed private-main code `95d0842` is deployed as release
-32/32. CI passed 187 frontend and 271 Linux backend tests. Saved questions now
-stay in a continuing conversation, with original replies and prior-answer
-follow-ups. The example timeline supports drag-to-pan and native ruler seeking.
-Unindexed uploads have an explicit, read-only analysis-status action beside the
-kept question draft; opening status never starts analysis or submits a question.
+October 19 update: reviewed private-main code `6d96727` is deployed as release
+33/33. [CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39143419258)
+passed 188 frontend and 280 Linux backend tests. Continuing conversation,
+timeline dragging and explicit unindexed-source status remain available. The
+new validator retains valid observations through the observed frame-key format
+variant while checking every reference against actual sampled frames. Failed
+questions keep their submitted draft; no automatic paid retry is added.
 
-The previous real final-ball retest still missed a later action. A fresh
-“How does the lead change?” question completed four calls but failed validation
-because three model observations used a nonstandard frame-reference field.
-Accuracy/real-answer acceptance and a genuine five-minute input remain open.
-V4 now reserves JPY 1,036, 28/60 calls and 2/8 indexing calls; JPY 1,162 historical
-reservations remain within the unchanged JPY 5,000 aggregate. These are conservative
-reservations, not invoices or free credits. No attempt 33 is authorized. See the
+The single authorized fresh “How does the lead change?” retest returned a real
+partial answer: four events, 21 actual-frame references, and a working contextual
+follow-up composer. Its 00:08.008 citation replays Milwaukee 51–Atlanta 59.
+It still misses the intermediate 62→61 revision and 64 reading; full score-change
+accuracy and genuine five-minute acceptance remain open. This trial used five
+completed model calls, reserving JPY 109, without reindexing or rewriting the
+previous failure. V4 now reserves JPY 1,145, 33/60 calls and 2/8 indexing calls;
+JPY 855 / 27 calls / six indexing calls remain. Historical reservations remain
+JPY 1,162 within the unchanged JPY 5,000 aggregate. These are conservative
+reservations, not invoices or free credits. All 33 releases are consumed; no
+attempt 34 or additional retest is authorized. See the
 [funding and validation record](docs/LIVE_GEMINI_TEST.md).
 
 ## Workspace

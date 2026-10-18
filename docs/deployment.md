@@ -550,3 +550,43 @@ calls. Model quality and genuine five-minute acceptance remain open. Full native
 browser console/navigation telemetry is unavailable; no full healthy-canary
 claim is made. All 32 release attempts are consumed; attempt 33 is not authorized.
 Private evidence remains under `.ctrlf-video-eval/aiand-20261018/release32/`.
+
+## Release 33 verification (October 19 JST)
+
+The user explicitly authorized private-main push of reviewed `6d96727`, exactly
+one further deployment (33 cumulative), and one fresh lead-change retest within
+the unchanged sole model grant. [CI 39143419258](https://github.com/zipking1988/ctrlf-video/actions/runs/39143419258)
+passed 188 frontend and 280 Linux backend tests and deployed both components.
+Backend state is committed at 33/33. Frontend
+`ctrlfvideo-frontend-ci-6d96727a-39143419258` serves 100% of traffic; public HTML,
+application/workspace scripts, bundle and CSS exactly match the approved commit.
+Real-mode health passes and maintenance is cleared. The complete financial
+ledger, runtime/environment, all three uploads and eight existing queries were
+unchanged before the retest; deployment added zero model calls. All 32 previous
+release entries and every original cutoff remain unchanged. No resource, IAM,
+key, model, funding or time-window expansion occurred.
+
+The private backup was downloaded and restored locally: 675 matching file hashes,
+two SQLite integrity checks, archive SHA-256
+`c80047ed88a1ebd2d7b11469630a4f77acaa6f8ce7d46374fd96668ccd0bbb75`.
+
+Exactly one fresh question, “How does the lead change?”, reused the existing
+70.203-second ready index with no parent answer. It completed five calls,
+reserving JPY 109, and returned `partial` with four events, 21 actual sampled-frame
+references and no contract errors. The new model response uses canonical keys;
+the earlier singular-key recovery remains established by offline replay and
+regressions. Browser evidence shows elapsed progress, nine retained conversation
+turns, the actual answer, explicit unresolved points and a follow-up-ready input.
+Replaying 00:08.008 shows Milwaukee 51–Atlanta 59 in the original player.
+
+Accuracy remains below acceptance: the answer omits the intermediate 62→61
+revision and 64 reading, and overstates an increasing trend. No prepared answer
+was substituted, earlier failed queries were not changed, and no second question
+or reindex was dispatched. V4 now reserves JPY 1,145 / 2,000, 33/60 calls and
+2/8 primary calls; remaining capacity is JPY 855, 27 calls and six primary calls.
+Historical reservations stay JPY 1,162 (cumulative models JPY 2,307), not settled
+invoices or free credit. JPY 5,000 and all original cutoffs remain unchanged.
+All 33 releases are consumed; attempt 34 and additional retests are unauthorized.
+Real five-minute acceptance and full native browser console/navigation canary
+telemetry remain unverified. Private receipts are under
+`.ctrlf-video-eval/aiand-20261018/release33/`, outside Git.

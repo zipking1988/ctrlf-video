@@ -287,3 +287,32 @@ the backend. All four observations retain their exact original statements and
 references; three exact singular-array keys are normalized with a visible
 uncertainty warning. No new model request was made, no failed stored answer was
 rewritten, and source-reading/score accuracy is not established by this replay.
+
+## October 19 release-33 single authorized retest
+
+Reviewed `6d96727` deployed through [CI 39143419258](https://github.com/zipking1988/ctrlf-video/actions/runs/39143419258)
+under the user's explicit deployment-33 and one-retest authorization. Deployment
+itself preserved the complete financial ledger and all eight existing queries.
+The one new request `2f79cc0c906f45c3b79db9883df0a734` asked “How does the lead
+change?” on the same ready 70.203-second generation, without a parent answer or
+new indexing. All five stages completed: embedding JPY 10, rerank JPY 8, planning
+JPY 8, visual review JPY 75 and synthesis JPY 8. Added reservation: JPY 109.
+
+The actual result is `partial`, no errors, four events and 21 references matching
+actual sampled files. The fresh visual response used canonical `frame_ids`;
+this is a live pipeline recovery result, not a live reproduction of the old alias.
+The original failed query and its exact raw response remain unchanged. Actual
+browser playback verifies 00:08.008 at Milwaukee 51–Atlanta 59, and the composer
+remains in contextual follow-up mode with nine saved turns. No further question
+was sent. The answer still omits the 62→61 revision and intermediate 64 reading;
+its increasing-trend claim is too broad. Accuracy acceptance remains failed;
+no editorial/prepared response replaces it, and no real five-minute input is
+available for the outstanding acceptance run.
+
+V4 now reserves JPY 1,145 / 2,000, 33/60 calls and 2/8 primary calls. Remaining
+capacity is JPY 855, 27 calls and six primary calls. Historical model reservations
+remain JPY 1,162; cumulative models reserve JPY 2,307. These are conservative
+reservations, not reconciled charges or free-credit balances. JPY 5,000 total,
+the sole funded owner and all original cutoffs are unchanged. All 33 deployment
+attempts are consumed. No attempt 34, additional operator retest, new funding,
+automatic retry, refund or grant reset is authorized.
