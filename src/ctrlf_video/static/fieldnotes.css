@@ -1006,6 +1006,12 @@ body.recorded-view .research-welcome { display: none; }
 .simple-conversation-heading h2 { margin: 0; font-size: 14px; font-weight: 650; }
 .simple-conversation-heading h2 span { margin-left: 8px; font-size: 11px; color: var(--muted); font-weight: 400; }
 .simple-conversation-heading > p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.simple-conversation-nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; }
+.simple-conversation-nav a, .simple-conversation-nav button { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 0; color: var(--accent); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.simple-conversation-nav a:visited { color: var(--accent-hover); }
+.simple-conversation-nav a:hover, .simple-conversation-nav button:hover { color: var(--accent-hover); text-decoration-thickness: 2px; }
+.simple-answer:focus { outline: 2px solid var(--accent); outline-offset: 6px; }
+.simple-answer { scroll-margin-block: 24px; }
 .simple-chat-thread { display: grid; gap: 24px; list-style: none; padding: 0; margin: 0; }
 .simple-chat-thread > li { min-width: 0; }
 .simple-saved-turn { padding-bottom: 18px; border-bottom: 1px solid var(--line); }

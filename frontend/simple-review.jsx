@@ -4,7 +4,7 @@ import {citedMoments, sourceClock} from "./review-timeline.mjs";
 import {questionLabel, isBreakdown} from "./question-shortcuts.mjs";
 import AnalysisTimeline from "./analysis-timeline.jsx";
 
-function SavedTurn({record, state, ui}) {
+function SavedTurn({record, state, ui, onOpen}) {
   const {query} = record;
   const supported = ["ok", "partial"].includes(query.response.status) && query.response.events.length > 0;
   const status = {ok:"Cited result", partial:"Partial", error:"Not completed", no_result:"No matching evidence"}[query.response.status];
@@ -15,7 +15,7 @@ function SavedTurn({record, state, ui}) {
       <p className="simple-saved-question"><strong>Full question</strong><br/>{query.question}</p>
       <p className="simple-saved-answer-text">{query.response.answer}</p>
       <div className="simple-saved-turn-actions">
-        <button type="button" className="text-button" aria-label={`Open answer and source evidence for: ${query.question}`} onClick={() => ui()?.select(record.id)}>Open answer & evidence</button>
+        <button type="button" className="text-button" aria-label={`Open answer and source evidence for: ${query.question}`} onClick={() => onOpen(record.id)}>Open answer & evidence</button>
         {supported && <button type="button" className="text-button" disabled={state.local} aria-label={`Continue conversation from: ${query.question}`} onClick={() => ui()?.continueFrom(record.id)}>Ask a follow-up</button>}
       </div>
     </details>
@@ -42,6 +42,22 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
     closeTimeline();
   };
   const key = `${state.sourceInfo?.id}:${state.epoch}:${selected?.id || "empty"}`;
+  const answerId = `${playerId}-review-answer`;
+  const activeAnswer = useRef(null);
+  const focusAnswerFor = useRef(null);
+  const openAnswer = id => {
+    if (id === selected?.id) {
+      activeAnswer.current?.focus();
+      return;
+    }
+    focusAnswerFor.current = `${state.sourceInfo?.id}:${state.epoch}:${id}`;
+    ui()?.select(id);
+  };
+  useEffect(() => {
+    // Only explicit answer navigation moves focus; incoming replies preserve typing.
+    if (focusAnswerFor.current === key) activeAnswer.current?.focus();
+    focusAnswerFor.current = null;
+  }, [key]);
   const timelineId = `${playerId}-cited-timeline`;
   const open = timelineFor === key || (breakdown && timelineFor !== `closed:${key}`);
   useEffect(() => setTimelineFor(null), [state.sourceInfo?.id, state.epoch]);
@@ -84,7 +100,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
   </section> : null;
   const activeTurn = (query ? <>
         <p className="simple-user-message">{questionLabel(query.question)}</p>
-        <article className="simple-answer" aria-label="Answer and source citations">
+        <article id={answerId} ref={activeAnswer} tabIndex={-1} className="simple-answer" aria-label="Answer and source citations">
           <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : breakdown ? "Whole-video breakdown" : "Answer"}</span></div>
           {analysis && breakdown && !!moments.length ? <>
             {citedTimeline}
@@ -132,10 +148,14 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
         <header className="simple-conversation-heading">
           <h2>Conversation <span>{state.records.length} {state.records.length === 1 ? "question" : "questions"}</span></h2>
           <p>{fixture ? "Synthetic demo · preset answers, no model calls." : state.local ? "Keep your questions here while analysis is unavailable." : "Keep asking about this video. Follow a detail or explore something new."}</p>
+          <nav className="simple-conversation-nav" aria-label="Conversation navigation">
+            {state.records.length > 1 && <button type="button" onClick={() => openAnswer(state.records.at(-1).id)}>Latest answer</button>}
+            <a href="#question" onClick={event => {event.preventDefault(); document.getElementById("question")?.focus();}}>Question box</a>
+          </nav>
         </header>
         {state.records.length ? <ol className="simple-chat-thread" aria-label="Questions and saved answers">
           {state.records.map(record => <li key={record.id} aria-current={record.id === selected?.id ? "true" : undefined}>
-            {record.id === selected?.id ? activeTurn : <SavedTurn record={record} state={state} ui={ui}/>}
+            {record.id === selected?.id ? activeTurn : <SavedTurn record={record} state={state} ui={ui} onOpen={openAnswer}/>}
           </li>)}
         </ol> : activeTurn}
       </> : activeTurn}
