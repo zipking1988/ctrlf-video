@@ -34,6 +34,9 @@ Updated: 2026-10-19. This is the current acceptance backlog, consolidated from o
 - [x] Prepare the local frame-reference format recovery and failed-draft retention fix; replay the unchanged actual response against 71 sampled-file IDs, with all four observations retained and three format corrections disclosed. No new paid request or stored-answer rewrite.
 - [x] Deploy reviewed `6d96727` under the separate 33rd-attempt authorization; CI passed 188 frontend / 280 Linux backend tests, exact assets and unchanged ledgers verified, backup restored (675 files / two databases). One authorized real retest returned partial with 21 references, but missed intermediate score changes. All 33 releases are consumed; no additional retest or attempt 34 is authorized.
 
+- [x] Prepare the October 19 local state-coverage recovery: smaller global batches, strict per-sample state/null accounting, explicit missing times, retained reversals/intermediate values, and a state ledger preserved beside whole-video prose. Three contextual API follow-ups and anti-carryover/idempotency/budget/unknown regressions pass with mocked transports. Actual local decoding confirms 62, 61 and 64 are present in the new inputs; no new model inference or stored-answer rewrite.
+- [ ] Validate the new structured state-reading contract and factual completeness with fresh authorized model inference; local mocks/decoded frames do not prove the model reads them correctly. All 33 deployment attempts remain consumed; this local work adds no push/deployment, paid call, funding or cutoff extension.
+
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.
 - [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Deployed in `1a980ae`.
 - [x] Install the October 18 JPY 2,000 / 60-call / eight-index-call grant for the explicitly confirmed current browser owner, preserving historical records; deploy reviewed `1a980ae` as attempt 27 of 29.
@@ -41,7 +44,7 @@ Updated: 2026-10-19. This is the current acceptance backlog, consolidated from o
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
-- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the release-32 lead-change trial, remaining capacity is JPY 964, 32 attempts and six primary calls; no new grant or deadline is implied.
+- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the release-33 lead-change trial, remaining capacity is JPY 855, 27 attempts and six primary calls; no new grant or deadline is implied.
 - [ ] Run an actual first-time human study. Automated browser walkthroughs establish flow behavior, not human comprehension or researcher value.
 
 ## First-use-case validation

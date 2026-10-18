@@ -38,6 +38,49 @@ Queries bind context to an owned, current video/generation and verified prior an
 
 An explicit whole-video prompt (`Break down the whole video.`, `Break down the entire video.`, or `拆解整段视频。` at the beginning of the submitted question) instead chooses deterministic complete-range windows, bypassing embedding/relevance/planning. Scope is never inferred from retrieved content or task context. Clips over 350 seconds are rejected before any model call; the existing three visual-attempt, 120-second window, 1-FPS and single syntax-repair bounds remain unchanged. Admission reserves the conservative visual-window plus synthesis/repair bound against both existing grants. Each window reserves a share of the 100-event output cap; overflow selection is disclosed and preserves chronology including the final window. Partial checkpoints retain uncertainty, completed-window counts, sampling limits and unreviewed ranges so unknown/cancel recovery cannot look complete. No output schema or ownership contract changes. This path has mock regression coverage; fresh live quality validation remains open.
 
+October 19 local reliability candidate (not deployed): natural submitted whole-source
+requests such as “Analyze the entire video” / “请分析整段视频” also choose the
+complete-range path. Whole-source breakdowns and change/trend questions split
+short sources into smaller overlapping batches (target 30 seconds, at most three
+visual attempts). A 70.203-second source uses three approximately 26.734-second
+windows; longer sources retain the existing complete-range plan. All 120-second,
+five-second-overlap, 1-FPS, 128-frame, 350-second, output and single syntax-repair
+limits remain unchanged. Admission uses the actual new window count against both
+existing grants before dispatch; a formerly one-window short review can cost more.
+This candidate installs no approval and makes no automatic retries.
+
+Change questions such as “How does the lead change?” use a structured visual
+state ledger instead of top-match search and prose synthesis. Each image carries
+its actual frame ID/time plus a request-local sample index. The model must return
+one literal state per sample or null when unreadable. Server validation maps only
+strict in-range integer indices to actual supplied images, rejects conflicting
+or duplicate readings, and lists missing/unreadable sample times. It never fills
+a gap from neighbors, an index caption or a parent answer. Only adjacent equal
+readings are grouped, without bridging unknown samples. The answer preserves
+the retained state sequence and source timestamps directly, including decreases
+and intermediate values. It makes no global monotonicity or continuous-state claim.
+Explicit numeric-time/range and point questions retain ordinary retrieval; scope
+is derived only from the current submitted question, not model/context text.
+
+Whole-video breakdowns retain narrative observations and also request the same
+per-sample audit of recurring visible text/counters/status. Each valid component
+survives failure of the other with an explicit warning. State runs have priority
+within each window's existing share of the 100-event cap; any reduction is
+reported. Their source timeline is appended independently of prose synthesis,
+so an omitted intermediate value in the overview cannot remove its reading.
+If the whole audit is absent, coverage remains explicitly unresolved. The final
+Answer schema stays 0.1; sample indices/internal state tags are not new public
+fields. Old results and indices are not rewritten. Valid parent events still
+provide conversational context; every follow-up rechecks current source images.
+
+Offline regressions cover the 62→61 / 64 state sequence, whole-source summary
+omissions, three contextual API follow-ups, missing readings despite a populated
+parent, idempotent replay, budget denial, scope limits and unknown cancellation.
+Actual isolated decoding of the unchanged real source produces 81 frames including
+visible 62, 61 and 64. That verifies source/input coverage, not fresh Gemini reading
+accuracy. The new schema, model quality and genuine five-minute acceptance still
+need separately authorized live validation. Production remains release 33.
+
 Release 31 (`9ad193d`): first/last/final action questions also use the
 bounded complete-range review, based only on the submitted question. Mentions of
 the previous answer or an explicit numeric time range keep ordinary retrieval.

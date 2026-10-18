@@ -35,6 +35,29 @@ Demo snapshot saves accept current canonical answers, or an exact answer/id alre
 
 Whole-video scope is an explicit question prefix, not a new endpoint or request field. `Break down the whole video.` (also `Break down the entire video.` / `拆解整段视频。`) chooses complete-range sampling for clips up to 350 seconds. Normal readiness, ownership, idempotency and funded-session gates still apply. The final schema remains 0.1; coverage counts, unreviewed ranges and sampling limits appear in `unresolved`. The visual-vector channel is empty for this path because it does not use vector retrieval. See [architecture](../ARCHITECTURE.md).
 
+The October 19 local candidate also recognizes natural explicit whole-source
+requests (“Analyze the entire video”, “请分析整段视频”) and ordinary change/trend
+questions (“How does the lead change?”). Both use bounded complete-range review;
+short global reviews use smaller batches within the same three-visual-call limit.
+Point questions and explicit numeric time ranges retain retrieval. Actual window
+count and one possible syntax repair must fit both current approvals before any
+request. No new endpoint, request field, enrollment or budget is introduced.
+
+Change results retain literal per-sample state readings as source-linked events.
+Missing, unreadable, duplicate or conflicting readings remain unresolved; no value
+is inherited from previous answers. Whole breakdowns keep narrative and state
+readings independently, and preserve a separate source-state sequence even when
+prose omits it. The internal `sample` index and `state_reading` tag do not extend
+the public schema. `invalid_state_readings` means the structured visual audit could
+not be validated; valid neighboring whole-review narrative/state evidence remains
+partial where available. All-unknown readings cannot establish absence.
+
+The current parent-request/owner/generation and idempotency rules are unchanged.
+Local mocks exercise a whole-video answer followed by three API context
+anchors and a later unreadable frame that cannot borrow its parent's value.
+These are transport regressions, not new live model answers. This candidate is
+not deployed; production and the financial ledger remain at release 33.
+
 Release 31 also handles submitted first/last/final action
 questions through that bounded chronological review. It returns ordered detected
 observations and explicit sampling/finality limits, without a new field or status.
