@@ -576,7 +576,8 @@
 .simple-answer { padding: 0 2px; border: 0; background: transparent; }
 .simple-answer-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--accent); font-size: 13px; font-weight: 600; }
 .simple-answer-heading .icon { width: 18px; height: 18px; }
-.simple-answer-text { margin: 0 0 14px; font-size: 16px; line-height: 1.7; letter-spacing: -.1px; }
+.simple-answer-text { margin: 0 0 14px; font-size: 16px; line-height: 1.7; letter-spacing: -.1px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.simple-user-message { overflow-wrap: anywhere; }
 .simple-citations { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; font-size: 11px; color: var(--muted); }
 .simple-citations button { display: inline-flex; gap: 5px; align-items: center; color: var(--accent); text-decoration: none; font-variant-numeric: tabular-nums; font-size: 12px; padding: 6px 9px; background: #eaf1eb; border-radius: 6px; }
 .simple-citations .icon { width: 12px; height: 12px; }
