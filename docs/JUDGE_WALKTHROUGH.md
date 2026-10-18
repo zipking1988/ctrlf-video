@@ -1,12 +1,18 @@
 # Recorded-test walkthrough
 
-The public entry is `/#example`, linked from the landing's **Try a real example**
+The public entry is `/#example`, linked from the landing's **Explore the clip review**
 action and the workspace menu. It opens a curated recorded sample in the same
 application, using the shared video/chat component. The former
 `/static/judge/index.html` redirects to this route. It needs neither
 an original browser session nor a private source's retention window. It does not
 run new model requests, enroll visitors, change a budget, share arbitrary user
 investigations or extend hosting beyond October 19, 2026.
+
+## Prepared clip review (October 18)
+
+The main example now covers the complete 70.2-second excerpt in six editorial sections. Codex inspected 71 locally decoded frames at approximately one-second spacing. The full-size 36.036 and 37.037-second frames show Atlanta's broadcast score changing from 62 to 61. The review distinguishes that observed revision from its unknown cause, identifies broadcast cuts/reaction shots and retains sampling limits. Each section links to actual source points. Download clip review exports a separate Markdown report with provenance and source/frame links.
+
+This is a **prepared editorial source review**, not a new Gemini pipeline result or a five-minute/full-game quality test. `clip-review.json` records source/frame hashes and exact decoded timestamps. The already authorized public source is unchanged; only selected derived public JPEGs are added. The original Gemini answer remains below **Original Gemini test · one scoreboard question**, with its original finding/export controls and unchanged private-source isolation. The following steps apply inside that disclosure.
 
 ## Visitor journey
 

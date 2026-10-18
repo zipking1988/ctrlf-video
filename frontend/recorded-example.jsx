@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import SimpleReview from "./simple-review.jsx";
+import ClipReview from "./clip-review.jsx";
 import {exampleView, exampleReport, findingKey, emptyFinding, completeFinding, storedFinding} from "./recorded-example-model.mjs";
 
 const initialFinding = () => {try {return storedFinding(localStorage.getItem(findingKey));} catch {return null;}};
@@ -7,7 +8,7 @@ const same = (a,b) => !!a && Object.keys(emptyFinding()).every(key => a[key] ===
 const reports = () => window.CtrlFVideoReport;
 function download(content, extension, type) {
   const url=URL.createObjectURL(new Blob([content],{type})), link=document.createElement("a");
-  link.href=url;link.download=`CtrlF Video - finding.${extension}`;document.body.append(link);link.click();link.remove();
+  link.href=url;link.download=`CtrlF Video - report.${extension}`;document.body.append(link);link.click();link.remove();
   setTimeout(()=>URL.revokeObjectURL(url),30000);
 }
 const dataUrl = blob => new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});
@@ -17,7 +18,7 @@ export default function RecordedExample({icon}) {
   const [saved,setSaved]=useState(initialFinding),[draft,setDraft]=useState(()=>initialFinding() || emptyFinding());
   const [editing,setEditing]=useState(false),[status,setStatus]=useState("");
   const [report,setReport]=useState(null),[exportStatus,setExportStatus]=useState(""),[exporting,setExporting]=useState(false);
-  const [metaNode,setMetaNode]=useState(null);
+
   const player=useRef(null),editor=useRef(null),dialog=useRef(null),request=useRef(0),abort=useRef(null),returnFocus=useRef(null),activeRef=useRef(false);
   const dirty=!same(saved,draft);
   function leave(upload=false,workspace=false) {
@@ -107,7 +108,7 @@ export default function RecordedExample({icon}) {
   return <section className="recorded-workspace fieldnotes canvas-first review-desk review-first workbench-shell" aria-label="Recorded example workspace">
     <header className="studio-header">
       <button className="brand" onClick={()=>leave()}>CtrlF Video</button>
-      <span className="example-project-title">Recorded example</span>
+      <span className="example-project-title">Basketball · clip review</span>
       <button className="example-upload" onClick={()=>leave(true)}>Upload video</button>
       <button className="text-button" onClick={()=>leave()}>Home</button>
     </header>
@@ -116,12 +117,14 @@ export default function RecordedExample({icon}) {
     {!loading && !error && view && <>
       <section className="source-dock" aria-label="Example source video">
         <div className="player-wrap"><video ref={player} id="example-player" tabIndex={-1} controls playsInline preload="metadata" src={sample.source.url} poster="/static/judge/basketball/frames/scoreboard-1-001.jpg" aria-label="Recorded basketball source" onError={()=>setStatus("Video could not load. Reload this page to retry.")}/></div>
-        <div id="example-source-meta" ref={setMetaNode}/>
+        <div className="simple-source-meta"><span>Original source · 01:10.203</span><span>Play any cited moment below</span></div>
       </section>
       <section className="agent-chat" aria-label="Example video chat">
-        <SimpleReview state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={metaNode} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={()=>setEditing(true)}/>
-        <div className="example-next"><span>Saved real Gemini result · No new analysis</span><button className="outline-button" onClick={()=>setEditing(!editing)}>{editing ? "Hide finding" : "Write a finding"}{icon("stack")}</button></div>
+        <ClipReview seek={seek} download={download}/>
         {status && <p className="example-status" role="status">{status}</p>}
+        <details className="example-original-result"><summary>Original Gemini test · one scoreboard question</summary><p>This separate saved test verifies one visible fact. It is not the source of the prepared clip review above.</p>
+        <SimpleReview state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={null} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={()=>setEditing(true)}/>
+        <div className="example-next"><span>Saved real Gemini result · No new analysis</span><button className="outline-button" onClick={()=>setEditing(!editing)}>{editing ? "Hide finding" : "Write a finding"}{icon("stack")}</button></div>
         {editing && <section ref={editor} className="example-finding" aria-label="Write a source-linked finding">
           <header><div><h2>Your finding</h2><p>Write what you checked. The source citation stays attached.</p></div><button className="text-button" onClick={()=>{setDraft({...sample.reviewed_finding});setStatus("Existing human review copied into your draft. Check it before saving.");}}>Use reviewed example</button></header>
           <form onSubmit={event=>{event.preventDefault();if(!completeFinding(draft))return;const value={...draft};setSaved(value);try{localStorage.setItem(findingKey,JSON.stringify(value));setStatus("Finding saved in this browser. Ready to export.");}catch{setStatus("Kept in this tab. Storage is unavailable; export before leaving.");}}}>
@@ -135,6 +138,7 @@ export default function RecordedExample({icon}) {
             <footer><button className="outline-button" disabled={!completeFinding(draft)} type="submit">Save finding</button><button className="primary-button" type="button" disabled={!saved || dirty} onClick={openReport}>Export report {icon("arrow-right")}</button><small>{dirty ? "Save edits before exporting." : "Saved in this browser only."}</small></footer>
           </form>
         </section>}
+        </details>
         <details className="example-history"><summary>Real test results & limitations</summary><p>This 70.2-second sports clip is a technical sample, not a UX study. The history below is a development record, not an accuracy benchmark.</p><ol>{sample.history.map((attempt,i)=><li key={i}><strong>{attempt.task || attempt.question || `Attempt ${i+1}`} · {attempt.model_status}</strong><p>{attempt.human_review || attempt.review}</p></li>)}</ol><p>{sample.provenance.public_copy}</p></details>
       </section>
     </>}

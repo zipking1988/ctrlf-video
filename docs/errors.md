@@ -16,6 +16,7 @@ Updated: 2026-10-14. Current adapters and HTTP recovery are implemented; live pr
 | `gemini_incomplete_response` / `invalid_gemini_response` | Provider output incomplete/blocked/invalid; dispatched attempts become unknown |
 | `invalid_observations` / `invalid_synthesis` / `invalid_rerank` | Model output failed validation; retain verified partial evidence when available |
 | `index_configuration_changed` | Frozen config/provider/model/budget no longer matches; rebuild with a new generation |
+| `whole_video_review_limit` | Whole-video review is limited to 350 seconds (5:50); use a shorter authorized clip or ask a specific question. No model call is made for this rejected request. |
 | `video_not_ready` / `preflight_required` | Finish complete local preflight/approved analysis before questions |
 | `invalid_context_anchor` / `stale_chat_generation` | Select current owned verified context; stale requests cannot publish |
 | `revision_conflict` | Another tab changed the desk; reload/reconcile instead of overwriting |

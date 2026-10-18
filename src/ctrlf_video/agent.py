@@ -18,10 +18,34 @@ from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from ctrlf_video.attempts import AttemptLedger, BudgetDenied
-from ctrlf_video.media import frames
+from ctrlf_video.media import MediaError, frames
 from ctrlf_video.schema import Answer, hms
 
 log = logging.getLogger(__name__)
+
+
+def whole_video_request(question: str) -> bool:
+    """Explicit user-visible prompt; never infer scope from retrieved/context text."""
+    return (
+        question.strip()
+        .lower()
+        .startswith(
+            ("break down the whole video.", "break down the entire video.", "拆解整段视频。")
+        )
+    )
+
+
+def whole_video_windows(duration):
+    from dataclasses import asdict
+
+    from ctrlf_video.windows import plan_windows
+
+    # Three existing <=120s reviews, with the existing five-second overlaps.
+    # Reject before dispatch; never silently truncate a longer recording.
+    windows = [asdict(window) for window in plan_windows(duration)]
+    if len(windows) > 3:
+        raise AgentError("whole_video_review_limit")
+    return windows
 
 
 def provider_error(body: bytes) -> str:
@@ -459,7 +483,22 @@ def observed_events(video, observations, all_frames):
     return events
 
 
-def progress_answer(video, observations, all_frames, reviewed):
+def whole_review_coverage(windows, reviewed):
+    warnings = [
+        f"Whole-video review: {reviewed}/{len(windows)} windows completed across "
+        f"{hms(0)}–{hms(windows[-1]['end'])}. Frames were sampled at at most 1 FPS; "
+        "brief actions and events between samples may be missed. "
+        "Window coverage is not proof of complete event detection."
+    ]
+    if reviewed < len(windows):
+        warnings.append(
+            "Whole-video review incomplete. Unreviewed ranges: "
+            + ", ".join(f"{hms(w['start'])}–{hms(w['end'])}" for w in windows[reviewed:])
+        )
+    return warnings
+
+
+def progress_answer(video, observations, all_frames, reviewed, *, review_windows=None, warnings=()):
     events = observed_events(video, observations, all_frames)
     if not events:
         return None
@@ -471,13 +510,15 @@ def progress_answer(video, observations, all_frames, reviewed):
             "answer": "\n".join(i["statement"] for i in observations)[:10000],
             "events": events,
             "unresolved": [
-                "The query did not fully complete; only verified candidate frames are retained."
-            ],
+                "The query did not fully complete; only verified sampled frames are retained."
+            ]
+            + list(warnings)[:96]
+            + (whole_review_coverage(review_windows, reviewed) if review_windows else []),
             "followups": [],
             "errors": [],
             "trace": {
                 "visible": {
-                    "channels": ["visual_vector"],
+                    "channels": [] if review_windows else ["visual_vector"],
                     "segments_reviewed": reviewed,
                     "evidence_segments": min(reviewed, len(events)),
                 },
@@ -737,14 +778,27 @@ class Agent:
         # Index provenance remains immutable. New work uses the current grant,
         # including both owner/deployment admission and every paid reservation.
         version = self.runtime.budget_version
-        zooms = min(3, len(segments), self.settings.rerank_k)
+        whole_video = whole_video_request(question)
+        full_windows = whole_video_windows(metadata["duration"]) if whole_video else None
+        zooms = len(full_windows) if whole_video else min(3, len(segments), self.settings.rerank_k)
         query_cost = (
             self.runtime.embed.max_cost_micro
             + self.runtime.rerank.max_cost_micro
             + zooms * self.runtime.vision.max_cost_micro
             + 3 * self.runtime.text.max_cost_micro
         )
-        self.ledger.admit_cost(owner, version, 5 + zooms, query_cost, self.runtime.currency_unit)
+        if whole_video:
+            # Visual windows + synthesis + the same single syntax-repair allowance.
+            query_cost = (
+                zooms * self.runtime.vision.max_cost_micro + 2 * self.runtime.text.max_cost_micro
+            )
+        self.ledger.admit_cost(
+            owner,
+            version,
+            (2 if whole_video else 5) + zooms,
+            query_cost,
+            self.runtime.currency_unit,
+        )
         kwargs = {
             "owner": owner,
             "version": version,
@@ -761,97 +815,106 @@ class Agent:
             expanded += "\nSelected prior question and verified evidence: " + json.dumps(
                 context, ensure_ascii=False
             )
-        vector = provider.call(
-            "embed",
-            "/embeddings",
-            {"model": self.runtime.embed.model, "input": [expanded]},
-            attempt=prefix + "embed",
-            kind="embed",
-            **kwargs,
-        )
-        query_vector = checked_embeddings(vector, 1)[0]
-        lexical = bm25(expanded, [s["text"] for s in segments])
-        semantic = [cosine(query_vector, s["vector"]) for s in segments]
-        rankings = [
-            sorted(range(len(segments)), key=lambda i: scores[i], reverse=True)
-            for scores in (lexical, semantic)
-        ]
-        fused = {
-            i: sum(1 / (60 + order.index(i) + 1) for order in rankings)
-            for i in range(len(segments))
-        }
-        candidates = sorted(fused, key=lambda i: (-fused[i], i))[: self.settings.candidate_k]
-        reranked = provider.call(
-            "rerank",
-            "/rerank",
-            {
-                "model": self.runtime.rerank.model,
-                "query": expanded,
-                "documents": [segments[i]["text"] for i in candidates],
-                "top_n": min(self.settings.rerank_k, len(candidates)),
-            },
-            attempt=prefix + "rerank",
-            kind="rerank",
-            **kwargs,
-        )
-        results = reranked.get("results") if isinstance(reranked, dict) else None
-        if not isinstance(results, list) or len(results) > min(
-            self.settings.rerank_k, len(candidates)
-        ):
-            raise AgentError("invalid_rerank")
-        indices = [item.get("index") if isinstance(item, dict) else None for item in results]
-        if any(type(i) is not int or not 0 <= i < len(candidates) for i in indices) or len(
-            set(indices)
-        ) != len(indices):
-            raise AgentError("invalid_rerank")
-        # Sparse descriptions can miss a visible moment. An empty relevance
-        # selection is not visual absence; retain bounded hybrid candidates.
-        if not indices:
-            indices = list(range(min(self.settings.rerank_k, len(candidates))))
-        selected = [segments[candidates[i]] for i in dict.fromkeys(indices)][
-            : self.settings.rerank_k
-        ]
-        planning = provider.chat(
-            "text",
-            json.dumps(
+        if whole_video:
+            selected = full_windows
+            inspect = list(range(len(selected)))
+        else:
+            vector = provider.call(
+                "embed",
+                "/embeddings",
+                {"model": self.runtime.embed.model, "input": [expanded]},
+                attempt=prefix + "embed",
+                kind="embed",
+                **kwargs,
+            )
+            query_vector = checked_embeddings(vector, 1)[0]
+            lexical = bm25(expanded, [s["text"] for s in segments])
+            semantic = [cosine(query_vector, s["vector"]) for s in segments]
+            rankings = [
+                sorted(range(len(segments)), key=lambda i: scores[i], reverse=True)
+                for scores in (lexical, semantic)
+            ]
+            fused = {
+                i: sum(1 / (60 + order.index(i) + 1) for order in rankings)
+                for i in range(len(segments))
+            }
+            candidates = sorted(fused, key=lambda i: (-fused[i], i))[: self.settings.candidate_k]
+            reranked = provider.call(
+                "rerank",
+                "/rerank",
                 {
-                    "question": question,
-                    "context": context,
-                    "task_brief": task_brief,
-                    "capabilities": manifest["capabilities"],
-                    "candidates": [
-                        {"index": i, "start": s["start"], "end": s["end"], "description": s["text"]}
-                        for i, s in enumerate(selected)
-                    ],
-                    "instruction": (
-                        "Choose up to 3 candidate indices for visual verification; "
-                        'return only {"inspect":[0]}. Do not answer the question in this step. '
-                        "Use only indices from the supplied candidates."
-                    ),
+                    "model": self.runtime.rerank.model,
+                    "query": expanded,
+                    "documents": [segments[i]["text"] for i in candidates],
+                    "top_n": min(self.settings.rerank_k, len(candidates)),
                 },
-                ensure_ascii=False,
-            ),
-            response_schema={
-                "type": "OBJECT",
-                "required": ["inspect"],
-                "properties": {
-                    "inspect": {
-                        "type": "ARRAY",
-                        "items": {"type": "INTEGER"},
-                    }
+                attempt=prefix + "rerank",
+                kind="rerank",
+                **kwargs,
+            )
+            results = reranked.get("results") if isinstance(reranked, dict) else None
+            if not isinstance(results, list) or len(results) > min(
+                self.settings.rerank_k, len(candidates)
+            ):
+                raise AgentError("invalid_rerank")
+            indices = [item.get("index") if isinstance(item, dict) else None for item in results]
+            if any(type(i) is not int or not 0 <= i < len(candidates) for i in indices) or len(
+                set(indices)
+            ) != len(indices):
+                raise AgentError("invalid_rerank")
+            # Sparse descriptions can miss a visible moment. An empty relevance
+            # selection is not visual absence; retain bounded hybrid candidates.
+            if not indices:
+                indices = list(range(min(self.settings.rerank_k, len(candidates))))
+            selected = [segments[candidates[i]] for i in dict.fromkeys(indices)][
+                : self.settings.rerank_k
+            ]
+            planning = provider.chat(
+                "text",
+                json.dumps(
+                    {
+                        "question": question,
+                        "context": context,
+                        "task_brief": task_brief,
+                        "capabilities": manifest["capabilities"],
+                        "candidates": [
+                            {
+                                "index": i,
+                                "start": s["start"],
+                                "end": s["end"],
+                                "description": s["text"],
+                            }
+                            for i, s in enumerate(selected)
+                        ],
+                        "instruction": (
+                            "Choose up to 3 candidate indices for visual verification; "
+                            'return only {"inspect":[0]}. Do not answer the question in this step. '
+                            "Use only indices from the supplied candidates."
+                        ),
+                    },
+                    ensure_ascii=False,
+                ),
+                response_schema={
+                    "type": "OBJECT",
+                    "required": ["inspect"],
+                    "properties": {
+                        "inspect": {
+                            "type": "ARRAY",
+                            "items": {"type": "INTEGER"},
+                        }
+                    },
                 },
-            },
-            attempt=prefix + "plan",
-            kind="text",
-            **kwargs,
-        )
-        inspect = planning.get("inspect")
-        if (
-            not isinstance(inspect, list)
-            or len(inspect) > 3
-            or any(type(i) is not int or not 0 <= i < len(selected) for i in inspect)
-        ):
-            raise AgentError("invalid_tool_request")
+                attempt=prefix + "plan",
+                kind="text",
+                **kwargs,
+            )
+            inspect = planning.get("inspect")
+            if (
+                not isinstance(inspect, list)
+                or len(inspect) > 3
+                or any(type(i) is not int or not 0 <= i < len(selected) for i in inspect)
+            ):
+                raise AgentError("invalid_tool_request")
         all_frames = {}
         reviewed = 0
         negatives = 0
@@ -891,6 +954,24 @@ class Agent:
                                     "or backend root cause from interface states. "
                                     "Include no_match:true when verification finds "
                                     "no matching evidence."
+                                    + (
+                                        " Review this entire supplied window chronologically. "
+                                        "Return separate observations for meaningful state "
+                                        "changes, "
+                                        "actions and transitions across its beginning, middle "
+                                        "and end. "
+                                        "For sports, describe visible possessions, ball movement, "
+                                        "position changes and score changes only when supported. "
+                                        "Distinguish broadcast cuts/replays from continuous "
+                                        "action. "
+                                        "Cite before/after frames for changes; a static frame "
+                                        "alone "
+                                        "does not prove a pass, score, tactic or cause. "
+                                        "Do not reduce this task to reading one scoreboard. "
+                                        "List intervals/actions you cannot determine in unresolved."
+                                        if whole_video
+                                        else ""
+                                    )
                                 ),
                             },
                             ensure_ascii=False,
@@ -901,6 +982,18 @@ class Agent:
                     **kwargs,
                 )
                 items, unresolved_items = checked_observations(result, sampled)
+                if whole_video:
+                    # Reserve evidence capacity for every window, including the tail.
+                    # Report any selection; never silently discard the last window.
+                    items.sort(key=lambda item: min(all_frames[f]["t"] for f in item["frame_ids"]))
+                    cap = 100 // len(selected)
+                    if len(items) > cap:
+                        warnings.append(
+                            f"{hms(window['start'])}–{hms(window['end'])}: retained {cap} "
+                            f"of {len(items)} observations across this window; additional "
+                            "observations are not included in this answer."
+                        )
+                        items = [items[i * (len(items) - 1) // (cap - 1)] for i in range(cap)]
                 reviewed += 1
                 negatives += int(result.get("no_match") is True)
                 for item in items:
@@ -920,20 +1013,32 @@ class Agent:
                             "end": window["end"],
                         }
                     )
-                progress = progress_answer(video, observations, all_frames, reviewed)
+                warnings += unresolved_items
+                progress = progress_answer(
+                    video,
+                    observations,
+                    all_frames,
+                    reviewed,
+                    review_windows=selected if whole_video else None,
+                    warnings=warnings,
+                )
                 if progress:
                     provider.check()
                     path = directory / (request_id + "_verified.json")
                     temp = path.with_suffix(".tmp")
                     temp.write_text(json.dumps(progress, ensure_ascii=False))
                     temp.replace(path)
-                warnings += unresolved_items
-            except (AgentError, BudgetDenied) as error:
+            except (AgentError, BudgetDenied, MediaError) as error:
                 if str(error) in {"model_unknown", "unknown_attempt_do_not_resend"}:
                     raise
                 warnings.append(str(error))
                 break
-        if not observations and negatives == reviewed == len(segments) and not warnings:
+        if (
+            not whole_video
+            and not observations
+            and negatives == reviewed == len(segments)
+            and not warnings
+        ):
             return Answer.model_validate(
                 {
                     "schema_version": "0.1",
@@ -959,6 +1064,9 @@ class Agent:
         if not observations:
             # Coarse search alone cannot establish a global negative claim.
             raise AgentError("no_verified_evidence")
+        if whole_video:
+            observations.sort(key=lambda item: min(frame["t"] for frame in item["evidence"]))
+            warnings += whole_review_coverage(selected, reviewed)
         try:
             synthesis = provider.chat(
                 "text",
@@ -980,6 +1088,27 @@ class Agent:
                             "Never substitute a window boundary for an evidence timestamp. "
                             "Do not infer emotion or backend root cause, or treat visible brands "
                             "as proof of commercial sponsorship agreements."
+                            + (
+                                " Produce a chronological whole-video breakdown, not a "
+                                "single-fact answer. "
+                                "Use four clearly separated sections: Overview; Sequence with "
+                                "source "
+                                "timestamps; Patterns to verify; Limits. Describe what changes "
+                                "across "
+                                "the recording, connect repeated visible patterns only with "
+                                "multiple "
+                                "cited observations, and distinguish observation from "
+                                "interpretation. "
+                                "Do not promise insights humans cannot see or invent a turning "
+                                "point. "
+                                "If evidence is too sparse for a section, say so. The source "
+                                "may be "
+                                "an edited clip: never call it a complete game unless that is "
+                                "established. "
+                                "Report incomplete windows and sampling limitations prominently."
+                                if whole_video
+                                else ""
+                            )
                         ),
                     },
                     ensure_ascii=False,
@@ -1004,7 +1133,7 @@ class Agent:
             unresolved.append(
                 "Audio has not been reliably transcribed; this answer uses visible frames only."
             )
-        if reviewed < len(segments):
+        if not whole_video and reviewed < len(segments):
             unresolved.append(
                 "Only candidate segments were reviewed, not every frame of the full video."
             )
@@ -1019,7 +1148,7 @@ class Agent:
             "errors": [],
             "trace": {
                 "visible": {
-                    "channels": ["visual_vector"],
+                    "channels": [] if whole_video else ["visual_vector"],
                     "segments_reviewed": reviewed,
                     "evidence_segments": min(reviewed, len(events)),
                 },

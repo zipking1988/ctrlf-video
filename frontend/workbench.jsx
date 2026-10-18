@@ -7,7 +7,7 @@ import React, {
 import { createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
 import { openFinding, saveFinding } from "./finding-editor-actions.mjs";
-import { savedAnswersForSource, questionLabel } from "./question-shortcuts.mjs";
+import { savedAnswersForSource, questionLabel, breakdownPrompt } from "./question-shortcuts.mjs";
 import SimpleReview from "./simple-review.jsx";
 import RecordedExample from "./recorded-example.jsx";
 
@@ -363,7 +363,7 @@ function QuestionShortcuts() {
 function QuestionHelp() {
   const state = useDesk();
   const demo = !state.sourceInfo?.id || state.sourceInfo.id === "demo_parcel";
-  return <p className="question-help">{state.local ? "Analysis required. Check status in Sources." : demo ? "Preset demo · No model calls." : "Sampled frames · Check cited moments · No audio transcription."}</p>;
+  return <div className="question-help">{!demo && <button type="button" className="text-button" disabled={state.sourceInfo?.metadata?.duration > 350} onClick={()=>ui()?.draftQuestion(breakdownPrompt)}>Draft a whole-video breakdown</button>}{state.sourceInfo?.metadata?.duration > 350 && <span>Whole-video review supports up to 5:50. For this recording, ask about a specific moment.</span>}<p>{state.local ? "Analysis required. Check status in Sources." : demo ? "Preset demo · No model calls." : "Whole-video review: up to 5:50 · Sampled frames · No audio transcription."}</p></div>;
 }
 function ConversationSurface() {
   const state = useDesk();

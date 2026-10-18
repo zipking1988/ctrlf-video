@@ -16,3 +16,6 @@ export function questionLabel(question) {
   const questionSentence = question.split(/(?<=[.!?。？])\s+/u).find(sentence => /[?？]$/u.test(sentence));
   return (questionSentence || question).trim();
 }
+
+export const breakdownPrompt = "Break down the whole video. Explain the sequence of events, changes and repeated patterns with source timestamps. Separate visible facts from interpretations and state what remains uncertain.";
+export const isBreakdown = question => /^(break down the (whole|entire) video\.|拆解整段视频。)/i.test(question.trim());

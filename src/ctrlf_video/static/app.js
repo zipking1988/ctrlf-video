@@ -896,6 +896,22 @@ window.CtrlFVideoUI = {
     setWorkspaceView("review", true);
     $("clear-context").click();
   },
+  draftQuestion: (question) => {
+    if (!activeVideo || realBusy) return;
+    setWorkspaceView("review", true);
+    if ($("question").value.trim()) {
+      notice("Your current draft is kept. Clear it before choosing a different starting question.");
+      $("question").focus();
+      return;
+    }
+    $("clear-context").click();
+    $("question").value = question;
+    $("question").dispatchEvent(new Event("input", {bubbles:true}));
+    $("question").focus();
+    notice(analysisUnavailable()
+      ? "Breakdown draft ready. New analysis is unavailable for this session; nothing was sent."
+      : "Breakdown draft ready. Review it, then press Ask. Whole-video review supports clips up to 5:50; sampled frames can miss brief actions.");
+  },
   askDemoQuestion: (question) => {
     if (!activeVideo && !localMode) {
       setWorkspaceView("review");

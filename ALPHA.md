@@ -51,3 +51,17 @@ Hackathon registration, roster, exact submission cutoff, final category, source-
 ## Verification
 
 The alpha pass covers landing/Review navigation, recorded-source replay, finding save/refresh/export, synthetic conversations, private upload/preflight/playback, retained drafts, library recovery and desktop layout. Regression suites cover ownership, CAS, generations, cancellation and budgets. Exact results and remaining limitations are recorded in [alpha QA](docs/ALPHA_QA.md).
+
+### Whole-video review follow-up
+
+The example now opens a prepared six-section review of the entire 70.2-second
+basketball clip, including the verified 62 → 61 score-display revision and
+source replay. Its Codex editorial provenance is distinct from the saved Gemini
+scoreboard test below it. Download clip review keeps the sequence, citations and
+limits together.
+
+For funded, indexed uploads, **Draft a whole-video breakdown** prepares an
+editable request for complete-range sampling up to 5:50. It never auto-sends or
+overwrites an existing draft. Output retains unfinished ranges and sampling
+limits; fresh live whole-video quality remains unverified. The automated first-use
+walkthrough passed, but an actual first-time human study remains open.

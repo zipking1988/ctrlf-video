@@ -16,14 +16,14 @@
     />
     <link rel="stylesheet" href="/static/styles.css?v=839bfa39b580" />
     <link rel="stylesheet" href="/static/workbench.css?v=8fd6bf35c46f" />
-    <link rel="stylesheet" href="/static/fieldnotes.css?v=a9d9c6928c49" />
+    <link rel="stylesheet" href="/static/fieldnotes.css?v=8776affa7618" />
     <script src="/static/demo-conversation.js?v=6ac79101a102" defer></script>
     <script src="/static/investigation-canvas.js?v=07916e301039" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
-    <script src="/static/workbench.js?v=45a1aa512f53" defer></script>
+    <script src="/static/workbench.js?v=8a7f2c2d99e1" defer></script>
     <script src="/static/workspace.js?v=5b314489320d" defer></script>
-    <script src="/static/app.js?v=0fe78f3ad5bd" defer></script>
+    <script src="/static/app.js?v=b843099b5212" defer></script>
   </head>
   <body>
     <a id="skip-link" href="#welcome-title" class="skip-link">Skip to main content</a>
@@ -44,27 +44,27 @@
         <div class="welcome-content">
           <div class="welcome-intro">
             <span class="welcome-kicker">DESKTOP ALPHA · QUESTIONS. VIDEO. EVIDENCE.</span>
-            <h1 id="welcome-title" tabindex="-1">Find the moment.<br />Check the source.</h1>
-            <p>Ask about your video, replay cited moments, and save findings with evidence.</p>
+            <h1 id="welcome-title" tabindex="-1">Understand the sequence.<br />Check the evidence.</h1>
+            <p>See what changes across a recording, inspect the details that matter, and replay the evidence behind each finding.</p>
             <div class="welcome-actions">
-              <a href="#example" class="welcome-primary">Try a real example <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></a>
+              <a href="#example" class="welcome-primary">Explore the clip review <img src="/static/icons/arrow-right.svg" width="20" height="20" alt="" /></a>
               <button id="welcome-upload" class="welcome-secondary" type="button" disabled><img src="/static/icons/folder-open.svg" width="20" height="20" alt="" /> Upload a video</button>
             </div>
-            <p class="welcome-access">Example: saved Gemini result. No sign-in or model call.<br />New analysis of your uploads requires an approved session.</p>
+            <p class="welcome-access">Example: prepared source review + saved Gemini test. No sign-in.<br />New analysis of your uploads requires an approved session.</p>
             <p id="welcome-notice" role="status">Connecting to your workspace…</p>
             <button id="welcome-retry" class="text-button" type="button" hidden>Reload to reconnect</button>
           </div>
           <figure class="welcome-product">
             <a href="#example" aria-label="Open the recorded example in the video workspace">
               <img src="/static/judge/basketball/frames/scoreboard-1-001.jpg" width="1280" height="720" fetchpriority="high" alt="Real basketball source frame with the broadcast scoreboard. Open the example to inspect its saved answer and replay this citation." />
-              <div class="welcome-example-result"><span>REAL GEMINI TEST · SAVED RESULT</span><strong>“What does the scoreboard show?”</strong><p>Milwaukee 51 · Atlanta 56 <time>00:01.001</time></p></div>
+              <div class="welcome-example-result"><span>70-SECOND CLIP · PREPARED SOURCE REVIEW</span><strong>Atlanta’s lead grows.<br />But why does 62 become 61?</strong><p>Six review sections · Compare the source frames <time>00:36 → 00:37</time></p></div>
             </a>
-            <figcaption>Actual source frame · Partial result · Replay and verify it yourself</figcaption>
+            <figcaption>Actual source frame · Review prepared from 71 sampled frames · Not a new Gemini result</figcaption>
           </figure>
         </div>
         <section id="evidence-chain" class="welcome-how-row" aria-labelledby="welcome-proof-title">
-          <h2 id="welcome-proof-title">From a question to something you can check.</h2>
-          <ol><li><span>01</span> Ask about what’s visible</li><li><span>02</span> Replay the cited moment</li><li><span>03</span> Save a finding & export</li></ol>
+          <h2 id="welcome-proof-title">Understand what changed. Keep the evidence.</h2>
+          <ol><li><span>01</span> Review the sequence</li><li><span>02</span> Check a change in the source</li><li><span>03</span> Keep the review & evidence</li></ol>
           <p>Built with Gemini · Deployed on Google Cloud. Sampled frames can miss brief events. Audio transcription is unavailable.</p>
         </section>
       </div>
@@ -568,17 +568,17 @@
       </p>
     </dialog>
     <dialog id="usage-guide" class="workspace-library usage-guide" aria-labelledby="usage-guide-title">
-      <header><div><span class="eyebrow">DESKTOP ALPHA</span><h2 id="usage-guide-title">A question. A moment. A finding.</h2></div><button id="close-usage-guide" class="icon-button" type="button" aria-label="Close quick guide">×</button></header>
-      <p>Use CtrlF Video to investigate what is visible in one recording. Start with the recorded example to try the complete review workflow without an account or a model request.</p>
+      <header><div><span class="eyebrow">DESKTOP ALPHA</span><h2 id="usage-guide-title">Review the sequence. Check the evidence.</h2></div><button id="close-usage-guide" class="icon-button" type="button" aria-label="Close quick guide">×</button></header>
+      <p>Use CtrlF Video to investigate what is visible in one recording. Start with the prepared clip review to explore the sequence and replay evidence without an account or a model request.</p>
       <ol class="guide-steps">
-        <li><strong>Choose your recording</strong><p>Try the real example, explore the preset demo, or upload an authorized video. Upload checks the file and enables playback; it does not start AI analysis.</p></li>
-        <li><strong>Ask a visual question</strong><p>For an approved session, use Menu → Sources → Start analysis first. Ask one concrete question, such as “Where does an error message appear?” Enter sends; Shift+Enter adds a line. If live questions are off, keep a draft or open a saved answer.</p></li>
+        <li><strong>Choose your recording</strong><p>Explore the clip review, try the preset demo, or upload an authorized video. Upload checks the file and enables playback; it does not start AI analysis.</p></li>
+        <li><strong>Ask a visual question</strong><p>For an approved session, use Menu → Sources → Start analysis first. Choose Draft a whole-video breakdown for chronological review of a clip up to 5:50, or ask one concrete question, such as “Where does an error message appear?” The starter fills an empty draft; it does not send it. Enter sends; Shift+Enter adds a line. If live questions are off, keep a draft or open a saved answer.</p></li>
         <li><strong>Replay the evidence</strong><p>Click a timestamp to seek the source. Timeline shows the selected answer’s cited frames. Replay the surrounding footage and check unresolved claims in Still to verify.</p></li>
-        <li><strong>Write and export a finding</strong><p>Choose Details & save → Write a finding. Separate observed facts from interpretation and open questions. Save, then use Menu → Export report for Markdown, JSON or HTML. The recorded example has its own Export report button below the finding.</p></li>
+        <li><strong>Write and export a finding</strong><p>Choose Details & save → Write a finding. Separate observed facts from interpretation and open questions. Save, then use Menu → Export report for Markdown, JSON or HTML. The prepared clip review has a Download clip review button. Its separate Original Gemini test has its own finding editor and Export report button.</p></li>
       </ol>
-      <details><summary>What this alpha can and cannot tell you</summary><p>Gemini reviews sampled images, so brief events and small text can be missed. Timeline is a citation list, not a complete video breakdown. Audio is not transcribed. The basketball example is a saved real partial result; the package demo uses synthetic preset answers. Neither establishes quality on UX studies.</p></details>
+      <details><summary>What this alpha can and cannot tell you</summary><p>Gemini reviews sampled images, so brief events and small text can be missed. Whole-video review samples the complete time range in up to three windows; Review coverage & limits lists unfinished ranges. Sampling is not exhaustive event detection. Audio is not transcribed. The basketball example contains a prepared Codex source review and a separate saved Gemini test; the package demo uses synthetic preset answers. Neither establishes quality on UX studies.</p></details>
       <details><summary>Privacy, saving and recovery</summary><p>Uploaded recordings stay on the server. Approved analysis sends sampled JPEGs and text to Google Gemini. Private access belongs to this browser’s session cookie; there is no account or cross-device recovery. Retention defaults to 24 hours; the upload screen shows the configured period. Delete recordings through Sources.</p><p>Workspace edits save automatically. If saving fails or another window changes the investigation, keep this page open and use the save indicator to recover. Export a copy before expiry or clearing cookies. Private video links still require your session; HTML can embed evidence images for a portable report. Example findings save only in this browser.</p></details>
-      <footer><button id="guide-example" class="outline-button" type="button">Try the recorded example</button><button id="guide-demo" class="outline-button" type="button">Explore preset demo</button></footer>
+      <footer><button id="guide-example" class="outline-button" type="button">Explore the clip review</button><button id="guide-demo" class="outline-button" type="button">Explore preset demo</button></footer>
     </dialog>
     <dialog id="upload-dialog" class="workspace-library upload-dialog" aria-labelledby="upload-title" aria-describedby="upload-access-summary">
       <header><div><span class="eyebrow">YOUR RECORDING</span><h2 id="upload-title">Before you upload</h2></div><button id="upload-cancel" class="icon-button" type="button" aria-label="Cancel upload">×</button></header>

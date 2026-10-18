@@ -30,5 +30,5 @@ test('legacy judge entry redirects within the same origin to the unified product
  assert.match(page,/href="\/#example"/);assert.match(redirect,/location\.replace\("\/#example"\)/);
  assert.ok(!page.includes('finding-form'));
  const home=fs.readFileSync('src/ctrlf_video/static/index.html','utf8');
- assert.match(home,/Try a real example/);assert.ok(!home.includes('href="/static/judge/index.html"'));
+ assert.match(home,/Explore the clip review/);assert.ok(!home.includes('href="/static/judge/index.html"'));
 });

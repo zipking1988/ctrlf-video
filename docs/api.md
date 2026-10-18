@@ -33,6 +33,8 @@ Investigation snapshots accept `taskBrief` and `studyType` with the same limits.
 
 Demo snapshot saves accept current canonical answers, or an exact answer/id already retained by the same owned investigation. This allows existing desks to survive demo-catalog translation without accepting arbitrary demo evidence into new investigations. Source validation, revision checks and ownership still apply.
 
+Whole-video scope is an explicit question prefix, not a new endpoint or request field. `Break down the whole video.` (also `Break down the entire video.` / `拆解整段视频。`) chooses complete-range sampling for clips up to 350 seconds. Normal readiness, ownership, idempotency and funded-session gates still apply. The final schema remains 0.1; coverage counts, unreviewed ranges and sampling limits appear in `unresolved`. The visual-vector channel is empty for this path because it does not use vector retrieval. See [architecture](../ARCHITECTURE.md).
+
 ## Answer contract
 
 Exports: [Answer](schema/answer-0.1.json), [QueryControl](schema/query-control-0.1.json), [synthetic fixtures](schema/fixtures-0.1.json). Run `make schema` after model changes and `make check` for drift.

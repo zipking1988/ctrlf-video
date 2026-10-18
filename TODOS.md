@@ -11,6 +11,14 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [ ] Fund any new model trial explicitly and agree client data/retention expectations; anonymous live analysis remains unavailable.
 - [ ] Resolve the submission and UX-validation prerequisites below. See [ALPHA.md](ALPHA.md).
 
+## Whole-video product value
+
+- [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
+- [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
+- [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
+- [ ] Validate fresh five-minute analysis against a fully annotated authorized source under a separately active finite model grant. No new model grant was installed by this update.
+- [ ] Run an actual first-time human study. Automated browser walkthroughs establish flow behavior, not human comprehension or researcher value.
+
 ## First-use-case validation
 
 - [x] Begin the authorized [UX recording spec](SPEC.md); keep the sports video as a technical development sample only.

@@ -27,3 +27,13 @@ test("coexisting private and recorded reviews have distinct timeline targets", (
     assert.equal(new Set(ids).size,ids.length);
   }
 });
+
+test("whole-video results expose coverage and chronological citations by default",()=>{
+ const sample=require('../src/ctrlf_video/static/judge/basketball/results.json');
+ const state={records:[{id:'q',query:{...sample.query,question:'Break down the whole video.'}}],selectedId:'q',sourceInfo:sample.source,epoch:0};
+ const html=renderToStaticMarkup(React.createElement(SimpleReview,{state,playerId:'player',metaTarget:null,ui:()=>({}),icon:()=>null}));
+ assert.match(html,/Whole-video breakdown/);assert.match(html,/Review coverage &amp; limits/);
+ assert.match(html,/<details class="simple-result-warning" open=""/);
+ assert.ok(!/<section id="player-cited-timeline"[^>]* hidden/.test(html));
+ assert.match(html,/sampling does not prove every event was detected/);
+});

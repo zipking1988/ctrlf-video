@@ -1,17 +1,18 @@
 import React, {useEffect, useRef, useState} from "react";
 import {createPortal} from "react-dom";
 import {citedMoments, sourceClock} from "./review-timeline.mjs";
-import {questionLabel} from "./question-shortcuts.mjs";
+import {questionLabel, isBreakdown} from "./question-shortcuts.mjs";
 
 export default function SimpleReview({state, ui, icon, metaTarget, playerId = "player", onSaveFinding, newQuestionLabel = "New question"}) {
   const selected = state.records.find(record => record.id === state.selectedId) || state.records.at(-1);
   const query = selected?.query;
+  const breakdown = !!query && isBreakdown(query.question);
   const moments = citedMoments(query, state.sourceInfo?.metadata?.duration);
   const [timelineFor, setTimelineFor] = useState(null);
   const timeline = useRef(null);
   const timelineTrigger = useRef(null);
   const closeTimeline = () => {
-    setTimelineFor(null);
+    setTimelineFor(`closed:${key}`);
     timelineTrigger.current?.focus();
   };
   const timelineKeyDown = event => {
@@ -21,10 +22,10 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
   };
   const key = `${state.sourceInfo?.id}:${state.epoch}:${selected?.id || "empty"}`;
   const timelineId = `${playerId}-cited-timeline`;
-  const open = timelineFor === key;
+  const open = timelineFor === key || (breakdown && timelineFor !== `closed:${key}`);
   useEffect(() => setTimelineFor(null), [state.sourceInfo?.id, state.epoch]);
   useEffect(() => {
-    if (open && document.querySelector(".agent-shell")?.classList.contains("review-first"))
+    if (open && timelineFor === key && document.querySelector(".agent-shell")?.classList.contains("review-first"))
       timeline.current?.scrollIntoView({block:"nearest"});
   }, [open]);
   const replay = frame => {
@@ -54,7 +55,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
   return <>
     {target && createPortal(<div className="simple-source-meta">
       <span>{state.sourceInfo?.name || "Package positions · Synthetic demo"}</span>
-      <button type="button" className="simple-timeline-toggle" ref={timelineTrigger} aria-expanded={open} aria-controls={timelineId} onClick={() => setTimelineFor(open ? null : key)}>
+      <button type="button" className="simple-timeline-toggle" ref={timelineTrigger} aria-expanded={open} aria-controls={timelineId} onClick={() => setTimelineFor(open ? `closed:${key}` : key)}>
         {icon("list")}Timeline<span className="simple-timeline-count">{moments.length}</span>
       </button>
     </div>, target)}
@@ -62,15 +63,15 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
       {query ? <>
         <p className="simple-user-message">{questionLabel(query.question)}</p>
         <article className="simple-answer" aria-label="Answer and source citations">
-          <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : "Answer"}</span></div>
+          <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : breakdown ? "Whole-video breakdown" : "Answer"}</span></div>
           <p className="simple-answer-text">{query.response.answer}</p>
-          {!!query.response.unresolved.length && <details className="simple-result-warning">
-            <summary>Still to verify · {query.response.unresolved.length} {query.response.unresolved.length === 1 ? "open point" : "open points"}</summary>
+          {!!query.response.unresolved.length && <details className="simple-result-warning" open={breakdown || undefined}>
+            <summary>{breakdown ? "Review coverage & limits" : "Still to verify"} · {query.response.unresolved.length} {query.response.unresolved.length === 1 ? "open point" : "open points"}</summary>
             {query.response.unresolved.map(text => <p key={text}>{text}</p>)}
           </details>}
           {query.response.status === "no_result" && <p className="simple-result-scope">No matching evidence was returned. This does not prove the event never occurred; replay the source or ask about a more specific visible detail.</p>}
           {query.response.status === "error" && <div className="simple-result-recovery">
-            {query.response.errors.map((error,index) => <div key={index}><p>{error.message}</p><p>{error.suggested_action}</p></div>)}
+            {query.response.errors.map((error,index) => <div key={index}>{error.code === "whole_video_review_limit" ? <p>Whole-video review supports clips up to 5:50. Choose a shorter recording, or ask a question about a specific visible moment.</p> : <><p>{error.message}</p><p>{error.suggested_action}</p></>}</div>)}
             <p>This question did not complete. It cannot anchor a follow-up. Your earlier answers remain available in Details & save.</p>
             <button type="button" className="outline-button" onClick={() => ui()?.newQuestion()}>Start a new question</button>
           </div>}
@@ -86,7 +87,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
                 <time>{sourceClock(frame.t)}</time><img src={frame.uri} alt={frame.caption || "Cited source frame"}/><span>{frame.description}</span>
               </button>
             </li>)}</ol> : <p>No cited moments for this question. Open a saved answer or start a new question.</p>}
-            <p className="simple-timeline-scope">{query.mode === "real" ? "Other moments were not exhaustively reviewed. This lists citations, not a full-video breakdown." : "Synthetic demo · preset moments, no model calls."}</p>
+            <p className="simple-timeline-scope">{query.mode === "real" ? (breakdown ? "These are cited observations from sampled windows. Check Review coverage & limits for unfinished ranges; sampling does not prove every event was detected." : "Other moments were not exhaustively reviewed. This lists citations, not a full-video breakdown.") : "Synthetic demo · preset moments, no model calls."}</p>
           </section>
 
         </article>

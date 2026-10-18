@@ -622,3 +622,98 @@ async def test_task_brief_reaches_gemini_and_is_bound_to_idempotent_request(tmp_
         ).status_code == 422
     finally:
         await client.aclose()
+
+
+@pytest.mark.parametrize("duration", [0.2, 120, 120.1, 300, 350])
+def test_whole_video_windows_cover_tail_without_raising_sampling_limits(duration):
+    from ctrlf_video.agent import whole_video_windows
+
+    windows = whole_video_windows(duration)
+    assert windows[0]["start"] == 0 and windows[-1]["end"] == duration
+    assert len(windows) <= 3
+    assert all(0 < w["end"] - w["start"] <= 120 for w in windows)
+    assert all(b["start"] == a["end"] - 5 for a, b in zip(windows, windows[1:], strict=False))
+
+
+def test_whole_video_scope_is_explicit_and_rejects_long_sources():
+    from ctrlf_video.agent import whole_video_request, whole_video_windows
+
+    assert whole_video_request("Break down the whole video. Explain the changes.")
+    assert whole_video_request("拆解整段视频。按顺序给出证据。")
+    assert not whole_video_request("Where does the caption say Break down the whole video.?")
+    with pytest.raises(AgentError, match="whole_video_review_limit"):
+        whole_video_windows(350.01)
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("failure", [None, "window", "too_long", "revoked"])
+async def test_whole_video_review_has_full_coverage_or_explicit_gaps_and_no_search(
+    tmp_path, monkeypatch, failure
+):
+    import ctrlf_video.agent as module
+
+    calls = []
+    app, client, video, desk = await setup_real(tmp_path, monkeypatch, calls)
+    ws, agent = app.state.workspace, app.state.agent
+    owner = (await client.get("/api/session")).json()["owner_id"]
+    row = ws.owned("videos", video, owner)
+    metadata = json.loads(row["metadata"])
+    metadata["duration"] = 351 if failure == "too_long" else 300
+    with ws.db() as c:
+        c.execute("UPDATE videos SET metadata=? WHERE id=?", (json.dumps(metadata), video))
+    # Test a five-minute *mock* media manifest, not live evidence/quality.
+    seed = next((tmp_path / video / "frames").glob("*.jpg")).read_bytes()
+    windows = []
+
+    def decode(directory, video_id, meta, window, count, prefix):
+        windows.append((window["start"], window["end"], count))
+        if failure == "window" and len(windows) == 2:
+            raise module.MediaError("mock_decode_failed")
+        name = prefix + "_001.jpg"
+        (directory / "frames" / name).write_bytes(seed)
+        return [
+            {
+                "frame_id": video_id + "_" + prefix + "_001",
+                "file": name,
+                "t": window["start"],
+                "uri": f"/media/{video_id}/frames/{name}",
+            }
+        ]
+
+    monkeypatch.setattr(module, "frames", decode)
+    if failure == "revoked":
+        agent.ledger.restrict(owner, "test_v1")
+    before = len(calls)
+    body = {
+        "investigation_id": desk["id"],
+        "request_id": "whole_video_test",
+        "generation": 0,
+        "question": "Break down the whole video. Explain changes.",
+    }
+    try:
+        result = await client.post("/api/chat", json=body)
+        if failure in {"too_long", "revoked"}:
+            assert result.status_code != 200
+            assert len(calls) == before and not windows
+            return
+        answer = Answer.model_validate(result.json()["response"])
+        assert answer.status == "partial", result.text
+        assert windows == (
+            [(0, 120, 120), (115, 235, 120)]
+            if failure
+            else [(0, 120, 120), (115, 235, 120), (230, 300, 70)]
+        )
+        assert answer.trace.visible.segments_reviewed == (1 if failure else 3)
+        assert answer.trace.visible.channels == []
+        assert any("1 FPS" in warning for warning in answer.unresolved)
+        assert any("Unreviewed ranges" in warning for warning in answer.unresolved) == bool(failure)
+        for url, payload in calls[before:]:
+            assert not url.endswith(":batchEmbedContents")
+            text = payload["contents"][0]["parts"][0]["text"]
+            prompt = json.loads(text)
+            assert "documents" not in prompt and "candidates" not in prompt
+        after = len(calls)
+        assert (await client.post("/api/chat", json=body)).json() == result.json()
+        assert len(calls) == after
+    finally:
+        await client.aclose()

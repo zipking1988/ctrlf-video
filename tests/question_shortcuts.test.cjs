@@ -16,3 +16,9 @@ test("shortcut labels use the actual question rather than a fabricated answer", 
   const state={sourceInfo:{id:"source-A"},records:[1,2,3,4].map(i=>record(String(i),{question:`Question ${i}?`}))};
   assert.deepEqual(savedAnswersForSource(state).map(r=>r.id),["4","3","2"]);
 });
+
+test('breakdown starter is explicit, editable text rather than an automatic model call',async()=>{
+ const {breakdownPrompt,isBreakdown}=await import('../frontend/question-shortcuts.mjs');
+ assert.ok(isBreakdown(breakdownPrompt));assert.ok(isBreakdown('拆解整段视频。按顺序解释。'));
+ assert.ok(!isBreakdown('Where does the caption say Break down the whole video.?'));
+});
