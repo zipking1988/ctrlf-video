@@ -41,6 +41,14 @@ Exports: [Answer](schema/answer-0.1.json), [QueryControl](schema/query-control-0
 
 Final answers keep schema `0.1`, absolute video-second timebase, answer, events, unresolved, followups, trace and errors. Event/frame video ownership and times are validated server-side; human-readable times must equal seconds, evidence must lie in the event interval, and support score/level are mutually exclusive. `trace.debug` is null. JSON Schema alone does not establish factual evidence quality.
 
+The local October 18 timing fix derives multi-frame observation bounds from the
+earliest/latest cited frames. A cited span is not proof of continuous action.
+Single-instant observations retain a nonempty legacy review interval because
+schema 0.1 forbids zero-length events; render their actual `evidence.t` as a point,
+not an inferred duration. Older stored results may still carry full-window bounds.
+The local timeline uses evidence timestamps for both versions. No output-model
+change, data rewrite or additional deployment is implied.
+
 | Status | Requirement |
 | --- | --- |
 | `ok` | Valid supported events; no unresolved/errors |

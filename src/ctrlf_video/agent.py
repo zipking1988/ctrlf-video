@@ -492,13 +492,20 @@ def observed_events(video, observations, all_frames):
             }
             for f in dict.fromkeys(item["frame_ids"])
         ]
+        first = min(frame["t"] for frame in evidence)
+        last = max(frame["t"] for frame in evidence)
+        # These bounds bracket the cited samples, not the complete review
+        # window or proof that the observation holds continuously between them.
+        # Schema 0.1 requires end > start: one-point observations retain their
+        # legacy review scope, while clients use evidence.t to show the point.
+        start, end = (first, last) if last > first else (item["start"], item["end"])
         events.append(
             {
                 "video_id": video,
-                "start": item["start"],
-                "end": item["end"],
-                "start_hms": hms(item["start"]),
-                "end_hms": hms(item["end"]),
+                "start": start,
+                "end": end,
+                "start_hms": hms(start),
+                "end_hms": hms(end),
                 "action": statement[:120],
                 "summary": statement,
                 "support_level": "medium",

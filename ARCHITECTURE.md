@@ -44,6 +44,16 @@ Planning requests use Gemini's structured output with a required `inspect` array
 
 Synthesis receives the validated source frame IDs with their decoded `t` and `t_hms`, alongside each observation. Review-window `start`/`end` remain separate and are not frame timestamps. This preserves the precise source time across the visual-review-to-summary boundary; it does not establish model semantic correctness.
 
+Local timing correction after the October 18 live audit: a published observation
+with multiple distinct cited times uses their minimum/maximum for event bounds,
+rather than the entire review window. These bounds bracket evidence, not verified
+continuous action. Schema 0.1 requires `end > start`, so a single-instant observation
+retains its legacy review scope in those fields. Clients place it at `evidence.t`
+and explicitly state that no event duration is established. Existing stored answers
+are not rewritten. The source timeline always uses cited frame times, including
+older results whose event bounds span the search window. This correction remains
+local; deployed `0ffd59e` has not changed.
+
 Follow-up context contains untrusted prior model claims with validated source
 references; reference validation does not verify their factual truth. Visual
 review must re-check contradictions against current frames. Visible text/counter

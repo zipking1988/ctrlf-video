@@ -635,6 +635,34 @@ def test_whole_video_windows_cover_tail_without_raising_sampling_limits(duration
     assert all(b["start"] == a["end"] - 5 for a, b in zip(windows, windows[1:], strict=False))
 
 
+def test_observation_bounds_use_cited_frames_instead_of_entire_review_window():
+    from ctrlf_video.agent import observed_events
+
+    frames = {
+        "before": {"t": 36.036, "uri": "/media/v/frames/before.jpg"},
+        "after": {"t": 37.037, "uri": "/media/v/frames/after.jpg"},
+    }
+    observation = {
+        "frame_ids": ["after", "before", "after"],
+        "statement": "A visible counter changes between these two frames.",
+        "start": 0,
+        "end": 70.203467,
+    }
+    event = observed_events("v", [observation], frames)[0]
+    assert (event["start"], event["end"]) == (36.036, 37.037)
+    assert event["start_hms"] == "00:00:36.036"
+    assert event["end_hms"] == "00:00:37.037"
+    assert len(event["evidence"]) == 2
+
+    # Schema 0.1 requires a nonempty event interval. A single citation retains
+    # the review scope in that legacy field; the UI must display its actual
+    # evidence time as a point, never invent an event duration.
+    observation["frame_ids"] = ["after"]
+    single = observed_events("v", [observation], frames)[0]
+    assert (single["start"], single["end"]) == (0, 70.203467)
+    assert single["evidence"][0]["t"] == 37.037
+
+
 def test_whole_video_scope_is_explicit_and_rejects_long_sources():
     from ctrlf_video.agent import whole_video_request, whole_video_windows
 
