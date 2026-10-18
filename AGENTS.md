@@ -1,5 +1,11 @@
 # Working on CtrlF Video
 
+The user subsequently explicitly authorized exactly one further deployment, 31
+cumulative, and the private-main push of reviewed `9ad193d`. It deployed through
+CI 39138311106 after 178 frontend and 271 Linux backend tests passed. All 30 prior
+release records, grants, historical reservations and October 19 cutoffs remain
+unchanged. All 31 attempts are consumed; no attempt 32 is authorized.
+
 Later October 18, the user explicitly authorized one more reviewed deployment,
 30 cumulative, and pushing the latest reviewed fixes to private main. Preserve
 all 29 prior release records; raise only the release limit from 29 to 30 and pin
@@ -35,8 +41,8 @@ reservations, ownership, cutoffs and release counts remain binding. ai& credits 
 separate from Google Cloud credits and do not increase spending authorization.
 Do not activate uncalibrated runtimes or treat mock tests as live acceptance.
 
-Current October 18 handoff: reviewed private-main release `4ccee61` deployed
-successfully as attempt 30/30; no releases remain authorized. The supplied backend key and fixed
+Current October 19 handoff: reviewed private-main release `9ad193d` deployed
+successfully as attempt 31/31; no releases remain authorized. The supplied backend key and fixed
 Gemini-vision / ai& Gemma-text pipeline are live. The actual 70.203-second source
 completed indexing and one breakdown plus three contextual follow-ups, but failed
 accuracy acceptance. Preserve its incorrect answers and separately labeled human
@@ -44,15 +50,21 @@ review; do not present them as a client-ready or five-minute pass. The sole v4
 grant had JPY 751 reserved, 18/60 attempts and 2/8 primary calls used at release 30.
 The user's subsequent "who throw the final ball ?" question completed five calls,
 reserving JPY 109, but returned an earlier 7.007s event without establishing the
-final throw. Current v4 usage is JPY 860, 23/60 attempts and 2/8 primary calls;
-remaining JPY 1,140 / 37 attempts / six primary calls do not imply another grant
-or release. Its generic waiting message concealed at least 24.762 seconds after
+final throw. The release-31 fresh retest used the same question and preceding breakdown,
+completed one visual call (JPY 75), and returned only an early 6.006–9.009s action
+despite 71 sampled frames. Its finality warning works, but it misses a later shot
+visible around 56.056s and still fails semantic acceptance. Current v4 usage is
+JPY 935, 24/60 attempts and 2/8 primary calls; remaining JPY 1,065 / 36 attempts /
+six primary calls do not imply another grant or release. The original generic
+waiting message concealed at least 24.762 seconds after
 embedding completion, including 20.957 seconds for extraction/vision. This is a
 known temporal-grounding/progress-communication failure, not missing configuration.
 The real five-minute file remains missing. A consistent private backup restored
 locally before release 30 with 363 file hashes. Release 30's fresh backup restored
 locally with all 361 file hashes and both SQLite integrity checks passing. All original
-cutoffs and final cleanup remain required; see [live outcomes](docs/LIVE_GEMINI_TEST.md).
+cutoffs and final cleanup remain required. Release 31 backup restored locally
+with 438 file hashes and two SQLite checks; deployment added zero model calls.
+See [live outcomes](docs/LIVE_GEMINI_TEST.md).
 
 CtrlF Video ("Ctrl+F for video") is a desktop video investigation agent for AI Builder Cup 2026. Its workspace is a spatial canvas of questions, evidence frames and conclusions with multi-turn context and a source player. Mobile is outside this edition's scope.
 

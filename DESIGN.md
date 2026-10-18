@@ -67,12 +67,13 @@ The user rejected scoreboard-only value framing. The landing now leads with sequ
 
 Private recordings expose **Draft a whole-video breakdown** even after earlier answers exist. It preserves existing text and never submits automatically. Whole-video results open their evidence timeline and coverage/limits by default. Existing one-video-above-chat layout and desktop scope remain. The older descriptions below document the preceding design.
 
-After the live final-ball report, a local candidate replaces the static waiting
+Release 31 replaces the static waiting
 notice with elapsed feedback every ten seconds. It reports waiting for a result,
 without inventing a model stage or percentage. Completion, failure or navigation
 ends those updates; newer draft text is retained. Choosing Draft a whole-video
 breakdown during an active request now explains the wait instead of silently
-doing nothing. This candidate is not live; all 30 authorized releases are used.
+doing nothing. These changes deployed in `9ad193d`; all 31 authorized releases
+are used. The fresh model retest still failed visual accuracy.
 
 ## Product experience
 

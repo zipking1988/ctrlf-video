@@ -475,3 +475,44 @@ Two live embedding probes, real ingestion of an uploaded 18-second synthetic cli
 CI [38884904791](https://github.com/zipking1988/ctrlf-video/actions/runs/38884904791) passed 215 Linux backend tests and 100 frontend tests, then deployed both components from commit `e67468f`. Offline deployment health checks explicitly preserve the operator-selected mode and make no model requests. Model expiry is October 19 at 22:00 JST, ahead of the existing maintenance/backup/removal schedule. No hosting extension, extra service, larger instance or increased total budget was introduced.
 
 A subsequent managed drill under real mode verified backup/candidate health/rollback while preserving every live budget and attempt row and the private runtime. No paid call was added. The real-mode backup was downloaded privately and independently restored/verified locally, including runtime configuration and both SQLite databases. A browser refresh restored the real source-linked finding and playable private source.
+
+## Release 31 verification and live retest (October 19 JST)
+
+The user explicitly authorized exactly one more deployment, 31 total, including
+pushing reviewed `9ad193d4b8c48971ac6c05bdc82a05c7d7915b47` to private main.
+[CI 39138311106](https://github.com/zipking1988/ctrlf-video/actions/runs/39138311106)
+passed 178 frontend and 271 Linux backend tests and deployed both components.
+The backend is committed at 31/31; all 30 preceding release records are unchanged.
+Frontend revision `ctrlfvideo-frontend-ci-9ad193d4-39138311106` serves 100% traffic.
+Public HTML, bundle, workspace/app modules and stylesheet match the approved
+revision byte for byte. Public health is real mode; maintenance has cleared.
+Before/after audits confirm identical grants, all attempt rows, source/generation,
+five original results, runtime/models and cutoffs. Deployment sent zero model calls.
+
+The fresh consistent private backup was downloaded and restored locally: all 438
+file hashes and both SQLite integrity checks passed. SHA-256:
+`b2c6dc57f5273e7b19f1d99aed1d1c9def4c6362be22c52e1192575c52b2aaef`.
+This does not replace the scheduled final backup/cleanup. Browser console and
+navigation-performance telemetry were unavailable; no performance pass is claimed.
+
+One fresh browser retest asked the original "who throw the final ball ?" with the
+same preceding breakdown as context, request `ad639fbe471e4b3d8901b8457f9e85e2`.
+It completed one visual call, reserving JPY 75, with no retrieval/planning/synthesis,
+repair, indexing or automatic retry. The result was visible within 26.961 seconds
+of the observed Send click; this is a UI-observed upper bound, not supplier latency.
+Its 71 decoded samples covered one window across the 70.203-second source, but
+vision returned only a green-jersey action at 6.006–9.009 seconds. The response
+correctly warns that sampled order does not establish actual finality. Source
+inspection shows a later white-jersey shot around 56.056 seconds; the model omitted
+it and cites a 9.009-second close-up as part of the early action. **Live accuracy
+still fails.** The old incorrect answer remains intact. Waiting elapsed updates
+have offline regressions; a timed live waiting screenshot was not captured.
+
+V4 now reserves JPY 935 / 2,000, 24/60 calls and 2/8 primary calls. Remaining
+reservation capacity is JPY 1,065, 36 calls and six primary calls. Historical model
+reservations remain JPY 1,162, so cumulative model reservations are JPY 2,097.
+These are conservative reservations, not reconciled invoices or free credits.
+The JPY 5,000 aggregate and every original cutoff are unchanged; all 31 release
+attempts are used. No attempt 32, new grant, model switch or hosting extension ran.
+The actual five-minute input remains missing. Private verification artifacts are
+under `.ctrlf-video-eval/aiand-20261018/release31/` and remain outside Git.

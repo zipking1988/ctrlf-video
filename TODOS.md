@@ -1,6 +1,6 @@
 # CtrlF Video — Remaining Work
 
-Updated: 2026-10-18. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
+Updated: 2026-10-19. This is the current acceptance backlog, consolidated from obsolete planning/review documents. Checked local behavior and mock transports do not establish live acceptance.
 
 ## October 18 alpha candidate
 
@@ -22,7 +22,8 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [ ] Correct observed score readings/timing, contradictory findings and inadequate game-sequence analysis. The live trial failed accuracy acceptance. No deployment attempts remain authorized.
 - [x] Locally trace the correct archived image/time pairing, fix multi-frame event bounds that incorrectly used the full review window, and render actual answers as source-linked timelines. Single citations remain points; existing model claims and stored records are preserved. Visual reading/prose errors still require separate live quality work.
 - [x] Deploy the separately authorized reviewed timeline/readiness fixes as attempt 30/30 (`4ccee61`, CI 39135948648); verify exact serving assets/revision, source seeking, unchanged funding/results and a restored local backup (361 files, two SQLite checks). No model calls or cutoff changes were added.
-- [x] Diagnose the subsequent final-ball question: five completed calls, JPY 109 reserved, at least 24.762s after embedding; an earlier match was accepted without finality. Build an undeployed chronological-ordering/uncertainty safeguard and elapsed waiting feedback, with mock regressions and zero extra paid requests. Fresh live quality remains unverified.
+- [x] Diagnose the subsequent final-ball question: five completed calls, JPY 109 reserved, at least 24.762s after embedding; an earlier match was accepted without finality. Build a chronological-ordering/uncertainty safeguard and elapsed waiting feedback, with mock regressions and zero extra paid requests during preparation. The subsequent live retest is recorded below.
+- [x] Deploy reviewed `9ad193d` as separately authorized attempt 31/31; verify exact serving assets, unchanged source/five answers/ledgers, and a locally restored 438-file backup. One fresh real final-ball retest used one visual call (JPY 75), but still missed later actions; accuracy acceptance fails.
 - [x] Preserve incorrect answers alongside a labeled human finding; verify four-question report preview, refresh and a consistent private local backup (363 file hashes, two SQLite checks). Browser JSON export initiated; its download file remains unlocated.
 
 ## Whole-video product value
@@ -30,11 +31,11 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.
 - [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Deployed in `1a980ae`.
 - [x] Install the October 18 JPY 2,000 / 60-call / eight-index-call grant for the explicitly confirmed current browser owner, preserving historical records; deploy reviewed `1a980ae` as attempt 27 of 29.
-- [ ] Verify an actual five-minute video and at least three genuine contextual follow-ups. The concrete real input file is still missing. The shorter real trial reserves JPY 751, 18/60 calls and 2/8 primary calls; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
+- [ ] Verify an actual five-minute video and at least three genuine contextual follow-ups. The concrete real input file is still missing. The shorter real trial now reserves JPY 935, 24/60 calls and 2/8 primary calls; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
-- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the user-submitted final-ball question, remaining capacity is JPY 1,140, 37 attempts and six primary calls; no new grant or deadline is implied.
+- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the release-31 retest, remaining capacity is JPY 1,065, 36 attempts and six primary calls; no new grant or deadline is implied.
 - [ ] Run an actual first-time human study. Automated browser walkthroughs establish flow behavior, not human comprehension or researcher value.
 
 ## First-use-case validation
