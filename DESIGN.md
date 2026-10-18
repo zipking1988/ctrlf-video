@@ -6,6 +6,18 @@ October 18 alpha hardening retains the selected layout. Quick guide is available
 
 ## October 18 whole-video review update
 
+Local follow-up after the user's finding/chat critique: the example opens with
+three source-linked findings, one-click saving/export, and an always available
+question entry. The full six-section breakdown is a disclosure below them.
+Visitors can select a finding as context, search the prepared notes, and follow
+its evidence or the next reviewed section. This is explicitly local evidence
+lookup, not intelligent Gemini conversation. Unknown identities, speech and
+out-of-range times are not answered. Notes, draft and question context persist
+in this browser under a source-specific key; the original saved Gemini result
+and private investigations remain separate. The old finding editor now starts
+with the reviewed example when empty, preserving any existing visitor draft.
+This change is a local candidate; hosted revision `9d2dad0` remains unchanged.
+
 The user rejected scoreboard-only value framing. The landing now leads with sequence review and an actual 62 → 61 score-display revision. The example begins with a prepared Codex source review: six chronological sections across the 70.2-second excerpt, side-by-side source frames, clickable absolute timestamps, explicit sampling/attribution and a Markdown download. The original Gemini result and browser-local finding editor remain in a separately labeled disclosure. This does not claim that the prepared review was produced by the application's model pipeline.
 
 Private recordings expose **Draft a whole-video breakdown** even after earlier answers exist. It preserves existing text and never submits automatically. Whole-video results open their evidence timeline and coverage/limits by default. Existing one-video-above-chat layout and desktop scope remain. The older descriptions below document the preceding design.

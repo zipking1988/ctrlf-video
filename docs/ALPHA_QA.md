@@ -99,3 +99,26 @@ validation and visual inspection. The captioned UI demonstration is 120.62 secon
 at 1280×720, with local synthetic narration and no paid media generation. Both
 remain private local deliverables under `.ctrlf-video-eval/alpha-2026-10-18/`.
 Neither artifact claims fresh Gemini whole-video quality or a human usability study.
+
+## Local finding-first follow-up
+
+The user identified an empty finding form and no useful question entry in the
+recorded example. The local candidate now begins with three evidence-linked
+findings, direct save/export, a contextual question box, and a collapsed full
+review. Question results are verbatim prepared excerpts, visibly labeled as
+local lookup with live Gemini off. They do not establish intelligent free-form
+model answering. The original finding editor preloads the reviewed finding only
+when its draft is empty, and has explicit accessible textarea labels.
+
+167 frontend tests and the generated-asset build passed. Focused regressions cover
+exact source-time ranges, adjacent-section context, unknown identity/audio,
+out-of-range times, stale/tampered storage and report provenance. Browser checks
+verified contextual English/Chinese questions, exact source seeking, saved-note
+export, draft preservation, refresh restoration and the prefilled legacy editor.
+One automation run stopped on an overly exact textarea label lookup after the
+prefill; explicit labels corrected that issue and the editor was rechecked in
+the in-app browser. This is not a human usability study.
+
+No backend/model dispatch, funding change or deployment occurred. The production
+revision remains `9d2dad0`, and the 26/26 release allowance remains consumed.
+True live conversation remains an unmet acceptance requirement.

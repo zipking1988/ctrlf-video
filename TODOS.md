@@ -15,6 +15,8 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 
 ## Whole-video product value
 
+- [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation and has not been deployed.
+- [ ] Enable and verify genuine Gemini follow-up questions with an explicitly funded owner/session and a newly reviewed deployment attempt. Existing grants are revoked and release allowance is consumed at 26/26.
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.

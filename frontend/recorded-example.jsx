@@ -82,6 +82,10 @@ export default function RecordedExample({icon}) {
     if(video.readyState>=1)apply();else video.addEventListener("loadedmetadata",apply,{once:true});
     setStatus(`Source selected at ${reports().time(time)}. Play to check the context.`);
   };
+  const editFinding = () => {
+    if(!Object.values(draft).some(value=>value.trim())) {setDraft({...sample.reviewed_finding});setStatus("Prepared reviewed finding copied into your draft. Check and edit before saving.");}
+    setEditing(true);
+  };
   const openReport = () => {
     if(!saved || dirty)return;
     returnFocus.current=document.activeElement;
@@ -123,16 +127,16 @@ export default function RecordedExample({icon}) {
         <ClipReview seek={seek} download={download}/>
         {status && <p className="example-status" role="status">{status}</p>}
         <details className="example-original-result"><summary>Original Gemini test · one scoreboard question</summary><p>This separate saved test verifies one visible fact. It is not the source of the prepared clip review above.</p>
-        <SimpleReview state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={null} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={()=>setEditing(true)}/>
-        <div className="example-next"><span>Saved real Gemini result · No new analysis</span><button className="outline-button" onClick={()=>setEditing(!editing)}>{editing ? "Hide finding" : "Write a finding"}{icon("stack")}</button></div>
+        <SimpleReview state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={null} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={editFinding}/>
+        <div className="example-next"><span>Saved real Gemini result · No new analysis</span><button className="outline-button" onClick={()=>editing ? setEditing(false) : editFinding()}>{editing ? "Hide finding" : "Write a finding"}{icon("stack")}</button></div>
         {editing && <section ref={editor} className="example-finding" aria-label="Write a source-linked finding">
           <header><div><h2>Your finding</h2><p>Write what you checked. The source citation stays attached.</p></div><button className="text-button" onClick={()=>{setDraft({...sample.reviewed_finding});setStatus("Existing human review copied into your draft. Check it before saving.");}}>Use reviewed example</button></header>
           <form onSubmit={event=>{event.preventDefault();if(!completeFinding(draft))return;const value={...draft};setSaved(value);try{localStorage.setItem(findingKey,JSON.stringify(value));setStatus("Finding saved in this browser. Ready to export.");}catch{setStatus("Kept in this tab. Storage is unavailable; export before leaving.");}}}>
             <label>Finding title<input required maxLength={200} value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})}/></label>
-            <label>Observed facts<textarea required rows={3} maxLength={2000} value={draft.observation} onChange={e=>setDraft({...draft,observation:e.target.value})}/></label>
+            <label>Observed facts<textarea aria-label="Observed facts" required rows={3} maxLength={2000} value={draft.observation} onChange={e=>setDraft({...draft,observation:e.target.value})}/></label>
             <details><summary>Open questions & interpretation</summary>
-              <label>Open questions<textarea rows={2} maxLength={2000} value={draft.openQuestions} onChange={e=>setDraft({...draft,openQuestions:e.target.value})}/></label>
-              <label>Interpretation / hypothesis<textarea rows={2} maxLength={2000} value={draft.interpretation} onChange={e=>setDraft({...draft,interpretation:e.target.value})}/></label>
+              <label>Open questions<textarea aria-label="Open questions" rows={2} maxLength={2000} value={draft.openQuestions} onChange={e=>setDraft({...draft,openQuestions:e.target.value})}/></label>
+              <label>Interpretation / hypothesis<textarea aria-label="Interpretation / hypothesis" rows={2} maxLength={2000} value={draft.interpretation} onChange={e=>setDraft({...draft,interpretation:e.target.value})}/></label>
               <button className="text-button" type="button" onClick={()=>{setSaved(null);setDraft(emptyFinding());try{localStorage.removeItem(findingKey);setStatus("Your saved finding was cleared. The recorded result is unchanged.");}catch{setStatus("Cleared in this tab. Browser storage could not be updated.");}}}>Clear my saved finding</button>
             </details>
             <footer><button className="outline-button" disabled={!completeFinding(draft)} type="submit">Save finding</button><button className="primary-button" type="button" disabled={!saved || dirty} onClick={openReport}>Export report {icon("arrow-right")}</button><small>{dirty ? "Save edits before exporting." : "Saved in this browser only."}</small></footer>
