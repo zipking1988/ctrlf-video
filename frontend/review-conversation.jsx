@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {sourceClock} from './review-timeline.mjs';
 import {reviewDocuments, searchReview, reviewStorageKey, restoreReviewState, savedReviewMarkdown} from './review-evidence.mjs';
+import ClipTimeline from './clip-timeline.jsx';
 
 export default function ReviewConversation({review,seek,download,prepareWorkspace,preparing,prepareError}) {
   const docs=reviewDocuments(review),key=reviewStorageKey(review);
@@ -34,12 +35,8 @@ export default function ReviewConversation({review,seek,download,prepareWorkspac
     setNotice('');
   }
   return <section className="review-discovery" aria-label="Findings and questions">
-    <header className="finding-heading"><div><span className="clip-eyebrow">70-SECOND CLIP · CHECKED SOURCE NOTES</span><h1>Start with the findings.</h1><p>Prepared by Codex from 71 sampled frames. Each finding links back to the source.</p></div><div><span className="finding-mode">Prepared review</span><button type="button" className="outline-button" onClick={()=>{input.current?.focus();input.current?.scrollIntoView({block:"center"});}}>Ask a question</button></div></header>
-    <div className="finding-grid">{docs.slice(0,3).map((doc,i)=><article className="review-finding" key={doc.id}>
-      <span className="finding-number">0{i+1}</span><h2>{doc.title}</h2><p>{doc.text}</p>{citations(doc)}
-      <details><summary>What remains uncertain</summary><p>{doc.limit}</p></details>
-      <footer><button type="button" className="text-button" onClick={()=>focusFinding(doc)}>Ask about this</button><button type="button" className="text-button" aria-pressed={state.savedIds.includes(doc.id)} onClick={()=>toggleSave(doc)}>{state.savedIds.includes(doc.id)?'Saved':'Save finding'}</button></footer>
-    </article>)}</div>
+    <header className="finding-heading"><div><span className="clip-eyebrow">70-SECOND CLIP · CHECKED SOURCE NOTES</span><h1>Follow the moments. Connect the findings.</h1><p>Prepared by Codex from 71 sampled frames. Select a moment to inspect its source.</p></div><div><span className="finding-mode">Prepared review</span><button type="button" className="outline-button" onClick={()=>{input.current?.focus();input.current?.scrollIntoView({block:"center"});}}>Ask a question</button></div></header>
+    <ClipTimeline review={review} docs={docs} seek={seek} citations={citations} onAsk={focusFinding} onSave={toggleSave} savedIds={state.savedIds}/>
     {!!state.savedIds.length && <section className="review-saved" aria-label="Saved review findings"><strong>{state.savedIds.length} saved {state.savedIds.length===1?'finding':'findings'}</strong><span>{storageError?'Kept in this tab only':'Saved in this browser'}</span><button type="button" className="outline-button" onClick={()=>download(savedReviewMarkdown(review,state.savedIds,location.origin),'md','text/markdown;charset=utf-8')}>Export saved findings</button></section>}
     <section className="review-live-entry" aria-labelledby="review-live-heading">
       <h2 id="review-live-heading">Ask Gemini about this video</h2>

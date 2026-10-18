@@ -212,3 +212,25 @@ sole grant. Historical JPY 1,162 remains charged. Reservations are not settled
 invoices. A consistent private backup restored locally: all 363 file hashes and
 both SQLite integrity checks pass. Evidence and backup stay in ignored
 `.ctrlf-video-eval/aiand-20261018/`; no complete MVP/client GO is claimed.
+
+## Local prepared-review timeline annotation (October 18)
+
+The annotated example's three-card overview was replaced locally by a wider
+chronological timeline: six source sections and three findings anchored at their
+first citations. Selecting a section/finding seeks the existing source player
+and opens real evidence frames, observation, uncertainty and ask/save actions.
+The playback marker follows native playback without changing the selected note.
+Prepared-review authorship and existing evidence-only search remain explicit.
+
+In-app browser checks verified section 6 via Enter, the 36.036/37.037 score
+comparison, moving playback marker, uncertainty expansion, explicit question
+context with unchanged draft, and finding persistence after refresh. The temporary
+test finding was removed and the original saved selection/context/draft preserved.
+All 173 frontend tests, build and whitespace checks passed. Before/after captures
+are private local artifacts in `.ctrlf-video-eval/timeline-20261018/`. The main
+browser viewport was 2614 × 1344. A temporary 1014px iframe also verified readable
+layout and horizontal scrolling through the final section without widening the
+page. The iframe wrapper and its local test server were closed after checking;
+its native click targeting was unavailable, so section activation was verified
+in the main tab. Details stack below 850px; that narrower layout was not checked.
+No model call, grant change, push to main or deployment ran for this local edit.

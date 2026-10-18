@@ -787,6 +787,8 @@ body.recorded-view .research-welcome { display: none; }
 
 /* Prepared source review: chronological reading, point evidence and explicit provenance. */
 .clip-review { color: #183e3a; padding: 24px 0 4px; }
+.recorded-workspace .clip-review { width: min(1200px, calc(100vw - 48px)); position: relative; left: 50%; transform: translateX(-50%); }
+.clip-review .review-live-entry, .clip-review .review-questions, .clip-review .review-saved, .clip-review .clip-full-review { max-width: 760px; margin-inline: auto; box-sizing: border-box; }
 .clip-heading h1 { font-size: clamp(26px, 2.8vw, 38px); line-height: 1.14; letter-spacing: -.035em; max-width: 700px; margin: 14px 0; }
 .clip-heading p, .clip-review p { line-height: 1.65; }
 .clip-eyebrow { color: #51736b; font-size: 10px; font-weight: 650; letter-spacing: .1em; }
@@ -851,6 +853,60 @@ body.recorded-view .research-welcome { display: none; }
 .review-finding footer { display: flex; justify-content: space-between; gap: 8px; margin-top: auto; border-top: 1px solid #dce2dc; padding-top: 12px; }
 .review-finding footer button { font-size: 12px; }
 .review-finding button[aria-pressed="true"] { color: #176c56; font-weight: 650; }
+.clip-timeline { border: 1px solid #cbd9d0; border-radius: 8px; overflow: hidden; background: #fbfcf8; }
+.clip-timeline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px 8px; }
+.clip-timeline-toolbar > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+.clip-timeline-toolbar strong { font-size: 14px; }
+.clip-timeline-toolbar span { font-size: 11px; color: #526663; }
+.clip-timeline-toolbar time { color: #183e3a; font-variant-numeric: tabular-nums; }
+.clip-timeline-help { font-size: 11px; color: #526663; margin: 0; padding: 0 20px 14px; }
+.clip-timeline-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-color: #91ada2 #e5ede7; border-block: 1px solid #d6e1d8; background: #eef3ed; }
+.clip-timeline-board { min-width: 1180px; padding: 16px 24px 20px; box-sizing: border-box; }
+.clip-timeline-ruler { height: 30px; position: relative; border-bottom: 1px solid #b7cbbf; }
+.clip-timeline-ruler time { position: absolute; top: 0; font-size: 10px; line-height: 1.5; color: #526663; font-variant-numeric: tabular-nums; }
+.clip-timeline-ruler time::after { content: ''; position: absolute; top: 23px; left: 0; height: 7px; border-left: 1px solid #b7cbbf; }
+.clip-timeline-ruler time:last-child { transform: translateX(-100%); }
+.clip-timeline-ruler time:last-child::after { left: auto; right: 0; }
+.clip-timeline-tracks { position: relative; }
+.clip-track-label { display: block; padding: 12px 0 9px; font-size: 9px; letter-spacing: .1em; font-weight: 650; color: #526e63; }
+.clip-track-label small { font-size: 10px; font-weight: 400; letter-spacing: 0; margin-left: 10px; }
+.clip-timeline-tracks ol { list-style: none; padding: 0; margin: 0; position: relative; }
+.clip-timeline-sequence ol { height: 174px; }
+.clip-timeline-tracks li { position: absolute; top: 0; box-sizing: border-box; }
+.clip-timeline-sequence li { padding-right: 8px; height: 100%; }
+.clip-moment { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 8px; text-align: left; background: #fffdf8; border: 1px solid #c3d3c7; border-radius: 6px; padding: 10px; color: #183e3a; cursor: pointer; }
+.clip-moment-time { display: flex; justify-content: space-between; gap: 8px; font-size: 9px; color: #526e63; font-variant-numeric: tabular-nums; }
+.clip-moment img { width: 100%; height: 70px; display: block; object-fit: contain; background: #17191d; border-radius: 3px; }
+.clip-moment strong { font-size: 12px; line-height: 1.4; font-weight: 550; }
+.clip-moment[aria-current="time"] .clip-moment-time { color: #135f54; font-weight: 700; }
+.clip-moment[aria-pressed="true"], .clip-finding-node[aria-pressed="true"] { border: 2px solid #0b625d; box-shadow: 0 0 0 2px #0b625d14; }
+.clip-moment[aria-pressed="true"] { padding: 9px; background: #f0f7f0; }
+.clip-playhead { position: absolute; z-index: 1; top: -7px; bottom: 0; width: 1px; background: #b96743; pointer-events: none; }
+.clip-playhead::before { content: ''; position: absolute; top: 0; left: -3px; width: 7px; height: 7px; border-radius: 50%; background: #b96743; }
+.clip-timeline-findings ol { height: 94px; }
+.clip-timeline-findings li { width: 240px; }
+.clip-finding-node { width: 100%; min-height: 90px; text-align: left; display: flex; flex-direction: column; gap: 8px; background: #e1f2e9; border: 1px solid #b3cdbd; border-radius: 6px; padding: 11px 13px; color: #183e3a; cursor: pointer; }
+.clip-finding-node > span { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; font-size: 10px; color: #46675e; }
+.clip-finding-node small { font-size: 10px; }
+.clip-finding-node strong { font-size: 12px; line-height: 1.5; font-weight: 600; }
+.clip-finding-revision { background: #fff0e9; border-color: #d5a78c; }
+.clip-finding-node[aria-pressed="true"] { padding: 10px 12px; }
+.clip-timeline-detail { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; padding: 22px; }
+.clip-selected-note, .clip-selected-evidence { min-width: 0; }
+.clip-selected-note h2 { font-size: 20px; margin: 10px 0; }
+.clip-selected-note > p { font-size: 13px; margin: 0 0 14px; }
+.clip-selected-note details { font-size: 12px; line-height: 1.65; }
+.clip-selected-note summary { cursor: pointer; color: #526663; }
+.clip-selected-note footer { display: flex; align-items: center; gap: 16px; padding-top: 18px; }
+.clip-selected-note footer button { font-size: 12px; }
+.clip-selected-note button[aria-pressed="true"] { color: #176c56; font-weight: 650; }
+.clip-selected-evidence > div:not(.finding-citations) { display: flex; gap: 8px; margin-top: 12px; }
+.clip-selected-evidence figure { flex: 1; min-width: 0; margin: 0; }
+.clip-selected-evidence figure button { width: 100%; padding: 0; display: block; border: 1px solid #b7c9bc; border-radius: 4px; background: #17191d; cursor: pointer; overflow: hidden; }
+.clip-selected-evidence figure img { display: block; width: 100%; height: auto; }
+.clip-selected-evidence figcaption { margin-top: 6px; font-size: 10px; color: #526663; font-variant-numeric: tabular-nums; }
+.clip-timeline button:focus-visible, .clip-timeline-scroll:focus-visible { outline: 2px solid #0b625d; outline-offset: 3px; }
+@media (max-width: 850px) { .clip-timeline-detail { grid-template-columns: 1fr; gap: 22px; } .clip-timeline-toolbar { flex-wrap: wrap; } }
 .review-saved { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: #e7efe6; border-radius: 6px; padding: 12px 16px; margin-top: 14px; font-size: 12px; }
 .review-saved > span { color: #526663; }
 .review-saved > button { margin-left: auto; }

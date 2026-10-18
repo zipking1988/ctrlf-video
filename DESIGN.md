@@ -25,6 +25,19 @@ and private investigations remain separate. The old finding editor now starts
 with the reviewed example when empty, preserving any existing visitor draft.
 This follow-up subsequently deployed in reviewed `1a980ae` on October 18. It does not establish the pending live five-minute acceptance.
 
+Following the timeline annotation, the local example now presents those notes on
+a chronological canvas: six source sections above three finding nodes, positioned
+at each finding's first cited source time. A ruler and playback marker link the
+sequence to the independent source player. Selecting a node seeks the video and
+opens its observation, actual evidence frames, uncertainty, ask and save actions
+below the timeline. Selection stays independent from playback and question
+context; Ask about this explicitly selects context while retaining the draft.
+The board expands up to 1200px and scrolls horizontally in narrower windows;
+question/search text retains its reading width. Keyboard activation, source seeks,
+playback updates, finding save/refresh and preserved drafts were checked locally.
+This remains a labeled prepared review, not new model analysis. The change is
+local only: all 29 authorized cloud deployments are already consumed.
+
 The example also offers an explicit path into the existing private workspace:
 prepare the verified public clip, confirm its normal upload disclosure, and keep
 the visitor's question as a draft. This copies only the fixed, size-bounded,
