@@ -1210,7 +1210,7 @@ window.CtrlFVideoSessionUI = {
   notify: notice,
   answer(query, submittedDraft) {
     renderAnswer(query);
-    if (submittedDraft !== undefined && $("question").value.trim() === submittedDraft)
+    if (query.response.status !== "error" && submittedDraft !== undefined && $("question").value.trim() === submittedDraft)
       $("question").value = "";
     updateSend();
   },

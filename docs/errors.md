@@ -36,3 +36,12 @@ A pending query uses HTTP 202 with a bounded polling delay; unknown uses 409 and
 `BudgetDenied` rejects missing/revoked/insufficient or conflicting approval before dispatch. SQLite contention has bounded waiting; failures do not authorize calls. Real `preflight` always exits 2 for open deployment acceptance; `agent-check` is the independent local readiness check.
 
 Cloud Run `K_SERVICE` cannot start a stateful workspace. Run the stateless gateway there and use one durable backend. See [API](api.md), [runtime](WORKSPACE_RUNTIME.md), [deployment](deployment.md) and [ARCHITECTURE](../ARCHITECTURE.md).
+
+October 19 local format-recovery candidate: the recorded lead-change failure used
+`frame_id` for an array where the model contract requires `frame_ids`. The local
+validator accepts only that exact array variant, still checks every ID against
+actual sampled frames, preserves the original model response, and discloses the
+format correction. Conflicting/foreign references and invalid statements are
+excluded as whole observations; valid neighboring observations remain partial.
+An entirely invalid batch retains `invalid_observations`. This candidate is not
+part of deployed release 32 and adds no automatic model retry.

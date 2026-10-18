@@ -280,3 +280,10 @@ capacity is JPY 964, 32 calls and six primary calls. Historical model reservatio
 remain JPY 1,162, bringing cumulative reservations to JPY 2,198. These are not
 settled invoices or free-credit balances. JPY 5,000 and all original cutoffs stay
 unchanged; all 32 releases are consumed. The real five-minute source remains missing.
+
+The subsequent local-only format-recovery candidate was replayed against that
+unchanged actual visual response and the 71 sampled-file identifiers/hashes from
+the backend. All four observations retain their exact original statements and
+references; three exact singular-array keys are normalized with a visible
+uncertainty warning. No new model request was made, no failed stored answer was
+rewritten, and source-reading/score accuracy is not established by this replay.

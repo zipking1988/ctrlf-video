@@ -542,3 +542,18 @@ Enter opened Sources with the unsent draft retained; Current source identified
 the pending duplicate. Existing ready-index reuse required no reindexing. The
 subsequent actual lead-change question failed batch evidence validation; this UI
 pass is not a real-answer/model-quality pass. See the deployment/live-test records.
+
+## October 19 local model-format and failed-draft recovery
+
+No layout change: the authored composer change keeps a final error's submitted
+question in its existing editable field, while preserving newer typed text. The
+new frontend regression failed against the prior code and passes after the guard.
+The backend candidate normalizes only the observed singular-array frame key,
+strictly validates actual frame IDs, excludes invalid rows without losing valid
+neighbors, and keeps invalid all-row failures distinguishable. Its offline replay
+uses the unchanged actual failed response and 71 actual sampled-file IDs/hashes;
+four observations survive, three format corrections are disclosed. It does not
+establish factual model accuracy, update the original failed query, make a model
+request or alter the deployed release. Checks: 188 frontend tests and 279 backend tests pass (one platform skip), with
+build, lint/format and unchanged contract exports passing. Attempt 33 remains
+unauthorized.

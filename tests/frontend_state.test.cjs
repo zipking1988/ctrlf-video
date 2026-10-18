@@ -196,6 +196,16 @@ test("research entry keeps upload cancellation on the welcome screen and demo ac
   assert.equal(h.get("demo-library").open, true);
 });
 
+test("a final failed answer preserves the submitted question as an editable draft", async () => {
+  const h=await harness();
+  h.get("question").value="How does the lead change?";
+  h.run(`window.CtrlFVideoSessionUI.answer(${JSON.stringify(h.answer("error"))}, "How does the lead change?")`);
+  assert.equal(h.get("question").value,"How does the lead change?");
+  h.get("question").value="A newer unsent draft";
+  h.run(`window.CtrlFVideoSessionUI.answer(${JSON.stringify(h.answer("error"))}, "How does the lead change?")`);
+  assert.equal(h.get("question").value,"A newer unsent draft");
+});
+
 test("entry connection failure exposes retry while preserving disabled upload", async () => {
   const h = await harness();
   h.get("welcome-upload").disabled = true;

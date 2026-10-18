@@ -472,28 +472,50 @@ def checked_text_list(value, maximum, code):
 
 def checked_observations(result, sampled):
     items = result.get("observations")
-    unresolved = checked_text_list(result.get("unresolved", []), 10, "invalid_observations")
+    unresolved = list(checked_text_list(result.get("unresolved", []), 10, "invalid_observations"))
     if not isinstance(items, list) or len(items) > 100:
         raise AgentError("invalid_observations")
     if "no_match" in result and type(result["no_match"]) is not bool:
         raise AgentError("invalid_observations")
     allowed = {frame["frame_id"] for frame in sampled}
+    checked = []
+    corrected = excluded = 0
     for item in items:
         if not isinstance(item, dict):
-            raise AgentError("invalid_observations")
-        ids = item.get("frame_ids")
+            excluded += 1
+            continue
+        # A recorded live response used the singular key for an array. Correct
+        # only that exact wire-format variant; never guess IDs or timestamps.
+        singular = "frame_ids" not in item and isinstance(item.get("frame_id"), list)
+        ids = item.get("frame_id") if singular else item.get("frame_ids")
         statement = item.get("statement")
         if (
             not isinstance(ids, list)
             or not 1 <= len(ids) <= 128
             or any(not isinstance(f, str) or f not in allowed for f in ids)
+            or ("frame_ids" in item and "frame_id" in item and item["frame_id"] != ids)
             or not isinstance(statement, str)
             or not 0 < len(statement) <= 3000
         ):
-            raise AgentError("invalid_observations")
-    if result.get("no_match") and items:
+            excluded += 1
+            continue
+        checked.append({"frame_ids": list(ids), "statement": statement})
+        corrected += int(singular)
+    if (items and not checked) or (result.get("no_match") and checked):
         raise AgentError("invalid_observations")
-    return items, unresolved
+    if corrected:
+        unresolved.append(
+            f"{corrected} observation{'s' if corrected != 1 else ''} required a "
+            "frame-reference format correction. "
+            "Their source IDs were checked; verify the claims against the cited frames."
+        )
+    if excluded:
+        unresolved.append(
+            f"{excluded} observation{'s were' if excluded != 1 else ' was'} excluded "
+            "because their source references or "
+            "statements could not be validated. This answer does not cover those claims."
+        )
+    return checked, unresolved
 
 
 def checked_synthesis(result):
@@ -1017,6 +1039,7 @@ class Agent:
         negatives = 0
         observations = []
         warnings = []
+        observation_error = None
         for n, i in enumerate(dict.fromkeys(inspect)):
             window = selected[i]
             directory = self.ws.root / video
@@ -1153,6 +1176,7 @@ class Agent:
                 if str(error) in {"model_unknown", "unknown_attempt_do_not_resend"}:
                     raise
                 warnings.append(str(error))
+                observation_error = error
                 break
         if (
             not complete_review
@@ -1184,6 +1208,8 @@ class Agent:
             ).model_dump(mode="json")
         if not observations:
             # Coarse search alone cannot establish a global negative claim.
+            if isinstance(observation_error, AgentError):
+                raise observation_error
             raise AgentError("no_verified_evidence")
         if complete_review:
             observations.sort(key=lambda item: min(frame["t"] for frame in item["evidence"]))
