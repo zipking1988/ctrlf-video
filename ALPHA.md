@@ -1,6 +1,6 @@
 # CtrlF Video — Alpha handoff
 
-Updated October 18, 2026 (JST). This is a desktop **alpha for supervised evaluation**, not a claim of production readiness or validated UX-research value. Reviewed commit `0ffd59e` is deployed at [ctrlfvideo.com](https://ctrlfvideo.com/); [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39131832940) passed. The Gemini-vision / ai& Gemma-text pipeline completed an actual 70.203-second clip and three contextual follow-ups, but failed accuracy acceptance. The original separate workspace remains untouched.
+Updated October 19, 2026 (JST). This is a desktop **alpha for supervised evaluation**, not a claim of production readiness or validated UX-research value. Reviewed commit `95d0842` is deployed at [ctrlfvideo.com](https://ctrlfvideo.com/); [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39141774133) passed. The Gemini-vision / ai& Gemma-text pipeline completed an actual 70.203-second clip and three contextual follow-ups, but failed accuracy acceptance. The original separate workspace remains untouched.
 
 ## What a visitor can do
 
@@ -43,7 +43,7 @@ Save failures and revision conflicts require recovery before navigation that wou
 
 ## Release gates
 
-PR #2 merged into private main and attempt 26 deployed `9d2dad0`. The user then explicitly raised the aggregate ceiling to JPY 5,000, authorized a fresh finite model grant and three further deployments, retaining all 26 records. Attempts 27, 28 and 29 deployed `1a980ae`, `7f5f14e` and `0ffd59e` successfully. All 29 attempts are consumed; another release requires new explicit finite authorization. The model grant remains for one confirmed current session only. All October 19 cutoffs remain unchanged. See [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39131832940) and [deployment controls](docs/deployment.md#release-process-and-cicd).
+PR #2 merged into private main and attempt 26 deployed `9d2dad0`. The user then explicitly raised the aggregate ceiling to JPY 5,000, authorized a fresh finite model grant and three further deployments, retaining all 26 records. Attempts 27, 28 and 29 deployed `1a980ae`, `7f5f14e` and `0ffd59e` successfully. Separately authorized attempts 30, 31 and 32 subsequently deployed `4ccee61`, `9ad193d` and `95d0842`. All 32 attempts are consumed; another release requires new explicit finite authorization. The model grant remains for one confirmed current session only. All October 19 cutoffs remain unchanged. See [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39131832940) and [deployment controls](docs/deployment.md#release-process-and-cicd).
 
 The public recorded example remains available only while the existing temporary deployment runs. Model validity ends October 19 at 22:00 JST; hosting authorization ends at 23:59 JST. The existing backup/cleanup process must remain in place. Continued judge/client access needs a new hosting agreement and finite budget.
 

@@ -6,25 +6,21 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 **Desktop alpha:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. Main CI records the deployed revision. New live analysis still requires a funded session; this is a supervised alpha, not production acceptance.
 
-October 19 update: reviewed private-main code `9ad193d` is deployed as release
-31/31. CI passed 178 frontend and 271 Linux backend tests. The subsequent real
-final-ball retest completed one visual call but still missed a later action;
-accuracy acceptance fails and a real five-minute input remains missing. V4 reserves
-JPY 935, 24/60 calls and 2/8 indexing calls; JPY 1,162 historical reservations stay
-charged within the unchanged JPY 5,000 aggregate. These are conservative
-reservations, not settled invoice charges or free credits. See the
+October 19 update: reviewed private-main code `95d0842` is deployed as release
+32/32. CI passed 187 frontend and 271 Linux backend tests. Saved questions now
+stay in a continuing conversation, with original replies and prior-answer
+follow-ups. The example timeline supports drag-to-pan and native ruler seeking.
+Unindexed uploads have an explicit, read-only analysis-status action beside the
+kept question draft; opening status never starts analysis or submits a question.
+
+The previous real final-ball retest still missed a later action. A fresh
+“How does the lead change?” question completed four calls but failed validation
+because three model observations used a nonstandard frame-reference field.
+Accuracy/real-answer acceptance and a genuine five-minute input remain open.
+V4 now reserves JPY 1,036, 28/60 calls and 2/8 indexing calls; JPY 1,162 historical
+reservations remain within the unchanged JPY 5,000 aggregate. These are conservative
+reservations, not invoices or free credits. No attempt 33 is authorized. See the
 [funding and validation record](docs/LIVE_GEMINI_TEST.md).
-
-A subsequent **local, undeployed conversation candidate** makes the ongoing flow
-visible: saved questions stay in order, original replies expand in place, and any
-supported answer can anchor another question while preserving the draft. A
-whole-video breakdown is one turn in this conversation. The public recorded
-example remains a saved-result walkthrough. This UI work adds no model call or
-release; all 31 deployment attempts are consumed.
-
-The local candidate also supports dragging the example timeline to pan or seek.
-An unindexed source shows an explicit analysis-status action beside the kept
-question draft; opening status never starts analysis or submits the question.
 
 ## Workspace
 
@@ -43,7 +39,7 @@ Before transfer, the upload dialog explains session access, server storage, conf
 The landing explains one concrete workflow: ask about visible footage → replay a cited moment → save a finding and export. Approved Gemini analysis searches descriptions of sampled frames and reviews candidate segments; sampling can miss brief events. New analysis of uploaded videos requires an approved session. Each investigation handles one recording. Cross-session aggregation and UX-study usefulness remain unverified; AskTape is only an exploratory working name. Existing exports are Markdown, JSON and HTML.
 
 - **Questions:** ask or follow up below the video, then replay supporting timestamps. In Review, **Still to verify** exposes unresolved claims; **Details & save** retains the full submitted prompt and earlier questions. Canvas keeps its research panel. Drafts survive view switching and refresh.
-- **Saved answers:** Deployed release 31 keeps earlier questions under Details & save; the undeployed local conversation candidate exposes them in the chronological thread. The canvas question area offers up to three existing answers from the current recording, opening their original results without another model request. These are saved results to check, not new analysis or a claim that they are correct. A real result without events cannot anchor a follow-up. When live analysis is unavailable, Review explicitly switches to saved-results mode, hides Send, and offers View saved answers; Enter opens that recovery path while keeping the draft. Progress and recoverable errors appear beside the composer; unavailable model access is explained before a new request is admitted by the UI.
+- **Saved answers:** Release 32 exposes earlier questions and their original replies in a chronological thread. The canvas question area offers up to three existing answers from the current recording, opening their original results without another model request. These are saved results to check, not new analysis or a claim that they are correct. A real result without events cannot anchor a follow-up. When live analysis is unavailable, Review explicitly switches to saved-results mode, hides Send, and offers View saved answers; Enter opens that recovery path while keeping the draft. Progress and recoverable errors appear beside the composer; unavailable model access is explained before a new request is admitted by the UI.
 - **Source player:** watch the recording above the chat. In Canvas, the compact bottom dock can be expanded or hidden while organizing evidence.
 - **Finding editor:** choose **Details & save → Write a finding**, or open a saved finding through the menu. Edit its title, observed facts, interpretation and open questions. Observed facts update the canvas summary while the original answer and evidence remain available.
 - **Research context:** choose **Menu → Recording context** to record the participant's task and whether the recording is a UX study or a technical sample. Each question captures the context submitted with it.

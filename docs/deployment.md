@@ -516,3 +516,37 @@ The JPY 5,000 aggregate and every original cutoff are unchanged; all 31 release
 attempts are used. No attempt 32, new grant, model switch or hosting extension ran.
 The actual five-minute input remains missing. Private verification artifacts are
 under `.ctrlf-video-eval/aiand-20261018/release31/` and remain outside Git.
+
+## Release 32 verification (October 19 JST)
+
+The user explicitly authorized reviewed `95d0842` for private main and exactly one
+more deployment, 32 cumulative. [CI 39141774133](https://github.com/zipking1988/ctrlf-video/actions/runs/39141774133)
+passed 187 frontend and 271 Linux backend tests and deployed both components.
+Backend state is committed at 32/32; all 31 prior records are retained. Frontend
+`ctrlfvideo-frontend-ci-95d08421-39141774133` serves 100% of traffic. Exact public
+HTML, bundle, application/workspace scripts and CSS match the approved commit.
+Real-mode health passes and maintenance is cleared. No resource, IAM, key,
+model, budget or cutoff change was made; only the release limit/pin changed.
+
+The complete financial ledger, runtime/environment, all three owned uploads and
+seven original query results were unchanged across deployment. The deployment
+added zero model calls. Its private backup restored locally with 600 file hashes
+and two SQLite integrity checks; archive SHA-256 is
+`639e246b4a2b4137ff05afe73706d699c1bcd9d3e3bfdcb8d9196bc07e276fc4`.
+
+Actual browser checks verified that the retained pending question now opens
+Sources from both the arrow and Enter, with immediate acknowledgement and a
+Current source marker. The three same-name uploads have identical original
+hashes; an existing 2/2-window indexed copy was opened without reindexing. The
+pending desk/draft was saved, and the indexed desk's previous draft was privately
+backed up before carrying the user's current question into a new context.
+
+That fresh “How does the lead change?” request did **not** pass acceptance. Four
+completed model calls reserve JPY 101; vision returned four observations, three
+with `frame_id` instead of `frame_ids`. The strict batch validator discarded the
+whole response, including its canonical first observation. No synthesis or
+automatic retry occurred. V4 now reserves JPY 1,036, 28/60 attempts and 2/8 primary
+calls. Model quality and genuine five-minute acceptance remain open. Full native
+browser console/navigation telemetry is unavailable; no full healthy-canary
+claim is made. All 32 release attempts are consumed; attempt 33 is not authorized.
+Private evidence remains under `.ctrlf-video-eval/aiand-20261018/release32/`.

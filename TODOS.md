@@ -30,16 +30,17 @@ Updated: 2026-10-19. This is the current acceptance backlog, consolidated from o
 
 - [x] Prepare and browser-check the October 19 local continuing-conversation UI: visible chronological turns, original saved replies, prior-turn follow-ups, retained draft and stable expanded replies. 181 frontend tests pass; no new model calls or deployment. The public saved example remains explicitly separate.
 - [x] Fix the subsequent timeline/composer annotations locally: drag-to-pan, native ruler scrubbing, explicit unindexed status/acknowledgement and a current-source marker for duplicate names. 187 frontend and 270 backend tests pass (one platform skip); the pending-state browser check uses a labeled read-only UI simulation. No new model call or deployment.
-- [ ] Deploy the reviewed conversation UI only under a separate finite release authorization; all 31 current attempts are consumed. Visual-analysis accuracy and genuine five-minute acceptance remain open.
+- [x] Deploy reviewed `95d0842` as separately authorized attempt 32/32; verify actual status actions, current-source marker, exact serving assets and a restored 600-file backup. All 32 attempts are consumed.
+- [ ] Fix the real lead-change question’s malformed frame-reference handling and retain failed drafts; verify against its cached actual response without a paid retry. Live answer quality and genuine five-minute acceptance remain open.
 
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.
 - [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Deployed in `1a980ae`.
 - [x] Install the October 18 JPY 2,000 / 60-call / eight-index-call grant for the explicitly confirmed current browser owner, preserving historical records; deploy reviewed `1a980ae` as attempt 27 of 29.
-- [ ] Verify an actual five-minute video and at least three genuine contextual follow-ups. The concrete real input file is still missing. The shorter real trial now reserves JPY 935, 24/60 calls and 2/8 primary calls; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
+- [ ] Verify an actual five-minute video and at least three genuine contextual follow-ups. The concrete real input file is still missing. The shorter real trials now reserve JPY 1,036, 28/60 calls and 2/8 primary calls; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
-- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the release-31 retest, remaining capacity is JPY 1,065, 36 attempts and six primary calls; no new grant or deadline is implied.
+- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the release-32 lead-change trial, remaining capacity is JPY 964, 32 attempts and six primary calls; no new grant or deadline is implied.
 - [ ] Run an actual first-time human study. Automated browser walkthroughs establish flow behavior, not human comprehension or researcher value.
 
 ## First-use-case validation

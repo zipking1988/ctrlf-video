@@ -1,10 +1,19 @@
 # Working on CtrlF Video
 
+On October 19 the user explicitly authorized the private-main push of reviewed
+`95d0842` and exactly one further deployment, 32 cumulative. Preserve all 31
+preceding release records, the JPY 5,000 aggregate, sole existing model grant,
+historical reservations and all original cutoffs. Only the trusted release pin
+and maximum changed for this attempt. CI 39141774133 deployed it successfully
+after 187 frontend and 271 Linux backend tests passed. All 32 releases are used;
+no attempt 33, new funding or deadline extension is authorized.
+
 The user subsequently explicitly authorized exactly one further deployment, 31
 cumulative, and the private-main push of reviewed `9ad193d`. It deployed through
 CI 39138311106 after 178 frontend and 271 Linux backend tests passed. All 30 prior
 release records, grants, historical reservations and October 19 cutoffs remain
-unchanged. All 31 attempts are consumed; no attempt 32 is authorized.
+unchanged. At that point all 31 attempts were consumed; the later separate
+release-32 authorization above supersedes that count.
 
 Later October 18, the user explicitly authorized one more reviewed deployment,
 30 cumulative, and pushing the latest reviewed fixes to private main. Preserve
@@ -36,8 +45,8 @@ On October 19 the user confirmed the existing visual layout and clarified that
 this is a continuing, open-ended conversation about a video. Users can ask a new
 visual question or follow earlier evidence without ending the investigation after
 one answer. Preserve original turns/context/source links; never substitute saved
-or prepared replies for fresh analysis. A local conversation-display candidate is
-under review; this clarification grants no deployment 32 or additional funding.
+or prepared replies for fresh analysis. The conversation-display fix subsequently shipped in the separately authorized
+release 32; this product clarification adds no funding.
 
 On October 18 the user explicitly requested ai& for video analysis using Gemini or
 “gamma” (interpreted as the catalogued Gemma model), superseding the earlier
@@ -48,8 +57,8 @@ reservations, ownership, cutoffs and release counts remain binding. ai& credits 
 separate from Google Cloud credits and do not increase spending authorization.
 Do not activate uncalibrated runtimes or treat mock tests as live acceptance.
 
-Current October 19 handoff: reviewed private-main release `9ad193d` deployed
-successfully as attempt 31/31; no releases remain authorized. The supplied backend key and fixed
+Current October 19 handoff: reviewed private-main release `95d0842` deployed
+successfully as attempt 32/32; no releases remain authorized. The supplied backend key and fixed
 Gemini-vision / ai& Gemma-text pipeline are live. The actual 70.203-second source
 completed indexing and one breakdown plus three contextual follow-ups, but failed
 accuracy acceptance. Preserve its incorrect answers and separately labeled human
@@ -71,7 +80,13 @@ locally before release 30 with 363 file hashes. Release 30's fresh backup restor
 locally with all 361 file hashes and both SQLite integrity checks passing. All original
 cutoffs and final cleanup remain required. Release 31 backup restored locally
 with 438 file hashes and two SQLite checks; deployment added zero model calls.
-See [live outcomes](docs/LIVE_GEMINI_TEST.md).
+Release 32 preserved all financial rows and added zero model calls. Its backup
+restored locally with 600 verified files and two SQLite checks. A subsequent real
+“How does the lead change?” test completed four calls (JPY 101 reserved) but
+failed evidence validation: the model used `frame_id` instead of `frame_ids` in
+three observations, discarding the batch. V4 now reserves JPY 1,036, 28/60 calls
+and 2/8 primary calls; remaining JPY 964 / 32 calls / six primary calls. No
+automatic retry or refund occurred. See [live outcomes](docs/LIVE_GEMINI_TEST.md).
 
 CtrlF Video ("Ctrl+F for video") is a desktop video investigation agent for AI Builder Cup 2026. Its workspace is a spatial canvas of questions, evidence frames and conclusions with multi-turn context and a source player. Mobile is outside this edition's scope.
 

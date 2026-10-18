@@ -260,3 +260,23 @@ The operator takes a consistent, restored-and-verified backup before changing mo
 The replacement v2 grant was applied October 16 at 20:11 JST after CI [38891244799](https://github.com/zipking1988/ctrlf-video/actions/runs/38891244799) passed 219 Linux backend tests and 100 frontend tests and deployed `19b6aa6` to both components. Focused transport regressions cover funded reuse, unlisted index rejection, absent new approvals, model revision mismatch and retention of old unknown reservations. No model dispatch was added by the rollover or its readiness checks.
 
 Before/after consistent backups passed complete-file hashes and isolated restoration of both SQLite databases. All nine historical cloud attempts and JPY 214 reserved remained unchanged, old unused funding was revoked, and the original ready index retained its provenance. The current browser shows all model prerequisites available; a fresh unapproved session remains unfunded. Current reservation capacity is JPY 761, not an invoice-based credit balance.
+
+## Release 32 lead-change validation (October 19 JST)
+
+Reviewed `95d0842` deployed under the separate 32nd-attempt authorization through
+[CI 39141774133](https://github.com/zipking1988/ctrlf-video/actions/runs/39141774133).
+The deployment preserved all financial rows and added zero model calls. A fresh
+user-drafted “How does the lead change?” question then reused the existing ready
+70.203-second index, with no new indexing or context anchor. It completed four
+calls (embedding JPY 10, rerank JPY 8, planning JPY 8, visual review JPY 75),
+reserving JPY 101. The model returned three observations with a nonstandard
+`frame_id` field; the batch validator rejected them and discarded the canonical
+first observation too. The final result is an error with no usable evidence;
+this is a failed real-answer trial, not missing credentials or exhausted funding.
+No automatic retry, refund, grant reset or additional deployment followed.
+
+V4 reserves JPY 1,036 of 2,000, 28/60 calls and 2/8 primary calls. Remaining grant
+capacity is JPY 964, 32 calls and six primary calls. Historical model reservations
+remain JPY 1,162, bringing cumulative reservations to JPY 2,198. These are not
+settled invoices or free-credit balances. JPY 5,000 and all original cutoffs stay
+unchanged; all 32 releases are consumed. The real five-minute source remains missing.

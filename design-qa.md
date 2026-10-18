@@ -535,3 +535,10 @@ model-admission boundary.
 - Checks: regression failures reproduced before fixes; 187 frontend tests pass, 270 backend tests pass with one Linux-only isolation skip on macOS; build, lint/format, contract checks and whitespace checks pass. Generated bundle and HTML hashes rebuilt, existing third-party notices preserved.
 - No remaining actionable P0/P1/P2 issue found in this scoped desktop pass. Full accessibility, physical touch, browser console telemetry and paid-model accuracy are not claimed. These changes do not resolve the existing five-minute source or model-quality acceptance gaps.
 - Release: local candidate only. All authorized 31 deployment attempts remain consumed; private main and production are unchanged. No model call, grant, budget, release-count or cutoff change.
+
+Release-32 follow-up: reviewed `95d0842` subsequently deployed through CI
+39141774133 (187 frontend / 271 Linux backend tests). Actual production arrow and
+Enter opened Sources with the unsent draft retained; Current source identified
+the pending duplicate. Existing ready-index reuse required no reindexing. The
+subsequent actual lead-change question failed batch evidence validation; this UI
+pass is not a real-answer/model-quality pass. See the deployment/live-test records.

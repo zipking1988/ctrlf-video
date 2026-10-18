@@ -1,6 +1,6 @@
 # CtrlF Video — Desktop Workspace Design
 
-Updated: 2026-10-18. Current direction: the user selected the first colorful concept, Coral Fieldnotes.
+Updated: 2026-10-19. Current direction: the user selected the first colorful concept, Coral Fieldnotes.
 
 October 18 alpha hardening retains the selected layout. Quick guide is available from the landing and workspace menu. A pre-transfer upload dialog explains playback-only access, configured retention, media transmission and the enforced upload cap. Unindexed uploaded recordings retain editable drafts; submission stays gated. Home/Review hashes track the visible view and survive refresh. Partial answers expose a separate Still to verify disclosure beside the answer; failed and empty results show recovery/scope without hiding it behind save controls. Rename errors remain in the active dialog. These are local candidate changes; deployment and live model authorization remain separate.
 
@@ -43,8 +43,8 @@ The October 19 local annotation fix adds mouse dragging to pan this example
 canvas, with a movement threshold that prevents a dragged card from being
 selected on release. The native range on the ruler supports pointer seeking and
 keyboard navigation; scrubbing selects the corresponding chapter and source
-evidence. Native touch scrolling remains available. This is an undeployed UI
-candidate, alongside the continuing conversation change.
+evidence. Native touch scrolling remains available. This shipped in separately authorized release 32 (`95d0842`), alongside the
+continuing conversation change.
 
 For an uploaded source awaiting indexing, the composer now states whether
 preflight/analysis is pending, running or stopped. Its status action and Enter
