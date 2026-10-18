@@ -11,6 +11,12 @@ composer, retaining all nine conversation turns. Source replay works; model
 accuracy still misses intermediate score changes. No prepared answer substitutes
 for a live response.
 
+## October 19 local design review
+
+The clean `codex/design-review` candidate preserves the approved layout and original answers. Active responses retain their line breaks, and long tokens wrap within the reading column. Conversation offers Latest answer and Question box shortcuts without clearing drafts; explicit saved-answer selection moves keyboard focus to the opened answer. The Question/Follow-up label stays visible while composing. Recorded examples retain their independent IDs and have no private-composer shortcuts.
+
+Browser checks covered real local fixture navigation, a labeled nine-turn layout harness, source replay and supported desktop widths. All 190 frontend tests and build/lint/schema checks pass. These changes are local and undeployed; release 33 and all original funding/cutoffs remain unchanged. See [design QA](design-qa.md).
+
 ## October 18 whole-video review update
 
 Real whole-video answers now expose their own model-produced event observations

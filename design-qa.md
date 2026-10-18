@@ -1,3 +1,27 @@
+# Local Review design fixes · October 19, 2026
+
+final result: passed
+
+Scoped result for the existing desktop Review design, not live-model accuracy or deployment acceptance. Clean branch: `codex/design-review`, based on `c2d4dee`. The earlier QA history below is preserved.
+
+Source visual truth: current-run baseline capture `/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/screenshots/12-comparison-before.png`, rendering the existing component at `c2d4dee` with labeled synthetic QA content. The live approved layout was also inspected at https://ctrlfvideo.com/#review; its screenshot is `/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/screenshots/01-live-review.png`.
+
+Implementation screenshot: `/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/screenshots/13-comparison-after.png`. Source and implementation are each 1280 × 1400 image/CSS pixels, deviceScaleFactor 1. No scaling normalization. Same light theme, same one-turn fixture, video paused at zero, same unsent draft, no focused control. Full-view combined evidence: `/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/screenshots/comparison-full.png`. Focused typography/label/layout evidence: `/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/screenshots/comparison-detail.png` (matching 800 × 660 crops). Both combined inputs were opened and inspected.
+
+Iteration 1 found five P2 issues: collapsed answer newlines, unbroken question overflow, no direct latest/composer navigation, lost focus after saved-answer selection, and the hidden new-question label. Fixes preserve line breaks/wrap tokens (`8089d11`), add scoped navigation/focus (`6cecd55`), and retain visible composer labels (`728a24b`). Iteration 2's same-state captures show retained font, palette, source aspect ratio, source content and reading width, with intentional extra room for navigation and the visible label. No actionable P0/P1/P2 remains in this scope.
+
+Required fidelity surfaces: Instrument Sans/16px answer/1.7 line height retained; 760px reading column and source proportions retained; existing paper/sage/teal/amber tokens retained; source video/assets unmodified; actual stored answers and uncertainty preserved. Added UI copy is only Latest answer / Question box and the existing visible field label. No new HTML design or Pretext runtime was needed for these surgical app fixes.
+
+Primary interactions tested in the browser: earlier-answer Enter activation now focuses `player-review-answer`; Latest answer reaches the newest turn; Question box focuses `question` without changing `#review` or its draft; timeline Escape restores its trigger; citation replay reaches 6 seconds with readyState 4. Real local-app fixture navigation and a separate nine-turn visual harness were both checked. At 896px a long-token case shrank from 6406px to 896px scrollWidth. Desktop checks include 1024, 1280 and 1440; 375/768 retain the declared desktop-only boundary. The final app's console warning/error log was empty.
+
+190 frontend tests, build and `make check` passed. Two new component regressions cover navigation availability and public/private target isolation. No backend changes; backend tests were not rerun. Optional mechanical DOM capture was unavailable (`cloneNode` not exposed); no detector or full accessibility/performance acceptance is claimed. Production model accuracy remains failed; no paid request, cloud change, push or deployment occurred.
+
+Full findings, screenshot paths, limitations and implementation checklist: [design-audit-20261019 audit](/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/design-audit-ctrlfvideo.com.md).
+
+Implementation checklist: all five local fixes verified; original worktree changes preserved; generated assets rebuilt. Deployment remains outside authorization.
+
+---
+
 # Private-main release review — October 17
 
 final result: passed
