@@ -1,5 +1,12 @@
 # Working on CtrlF Video
 
+Later October 18, the user explicitly authorized one more reviewed deployment,
+30 cumulative, and pushing the latest reviewed fixes to private main. Preserve
+all 29 prior release records; raise only the release limit from 29 to 30 and pin
+the new reviewed commit. The JPY 5,000 aggregate, existing sole model grant,
+historical reservations and every October 19 cutoff remain unchanged. This does
+not authorize attempt 31 or establish live accuracy/five-minute acceptance.
+
 On October 18, 2026 the user explicitly authorized the real five-minute alpha
 acceptance plan: JPY 5,000 aggregate total, a fresh JPY 2,000 model grant capped
 at 60 model attempts and eight initial indexing calls, and three additional
@@ -29,7 +36,7 @@ separate from Google Cloud credits and do not increase spending authorization.
 Do not activate uncalibrated runtimes or treat mock tests as live acceptance.
 
 Current October 18 handoff: private main `0ffd59e` deployed successfully as
-attempt 29/29; no releases remain authorized. The supplied backend key and fixed
+attempt 29/29; the newly authorized attempt 30 is pending. The supplied backend key and fixed
 Gemini-vision / ai& Gemma-text pipeline are live. The actual 70.203-second source
 completed indexing and one breakdown plus three contextual follow-ups, but failed
 accuracy acceptance. Preserve its incorrect answers and separately labeled human

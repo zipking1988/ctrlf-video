@@ -377,6 +377,18 @@ file hashes and both SQLite checks passing (SHA-256
 Its credentials, sources and financial ledger remain outside Git. This does not
 replace the scheduled cutoff backup/cleanup.
 
+Later October 18, the user explicitly authorized exactly one further deployment,
+30 cumulative, and pushing the latest reviewed fixes to private main. Attempt 30
+contains the prepared-review timeline, actual-result source timeline, corrected
+multi-frame event bounds and explicit preview/session readiness notices. The
+operator must preserve every prior record and pin the reviewed commit while
+changing only `max_releases` from 29 to 30 and `approved_release_sha`. No model
+grant, runtime, IAM, resource sizing, JPY 5,000 total or cutoff changes are included.
+The existing main-only workflow remains the deployment path; its Linux tests,
+consistent restored-backup check, owned-data verification and rollback guards
+still apply. This authorization does not grant attempt 31. The deployment result
+will be recorded after the matching CI run and production checks finish.
+
 Recovery entry points on the VM (trusted operator only):
 
 ```sh

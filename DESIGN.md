@@ -36,7 +36,8 @@ The board expands up to 1200px and scrolls horizontally in narrower windows;
 question/search text retains its reading width. Keyboard activation, source seeks,
 playback updates, finding save/refresh and preserved drafts were checked locally.
 This remains a labeled prepared review, not new model analysis. The change is
-local only: all 29 authorized cloud deployments are already consumed.
+part of the reviewed attempt-30 candidate, following separate authorization for
+one additional deployment; the earlier 29 attempts remain consumed.
 
 The next local pass carries the canvas into actual model results. Whole-video
 answers open with their own source timeline and selected evidence; generated
@@ -49,7 +50,8 @@ context. All cited frames remain inspectable. Partial coverage and unresolved
 claims stay visible, and opening an old answer makes no model request.
 This is locally verified using the unchanged saved live outputs and the public
 recorded result. It does not establish improved visual-model accuracy or change
-the exhausted cloud release allowance.
+the model allowance. The separately authorized attempt 30 will deploy these
+reviewed fixes; production verification is recorded in the deployment document.
 
 The example also offers an explicit path into the existing private workspace:
 prepare the verified public clip, confirm its normal upload disclosure, and keep

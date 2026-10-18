@@ -16,6 +16,11 @@ previous records), including private main pushes and fixes. Model and new workfl
 admission still close October 19 at 22:00 JST; later recovery/cleanup cutoffs are
 unchanged. Installation and live outcomes will be recorded separately below.
 
+The user later authorized exactly one additional reviewed release and its private
+main push: 30 cumulative, retaining all 29 prior records. This release allowance
+does not add model funding or change the JPY 5,000 aggregate and existing cutoffs.
+See the [deployment record](deployment.md) for attempt 30 verification.
+
 The fresh grant `live_jpy5000_alpha_20261018_v4` is installed for deployment and
 one current browser owner. After the old session naturally expired, the user
 explicitly confirmed binding this sole grant to `Live alpha acceptance · 2026-10-18`.
