@@ -44,7 +44,7 @@ class Element {
   querySelector() { return new Element(); }
 }
 async function harness({ state = {}, requests = [], job = "ready", realReady = true, starter = false, empty = false } = {}) {
-  const store = createStore(), ids = new Map(), calls = [], answers = [], timers = new Map(), entries = [];
+  const store = createStore(), ids = new Map(), calls = [], answers = [], timers = new Map(), entries = [], uploads = [];
   let seq = 100, timerSeq = 0, ready = false, busy = false, context = null, override = null;
   const get = id => { if (!ids.has(id)) ids.set(id, new Element()); return ids.get(id); };
   const desks = new Map([
@@ -99,6 +99,16 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
   };
   const window = { CtrlFVideoSessionUI: ui, CtrlFVideoWorkbench: store, addEventListener() {} };
   const sandbox = vm.createContext({ window, document: { getElementById: get, createElement: () => new Element(), addEventListener() {} }, fetch,
+    XMLHttpRequest: class {
+      constructor() { this.upload = {}; this.status = 201; this.responseText = JSON.stringify({ id: "uploaded-video" }); }
+      open() {}
+      setRequestHeader() {}
+      send(file) {
+        uploads.push(file);
+        videos.set("uploaded-video", { id: "uploaded-video", name: file.name, job: { state: "awaiting_configuration" } });
+        this.onload();
+      }
+    },
     localStorage: { getItem: () => "desk-A", setItem() {} }, crypto: { randomUUID: () => `request-${++seq}` },
     setTimeout: (fn, delay) => { const id = ++timerSeq; timers.set(id, { fn, delay }); return id; }, clearTimeout: id => timers.delete(id),
   });
@@ -107,11 +117,49 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
     .replace("window.CtrlFVideoPersistence={flush,", "window.testWorkspace={start,openDesk,openSource,recover,confirmDelete,showRuntime,get:()=>({current,currentVideo,activeRequest,requestEpoch})}; window.CtrlFVideoPersistence={flush,");
   vm.runInContext(source, sandbox);
   ready = true; await window.testWorkspace.start();
-  return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers, entries,
+  return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers, entries, uploads,
     get busy() { return busy; }, setContext(value) { context = value; }, setOverride(fn) { override = fn; },
     async timer(delay) { const entry = [...timers].find(([, timer]) => timer.delay === delay); assert.ok(entry, `Missing ${delay}ms timer`); timers.delete(entry[0]); entry[1].fn(); await tick(); },
   };
 }
+
+test("successful upload saves the previous draft and opens the new investigation", async () => {
+  const h = await harness();
+  h.get("question").value = "Keep the original draft";
+  await h.window.CtrlFVideoPersistence.upload({ name: "recording.mp4", type: "video/mp4", size: 1024 });
+  assert.equal(h.uploads.length, 1);
+  assert.equal(h.window.testWorkspace.get().current.video, "uploaded-video");
+  assert.equal(h.desks.get("desk-A").state.ui.draft, "Keep the original draft");
+  assert.match(h.get("notice").textContent, /Upload complete/);
+});
+
+test("uploaded source creation failure keeps the draft and explains recovery without another upload", async () => {
+  const h = await harness();
+  h.get("question").value = "Keep the original draft";
+  h.setOverride(c => c.url === "/api/investigations" && c.method === "POST"
+    ? response({ detail: "workspace_backend_unavailable" }, 503) : undefined);
+  await h.window.CtrlFVideoPersistence.upload({ name: "recording.mp4", type: "video/mp4", size: 1024 });
+  assert.equal(h.uploads.length, 1);
+  assert.equal(h.window.testWorkspace.get().current.id, "desk-A");
+  assert.equal(h.get("question").value, "Keep the original draft");
+  assert.match(h.get("notice").textContent, /video was uploaded.*Open Sources.*instead of uploading it again/);
+});
+
+test("late uploaded source creation failure cannot notify a newer investigation", async () => {
+  const h = await harness(), creating = deferred();
+  h.setOverride(c => c.url === "/api/investigations" && c.method === "POST" ? creating.promise : undefined);
+  const uploading = h.window.CtrlFVideoPersistence.upload({ name: "recording.mp4", type: "video/mp4", size: 1024 });
+  await tick();
+  assert.ok(h.calls.some(c => c.url === "/api/investigations" && c.method === "POST"));
+  await h.window.testWorkspace.openDesk("desk-B");
+  h.get("question").value = "New investigation draft";
+  h.get("notice").textContent = "New investigation notice";
+  creating.resolve(response({ detail: "workspace_backend_unavailable" }, 503));
+  await uploading;
+  assert.equal(h.window.testWorkspace.get().current.id, "desk-B");
+  assert.equal(h.get("question").value, "New investigation draft");
+  assert.equal(h.get("notice").textContent, "New investigation notice");
+});
 
 test("new visitors and untouched demo desks enter through the research welcome without model dispatch", async () => {
   for (const options of [{ empty: true }, { starter: true }]) {

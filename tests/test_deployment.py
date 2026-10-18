@@ -1,5 +1,6 @@
 """Release fault injection on private temporary copies; no cloud/model requests."""
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -213,6 +214,58 @@ def test_budget_window_and_serial_release_guards_fail_before_work(release, reaso
         release.deploy("f" * 40, Path("unused"), "unused")
     assert not release.calls
     assert release.current.resolve() == release.original
+
+
+def test_operator_commit_pin_rejects_other_code_without_consuming_attempt(release):
+    release.config["approved_release_sha"] = "a" * 40
+    with pytest.raises(RuntimeError, match="operator-approved"):
+        release.deploy("b" * 40, Path("unused"), "unused")
+    assert not release.state.get("attempts")
+    assert not release.calls
+    assert release.deploy("a" * 40, Path("unused"), "unused")["phase"] == "pending"
+
+
+@pytest.mark.parametrize("mismatch", [None, "missing", "sha", "before", "after", "other_file"])
+def test_routes_exception_requires_exact_reviewed_commit_and_both_file_hashes(
+    release, tmp_path, mismatch
+):
+    old = release.current / "src/ctrlf_video"
+    old.mkdir(parents=True)
+    source = tmp_path / "candidate"
+    new = source / "src/ctrlf_video"
+    new.mkdir(parents=True)
+    for name in ("workspace.py", "attempts.py", "schema.py", "api.py", "routes.py"):
+        (old / name).write_bytes(b"original contract")
+        (new / name).write_bytes(b"original contract")
+    (new / "routes.py").write_bytes(b"reviewed additive upload header")
+    sha = "a" * 40
+    approval = {
+        "sha": sha,
+        "before_sha256": hashlib.sha256((old / "routes.py").read_bytes()).hexdigest(),
+        "after_sha256": hashlib.sha256((new / "routes.py").read_bytes()).hexdigest(),
+    }
+    if mismatch in {"sha", "before", "after"}:
+        approval[{"sha": "sha", "before": "before_sha256", "after": "after_sha256"}[mismatch]] = "0"
+    if mismatch != "missing":
+        release.config["reviewed_routes_change"] = approval
+    if mismatch == "other_file":
+        (new / "workspace.py").write_bytes(b"unreviewed migration")
+    archive = tmp_path / "candidate.tgz"
+    with tarfile.open(archive, "w:gz") as bundle:
+        bundle.add(source, arcname=".")
+    expected = hashlib.sha256(archive.read_bytes()).hexdigest()
+    release.state["attempts"] = [sha]
+    release.config.update(uv="uv", python="python", user="synthetic")
+    if mismatch:
+        with pytest.raises(RuntimeError, match="reviewed migration"):
+            release_module.Release.prepare(release, sha, archive, expected)
+        assert not release.calls  # Reject before dependency install or execution.
+    else:
+        target = release_module.Release.prepare(release, sha, archive, expected)
+        assert (target / "src/ctrlf_video/routes.py").read_bytes() == (
+            new / "routes.py"
+        ).read_bytes()
+        assert any("pytest" in call for call in release.calls)
 
 
 def test_backup_corruption_is_rejected_before_code_switch(release, monkeypatch):

@@ -7,7 +7,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Add a client-facing Quick guide, upload access/retention disclosure and server-advertised upload limits.
 - [x] Fix upload-to-Review refresh, hash navigation, unindexed draft editing and in-dialog rename recovery.
 - [x] Surface unresolved scope and failure recovery beside answers; preserve evidence and model admission gates.
-- [ ] Release the tested candidate under a separately reviewed deployment attempt. The 25-attempt allowance is consumed; do not reset it or bypass the release manager.
+- [x] Obtain authorization for one additional reviewed alpha deployment attempt (cumulative 26); retain all 25 records and pin the reviewed commit. Main CI is the authoritative deployment result.
 - [ ] Fund any new model trial explicitly and agree client data/retention expectations; anonymous live analysis remains unavailable.
 - [ ] Resolve the submission and UX-validation prerequisites below. See [ALPHA.md](ALPHA.md).
 

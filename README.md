@@ -4,7 +4,7 @@
 
 Ask visual questions about footage, follow up on evidence, and arrange questions, frames and conclusions on a spatial canvas linked to a source player. See [profile.md](profile.md) for the product and [hackathon.md](hackathon.md) for event rules.
 
-**Alpha candidate:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. This candidate is not yet a new production deployment or unrestricted live-analysis service.
+**Desktop alpha:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. Main CI records the deployed revision. New live analysis still requires a funded session; this is a supervised alpha, not production acceptance.
 
 ## Workspace
 

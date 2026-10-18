@@ -305,6 +305,7 @@
     if (uploading) {ui().notify("An upload is already in progress. Wait for it to finish before choosing another video.");return;}
     uploading=true;
     const deskId=current?.id, epoch=requestEpoch;
+    let completionEpoch=epoch, uploaded=false;
     try {
       const saved=await flush();if (!owns(deskId,epoch)) return;
       if (!saved) {ui().notify("Save your investigation before uploading. Use the save indicator to recover a conflict or reconnect; your current edits are kept.");return;}
@@ -323,11 +324,17 @@
         xhr.onerror=()=>reject(new Error("Upload interrupted. The previous investigation is preserved."));xhr.ontimeout=xhr.onerror;xhr.send(file);
       });
       if (!owns(deskId,epoch)) return;
+      uploaded=true;
       const video=await api(`/api/videos/${result.id}`);if (!owns(deskId,epoch)) return;
-      if (!await create(video)) return;
+      const creating=create(video);
+      // Creation advances navigation itself; only a later navigation is stale.
+      completionEpoch=requestEpoch;
+      if (!await creating) return;
       ui().notify("Upload complete. Preflight is running; check Sources for progress.");
       ui().showSource();
-    }catch(error){if(owns(deskId,epoch)) ui().notify(error.message);}
+    }catch(error){if(requestEpoch===completionEpoch) ui().notify(uploaded
+      ? `Your video was uploaded, but its investigation could not be opened. Open Sources to recover the recording instead of uploading it again. ${error.message}`
+      : error.message);}
     finally {uploading=false;}
   }
   async function watch(videoId, epoch) {

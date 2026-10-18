@@ -196,8 +196,19 @@ class Release:
         # Automatic deployment must not introduce database/ledger/schema migration.
         for name in ("workspace.py", "attempts.py", "schema.py", "api.py", "routes.py"):
             path = Path("src/ctrlf_video") / name
-            if (target / path).read_bytes() != (self.current / path).read_bytes():
-                raise RuntimeError("Persistence contract changed; reviewed migration required")
+            before = (self.current / path).read_bytes()
+            after = (target / path).read_bytes()
+            if after != before:
+                # A trusted operator may approve one exact, additive routes change.
+                # The other persistence/schema files remain unconditionally frozen.
+                approved = self.config.get("reviewed_routes_change", {})
+                if not (
+                    name == "routes.py"
+                    and approved.get("sha") == sha
+                    and approved.get("before_sha256") == hashlib.sha256(before).hexdigest()
+                    and approved.get("after_sha256") == hashlib.sha256(after).hexdigest()
+                ):
+                    raise RuntimeError("Persistence contract changed; reviewed migration required")
         uv = self.config["uv"]
         self.command(
             [uv, "sync", "--frozen", "--no-editable", "--python", self.config["python"]], cwd=target
@@ -254,6 +265,9 @@ class Release:
 
     def deploy(self, sha, archive, expected, *, drill=False):
         self.guard()
+        approved_sha = self.config.get("approved_release_sha")
+        if approved_sha is not None and sha != approved_sha:
+            raise RuntimeError("Release differs from the operator-approved commit")
         self.healthy(check_canary=False)
         self.state.update(
             phase="preparing",

@@ -307,6 +307,28 @@ release records and other configuration were checked unchanged. The JPY 3,000
 total, model restrictions and October 19 cutoffs remain unchanged; this count is
 not billing credit. Any further attempt after number 25 needs a new review.
 
+On October 18 the user authorized review of PR #2 and exactly one additional
+alpha attempt, bringing the cumulative limit to 26 while retaining all 25
+records and the same JPY 3,000 total and cutoffs. The trusted operator pins
+`approved_release_sha` to the reviewed alpha commit. A different commit fails
+before reservation. No model allowance is included.
+
+The alpha's sole protected API change adds the `X-CTRLF-Upload-Limit` response
+header to the session route. After reviewing it, the operator can install
+`reviewed_routes_change` with the exact commit and before/after SHA-256 values.
+Only `routes.py` can use this exception; mismatched hashes or commits and all
+other protected files still fail. The root-owned release control and configuration
+must be backed up and installed under the existing shared lock. The candidate
+cannot authorize itself. Existing restored-backup, ledger, rollback and cleanup
+checks still run. The final main CI run records whether this attempt succeeds.
+
+For local operator commands, the verified project account is
+`zipking1988@gmail.com`. Supply all three flags explicitly:
+`--account=zipking1988@gmail.com --project=ctrlfvideo --billing-project=ctrlfvideo`.
+An inherited work account can report `compute.instances.get` denied even when
+this saved personal account already has access. No global account switch or
+additional IAM grant is needed for that mismatch.
+
 Recovery entry points on the VM (trusted operator only):
 
 ```sh

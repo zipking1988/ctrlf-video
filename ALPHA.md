@@ -1,6 +1,6 @@
 # CtrlF Video — Alpha handoff
 
-Prepared October 18, 2026 (JST). This is a desktop **alpha candidate for a guided demo and supervised evaluation**, not a claim of production readiness or validated UX-research value. The new candidate has not replaced the hosted release. The original separate workspace remains untouched.
+Prepared October 18, 2026 (JST). This is a desktop **alpha candidate for a guided demo and supervised evaluation**, not a claim of production readiness or validated UX-research value. Check the latest main CI deployment result for the hosted revision. The original separate workspace remains untouched.
 
 ## What a visitor can do
 
@@ -42,7 +42,7 @@ Save failures and revision conflicts require recovery before navigation that wou
 
 ## Release gates
 
-The latest verified hosted CI run is for `49bb911`; the additional 25th deployment attempt was authorized only for that reviewed release. The local alpha candidate needs a newly reviewed finite release attempt. The JPY 3,000 total and October 19 cutoffs remain unchanged. No new models, grants, resources or hosting extension were enabled for this work.
+The user authorized review of PR #2 and one additional alpha deployment attempt on October 18. This is cumulative attempt 26, with all previous records retained and the candidate pinned to its reviewed commit. The JPY 3,000 total and October 19 cutoffs remain unchanged. No new models, grants, resources or hosting extension are included. See the latest main CI deployment result for completion and [deployment controls](docs/deployment.md#release-process-and-cicd) for the exact operator gate.
 
 The public recorded example remains available only while the existing temporary deployment runs. Model validity ends October 19 at 22:00 JST; hosting authorization ends at 23:59 JST. The existing backup/cleanup process must remain in place. Continued judge/client access needs a new hosting agreement and finite budget.
 

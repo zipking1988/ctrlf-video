@@ -35,6 +35,8 @@ The QA skill's provisional UI score is **89 → 100 for the tested categories on
 
 ## Material limits
 
-No paid model requests, spending approvals, cloud deployment, budget increase, new resources, public source release or hackathon submission ran in this pass. The most recent successful hosted CI is `49bb911`; the local changes require a newly reviewed release attempt after the consumed 25-attempt allowance. The JPY 3,000 ceiling and October 19 cutoffs remain unchanged.
+No paid model requests, spending approvals, cloud deployment, budget increase, new resources, public source release or hackathon submission ran in the initial QA pass. Its hosted baseline was `49bb911`. The user subsequently authorized PR #2 review and exactly one further alpha attempt, cumulative 26. The JPY 3,000 ceiling and October 19 cutoffs remain unchanged.
+
+The release review found and fixed one additional upload failure: after the source uploaded, a rejected investigation creation could hide the recovery notice because creation advanced its own navigation epoch. Regression coverage now includes successful completion, draft-preserving recovery through Sources, and suppression after actual navigation. The operator release gate pins a reviewed commit and permits only the exact reviewed before/after hashes for the additive session header in `routes.py`; other protected files remain frozen. No model grant changes are part of this release. Final deployment evidence belongs to the corresponding main CI run.
 
 Linux namespace isolation passed on the CI runner. This does not establish containerized deployment isolation, target-host load, billing, broad Gemini accuracy, UX-recording usefulness, client privacy/commercial terms, or long-term service availability. Registration/category/source-lineage and public-source prerequisites remain open. See [alpha handoff](../ALPHA.md) and [remaining work](../TODOS.md).
