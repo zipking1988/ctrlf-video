@@ -28,6 +28,18 @@ reservations, ownership, cutoffs and release counts remain binding. ai& credits 
 separate from Google Cloud credits and do not increase spending authorization.
 Do not activate uncalibrated runtimes or treat mock tests as live acceptance.
 
+Current October 18 handoff: private main `0ffd59e` deployed successfully as
+attempt 29/29; no releases remain authorized. The supplied backend key and fixed
+Gemini-vision / ai& Gemma-text pipeline are live. The actual 70.203-second source
+completed indexing and one breakdown plus three contextual follow-ups, but failed
+accuracy acceptance. Preserve its incorrect answers and separately labeled human
+review; do not present them as a client-ready or five-minute pass. The sole v4
+grant has JPY 751 reserved, 18/60 attempts and 2/8 primary calls used. Remaining
+JPY 1,249 / 42 attempts / six primary calls do not imply another grant or release.
+The real five-minute file remains missing. A consistent private backup restored
+locally with 363 file hashes and both SQLite integrity checks passing. All original
+cutoffs and final cleanup remain required; see [live outcomes](docs/LIVE_GEMINI_TEST.md).
+
 CtrlF Video ("Ctrl+F for video") is a desktop video investigation agent for AI Builder Cup 2026. Its workspace is a spatial canvas of questions, evidence frames and conclusions with multi-turn context and a source player. Mobile is outside this edition's scope.
 
 On 2026-10-14 the user requested a complete rename and a Gemini-only cleanup of this checkout, explicitly authorizing removal of the other provider integration and obsolete docs/source snapshots. The package is `ctrlf_video`; settings use `CTRLF_VIDEO_*`, runtime/infrastructure use `CTRLF_*`, and browser globals use `CtrlFVideo*`. Do not add previous-brand compatibility aliases. The original separate repository/workspace must remain untouched.

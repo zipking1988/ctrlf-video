@@ -172,3 +172,43 @@ No live five-minute model validation has run: no actual five-minute source path
 has been supplied. The real available basketball clip is only 70.2 seconds and
 the five-minute decoder fixture is synthetic. Neither is substituted for the
 requested acceptance; prepared-note search is not accepted as model conversation.
+
+## Gemini vision / ai& Gemma text live trial (October 18)
+
+The user-supplied key was installed privately and verified against ai&'s
+organization catalog/pricing. Two full-window image calibrations failed and remain
+unknown/charged; text and a single real frame passed. Production uses Gemini for
+images/embeddings and Gemma for text, with fixed supplier roles and the same grant.
+No source video or JPEGs reach ai& in this split. See [provider setup](AIAND_SETUP.md).
+
+Attempt 28 deployed `7f5f14e`; final authorized attempt 29 deployed `0ffd59e`.
+[CI 39131832940](https://github.com/zipking1988/ctrlf-video/actions/runs/39131832940)
+passed 173 frontend and 268 Linux backend tests. Local verification passed 267
+backend tests with one Linux-only skip, frontend tests, build and `make check`.
+Production asset hashes match the reviewed build; configured mode, session and
+persistence passed deployment checks. No release attempts remain.
+
+The funded browser uploaded the actual public 70.203467-second basketball source
+through the owned product flow, not the synthetic fixture. Real indexing, one
+whole-clip question and three sequential contextual follow-ups completed. All
+three follow-ups report `usedContext=true`; all four answers are `partial`.
+Whole-source windows cover the source time range at bounded sampling. This
+verifies live model integration and conversation, not factual completeness.
+
+Accuracy acceptance failed. The first answers overstated score timing. Rechecks
+notice a displayed decrease and retract 67 at 00:28, but still claim 62 at 00:14
+(the independently decoded frame shows 59), contradict intervals and format
+60.060 seconds as `01:00:06`. The requested game sequence/camera-cut explanation
+remains inadequate. Original incorrect responses are retained. The human review
+is explicitly labeled separately, citing actual 36.036/37.037 frames for 62 → 61;
+it is not counted as model success. The actual five-minute input is still missing.
+
+The report preview contains four questions, one human finding and 49 evidence
+frames. JSON download reports started; its download file was not independently
+located. Refresh restores the source, all four questions, finding and selected
+context without new model requests. Ledger audit: JPY 751 reserved, 18 calls and
+two initial indexing calls; JPY 1,249 / 42 calls / six primary calls remain in the
+sole grant. Historical JPY 1,162 remains charged. Reservations are not settled
+invoices. A consistent private backup restored locally: all 363 file hashes and
+both SQLite integrity checks pass. Evidence and backup stay in ignored
+`.ctrlf-video-eval/aiand-20261018/`; no complete MVP/client GO is claimed.

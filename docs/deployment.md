@@ -352,9 +352,30 @@ Attempt 27 deployed reviewed private-main commit `1a980ae` successfully through
 Upload is the primary landing action; real whole-video answers expose generated
 observations and direct contextual follow-up. Grant installation and CI sent zero
 new model requests. Actual five-minute source input and three-follow-up acceptance
-remain pending; prepared notes are not acceptance evidence. Two release attempts
-remain. The grant's consistent local backup passed all 34 file hashes and both
+remained pending at that release; prepared notes are not acceptance evidence. Two release attempts
+then remained. The grant's consistent local backup passed all 34 file hashes and both
 database integrity checks. See [live test record](LIVE_GEMINI_TEST.md).
+
+Attempts 28 (`7f5f14e`) and 29 (`0ffd59e`) subsequently deployed the fixed
+Gemini-vision / ai& Gemma-text split and a contextual-claim/tail-window fix.
+[CI 39131832940](https://github.com/zipking1988/ctrlf-video/actions/runs/39131832940)
+passed 173 frontend and 268 Linux backend tests, then verified both deployments,
+session, configured mode and persistence. Public HTML, workspace module and
+generated bundle match the reviewed files. The release state is committed,
+29/29: no further deployment is authorized. Markdown-only handoff pushes are
+excluded from deployment. The backend key is privately installed; no new IAM
+grant or service-account key was needed. Existing explicit account/project/
+billing-project CLI flags remain required.
+
+Real indexing, one whole-source answer and three contextual follow-ups completed
+on the actual 70.203-second clip. Accuracy acceptance failed; the real five-minute
+input remains missing. Current v4 reservations are JPY 751 / 2,000, 18/60 calls
+and 2/8 primary calls. The aggregate JPY 5,000 and all original October 19 cutoffs
+remain unchanged. A new consistent private backup restored locally with all 363
+file hashes and both SQLite checks passing (SHA-256
+`3044b6195fccf782c74b0d7bc23c1caa5b1be0d538787f7ea548e8f133a26886`).
+Its credentials, sources and financial ledger remain outside Git. This does not
+replace the scheduled cutoff backup/cleanup.
 
 Recovery entry points on the VM (trusted operator only):
 

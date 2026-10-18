@@ -33,6 +33,55 @@ Actual five-minute source input and live analysis/follow-up acceptance remain
 pending. The available real basketball sample is 70.2 seconds; the local five-minute
 decoder fixture is synthetic and will not be substituted for this acceptance.
 
+### October 18 ai& split deployment and live trial
+
+The user's ai& key is privately installed and verified. Native Gemini retains
+visual review and embeddings; ai& `google/gemma-4-31b-it` handles text planning,
+selection and synthesis. No original video or JPEG frames reach ai& in this split.
+All requests use the same v4 allowance. Releases 28 (`7f5f14e`) and 29
+(`0ffd59e`) succeeded; all 29 authorized release attempts are now consumed.
+See [setup and calibration](AIAND_SETUP.md) for the two retained unknown batch
+failures, successful text/single-frame calibration and fixed role assignments.
+
+The current owned source is the actual 70.203467-second basketball excerpt
+(SHA-256 `0c9424e1dd66f0f9823831e4b2ed22b7f81362740667212c8d65bcf2183e9a2a`).
+It completed real indexing, one whole-clip question and three sequential
+follow-ups; all three used their selected preceding answer as context.
+All four results are `partial`, not prepared answers. The first two overstated
+score timing. The last answer corrects one claim and detects the displayed
+decrease, but still misreads the score at 14 seconds, contradicts its own intervals,
+malforms a timestamp and inadequately explains the game sequence. Live integration
+passes; accuracy/client readiness fails. A separate labeled human finding records
+the actual 62 → 61 graphic change at 36.036/37.037 seconds without replacing the
+incorrect model responses. No actual five-minute acceptance has run.
+
+| v4 work | Reserved JPY | Attempts | Initial indexing calls |
+| --- | ---: | ---: | ---: |
+| Calibration (including two unknown failures) | 233 | 4 | 0 |
+| Source indexing | 160 | 3 | 2 |
+| Initial whole-clip answer | 83 | 2 | 0 |
+| First contextual retrieval/visual follow-up | 109 | 5 | 0 |
+| Two contextual whole-clip rechecks | 166 | 4 | 0 |
+| **Used** | **751** | **18** | **2** |
+| **Remaining** | **1,249** | **42** | **6** |
+
+JPY 1,162 historical model reservations remain charged separately; current
+cumulative model reservations are JPY 1,913. This accounting is conservative,
+not a supplier invoice or reconciled cloud spend. The redundant near-tail index
+window consumed JPY 75 before its fix; it is not refunded. Future five-minute
+admission requires that actual file's preflight window count and the still-active
+grant. Unknown attempts are not resent. No budget reset or cutoff extension ran.
+
+The report preview shows four questions, one human-reviewed finding and 49
+evidence frames. JSON export reports download started; its browser download file
+was not independently located. Refresh restored the source, all four questions,
+selected follow-up and finding without another dispatch. A consistent private
+cloud backup was downloaded and restored locally: all 363 file hashes and both
+SQLite integrity checks passed (archive SHA-256
+`3044b6195fccf782c74b0d7bc23c1caa5b1be0d538787f7ea548e8f133a26886`).
+Local evidence lives under ignored `.ctrlf-video-eval/aiand-20261018/`; its backup
+contains private credentials and must never be committed or shared publicly.
+
 ## Historical October 17 status
 
 On October 17, 2026 the user authorized real uploaded-video testing within the then **JPY 3,000 aggregate cloud/model ceiling**, ending October 19 at 23:59 JST. One uploaded 18-second synthetic clip completed ingestion, retrieval, visual verification, synthesis and editable finding saving. This is technical validation, not broad accuracy or UX acceptance. The October 18 allocation above supersedes this historical ceiling.

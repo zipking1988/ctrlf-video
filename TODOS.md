@@ -17,19 +17,21 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 
 - [x] Verify the public ai& catalog lists `google/gemma-4-31b-it` with vision/video capability; prepare a bounded inline-JPEG generation adapter through existing reservations.
 - [x] Verify the supplied key and organization pricing; live structured text and single-image Gemma checks passed. Four calls reserve JPY 233 in the sole existing grant; both rejected 128-image attempts remain unknown.
-- [ ] Resolve ai& full-window input compatibility before activation; two 128-image cases failed. Keep production Gemini and existing coverage/attempt guards. No new grant or automatic fallback.
-- [ ] Deploy and run actual source analysis plus three contextual follow-ups. Mock integration tests do not satisfy live acceptance.
+- [ ] Resolve all-Gemma full-window input compatibility before activating that route; two 128-image cases failed. Production instead uses fixed Gemini vision / Gemma text, retaining coverage/attempt guards and the same grant.
+- [x] Deploy the split (`0ffd59e`, release 29/29) and run actual 70.203-second source analysis plus three contextual follow-ups. All follow-ups used context; this verifies live integration only.
+- [ ] Correct observed score readings/timing, contradictory findings and inadequate game-sequence analysis. The live trial failed accuracy acceptance. No deployment attempts remain authorized.
+- [x] Preserve incorrect answers alongside a labeled human finding; verify four-question report preview, refresh and a consistent private local backup (363 file hashes, two SQLite checks). Browser JSON export initiated; its download file remains unlocated.
 
 ## Whole-video product value
 
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.
 - [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Deployed in `1a980ae`.
 - [x] Install the October 18 JPY 2,000 / 60-call / eight-index-call grant for the explicitly confirmed current browser owner, preserving historical records; deploy reviewed `1a980ae` as attempt 27 of 29.
-- [ ] Verify an actual five-minute video and at least three genuine contextual Gemini follow-ups. The concrete real input file is still missing. No new model calls have been made; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
+- [ ] Verify an actual five-minute video and at least three genuine contextual follow-ups. The concrete real input file is still missing. The shorter real trial reserves JPY 751, 18/60 calls and 2/8 primary calls; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
-- [ ] Validate fresh five-minute analysis against a fully annotated authorized source under a separately active finite model grant. No new model grant was installed by this update.
+- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. Remaining: JPY 1,249, 42 attempts and six primary calls; no new grant or deadline is implied.
 - [ ] Run an actual first-time human study. Automated browser walkthroughs establish flow behavior, not human comprehension or researcher value.
 
 ## First-use-case validation
