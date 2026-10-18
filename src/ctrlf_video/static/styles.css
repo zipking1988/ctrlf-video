@@ -112,7 +112,9 @@ textarea:focus-visible,
 }
 .skip-link:focus {
   position: fixed;
-  z-index: 30;
+  z-index: 110;
+  top: 12px;
+  left: 12px;
   background: var(--raised);
   padding: 12px;
 }

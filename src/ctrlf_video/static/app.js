@@ -968,7 +968,14 @@ function openInspector(tab = "context") {
   ).focus();
 }
 document.querySelector(".skip-link")?.addEventListener("click", event => {
+  // The public example owns its video focus; never open the private composer.
+  if (window.CtrlFVideoRecordedExample?.active()) return;
   event.preventDefault();
+  if (!$("research-welcome").hidden) {
+    $("welcome-title").focus();
+    $("welcome-title").scrollIntoView({ block: "start" });
+    return;
+  }
   setChatOpen(true, true);
 });
 $("agent-launcher").addEventListener("click", () => setChatOpen(document.querySelector(".agent-shell").classList.contains("chat-collapsed"), true));
