@@ -65,6 +65,20 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
         <article className="simple-answer" aria-label="Answer and source citations">
           <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : breakdown ? "Whole-video breakdown" : "Answer"}</span></div>
           <p className="simple-answer-text">{query.response.answer}</p>
+          {query.mode === "real" && breakdown && !!query.response.events.length && <section className="live-findings" aria-label="Findings from this analysis">
+            <h2>Findings from this analysis</h2>
+            <p>Generated from this recording. Replay each citation to check the observation.</p>
+            <ol>{query.response.events.map((event,index)=><li key={index}>
+              <strong>{event.action}</strong>
+              {event.summary !== event.action && <p>{event.summary}</p>}
+              <div>{event.evidence.map(frame=><button type="button" className="outline-button" key={`${frame.frame_id}:${frame.t}`} onClick={()=>replay(frame)} aria-label={`Replay finding ${index+1} at ${sourceClock(frame.t)}`}>{sourceClock(frame.t)} {icon("play")}</button>)}</div>
+            </li>)}</ol>
+          </section>}
+          {query.mode === "real" && ["ok","partial"].includes(query.response.status) && !!query.response.events.length && <div className="live-answer-actions">
+            <button type="button" className="primary-button" disabled={state.local} onClick={()=>ui()?.continueFrom(selected.id)}>Follow up on this answer {icon("arrow-right")}</button>
+            <button type="button" className="outline-button" onClick={save}>Write a finding</button>
+            <small>{query.usedContext ? "This answer used the selected earlier answer as context." : "Follow-up questions use this answer and its source evidence as context."}</small>
+          </div>}
           {!!query.response.unresolved.length && <details className="simple-result-warning" open={breakdown || undefined}>
             <summary>{breakdown ? "Review coverage & limits" : "Still to verify"} · {query.response.unresolved.length} {query.response.unresolved.length === 1 ? "open point" : "open points"}</summary>
             {query.response.unresolved.map(text => <p key={text}>{text}</p>)}

@@ -884,3 +884,10 @@ body.recorded-view .research-welcome { display: none; }
 .review-live-entry small { display: block; margin-top: 12px; font-size: 11px; line-height: 1.6; color: #526663; }
 .review-live-entry [role="alert"] { color: #963c32; }
 .review-question-actions { flex-wrap: wrap; }
+.live-findings { margin: 24px 0; }
+.live-findings h2 { font-size: 18px; }
+.live-findings > p, .live-answer-actions small { color: #526663; font-size: 12px; line-height: 1.6; }
+.live-findings ol { list-style: none; padding: 0; display: grid; gap: 12px; }
+.live-findings li { padding: 16px; background: #edf3ee; border-left: 3px solid #8eafa2; }
+.live-findings li > div, .live-answer-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.live-answer-actions small { flex-basis: 100%; }

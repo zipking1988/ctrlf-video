@@ -6,6 +6,13 @@ October 18 alpha hardening retains the selected layout. Quick guide is available
 
 ## October 18 whole-video review update
 
+Real whole-video answers now expose their own model-produced event observations
+and source citations directly below the summary. A visible follow-up action
+selects that actual answer as context, and finding editing is available beside it.
+These cards use only the owned result; no prepared public review is imported.
+The funded five-minute and three-follow-up acceptance remains pending until its
+actual source, authorized active session and model outputs have been verified.
+
 Local follow-up after the user's finding/chat critique: the example opens with
 three source-linked findings, one-click saving/export, and an always available
 question entry. The full six-section breakdown is a disclosure below them.

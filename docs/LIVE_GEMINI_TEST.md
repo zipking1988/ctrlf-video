@@ -1,5 +1,21 @@
 # Limited Gemini test on ctrlfvideo.com
 
+## October 18 real alpha authorization (supersedes prior allocation)
+
+The user approved JPY 5,000 aggregate spending through the unchanged cutoff,
+including a fresh JPY 2,000 model grant, at most 60 attempts and eight initial
+indexing calls, on the same authorized owner/session. Historical model reservations
+of JPY 1,162 stay charged; infrastructure/pending billing reserves JPY 1,500 and
+buffer is JPY 338. Revoked unused allowances stay revoked. This authorizes actual
+five-minute video analysis and at least three contextual follow-ups, including
+bounded diagnosis/retesting within this same grant. It does not prove quality or
+settled costs. Prepared answers and synthetic footage cannot pass this acceptance.
+
+Three reviewed deployment attempts are authorized (cumulative 29, retaining 26
+previous records), including private main pushes and fixes. Model and new workflow
+admission still close October 19 at 22:00 JST; later recovery/cleanup cutoffs are
+unchanged. Installation and live outcomes will be recorded separately below.
+
 Updated October 17, 2026. The user authorized real uploaded-video testing within the existing **JPY 3,000 aggregate cloud/model ceiling**, ending October 19 at 23:59 JST. This does not increase that ceiling or extend hosting. Real mode is active for the approved browser session. One uploaded 18-second synthetic clip completed ingestion, retrieval, visual verification, synthesis and editable finding saving. This is technical validation, not broad accuracy or UX acceptance.
 
 Current spending state: the October 17 one-question test below is complete and

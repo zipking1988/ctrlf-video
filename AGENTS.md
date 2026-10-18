@@ -1,5 +1,17 @@
 # Working on CtrlF Video
 
+On October 18, 2026 the user explicitly authorized the real five-minute alpha
+acceptance plan: JPY 5,000 aggregate total, a fresh JPY 2,000 model grant capped
+at 60 model attempts and eight initial indexing calls, and three additional
+deployments (29 cumulative, preserving all 26 prior records). Review/fix/private
+main pushes are authorized for this work. Use the same approved owner/session;
+verify an actual five-minute source and at least three contextual follow-ups.
+Prepared answers and synthetic footage do not count as live acceptance. Retain
+JPY 1,162 historical model reservations, JPY 1,500 infrastructure/pending reserve
+and JPY 338 buffer. Do not reactivate revoked unused funding. All October 19
+admission, model, IAM and cleanup cutoffs remain unchanged. No public enrollment,
+source publication, automatic retry, key creation or hosting extension is granted.
+
 ## Product and authorized scope
 
 CtrlF Video ("Ctrl+F for video") is a desktop video investigation agent for AI Builder Cup 2026. Its workspace is a spatial canvas of questions, evidence frames and conclusions with multi-turn context and a source player. Mobile is outside this edition's scope.
