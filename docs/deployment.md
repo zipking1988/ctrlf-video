@@ -590,3 +590,37 @@ All 33 releases are consumed; attempt 34 and additional retests are unauthorized
 Real five-minute acceptance and full native browser console/navigation canary
 telemetry remain unverified. Private receipts are under
 `.ctrlf-video-eval/aiand-20261018/release33/`, outside Git.
+
+
+## October 19: PR #3 design release, attempt 34
+
+The user explicitly authorized merging reviewed PR #3 and exactly one further
+deployment (34 cumulative), retaining the JPY 5,000 aggregate and all existing
+cutoffs. PR #3 merged at `e47b2168e434cfa8f7a7ebf3a369ba1b5a6a62bb`.
+[CI 39146742816](https://github.com/zipking1988/ctrlf-video/actions/runs/39146742816)
+completed successfully: 192 frontend tests, 280 Linux backend tests, asset rebuild,
+lint/schema, media isolation and recovery checks. Both deployment jobs are green.
+
+Only the trusted release limit and reviewed SHA pin changed. The backend is
+committed at 34/34 and frontend revision
+`ctrlfvideo-frontend-ci-e47b2168-39146742816` serves 100% of traffic. Public HTML,
+bundle, workspace/app scripts and both changed stylesheets match the reviewed
+commit byte for byte. Gateway/backend health passes in real mode; maintenance
+is cleared. All 33 previous release entries, the complete financial ledger,
+runtime/environment bytes, three owned sources and nine queries are unchanged.
+V4 remains JPY 1,145 reserved, 33/60 calls and 2/8 primary calls; this deployment
+added zero model requests and no grant.
+
+The fresh consistent backup was downloaded privately and restored locally with
+752 matching file hashes and two SQLite integrity checks. Archive SHA-256:
+`40e2d0763fad8f98ebeade60240993c8b994c52ec252e4a755db6ff70f7d8e84`.
+Receipts and browser evidence remain outside Git in the separate worktree's
+`.ctrlf-video-eval/release34/`.
+
+Live browser checks passed: landing disclosures, skip-to-heading with route
+preserved, Quick guide and focus return, restored nine-turn Review conversation,
+Latest answer/Question box focus, preserved multiline answer, timeline open/Escape
+focus return, and citation replay at 00:08.008 (media readyState 4). No browser
+warning/error was recorded. No fresh question was sent. These checks establish
+deployment and UI behavior, not semantic accuracy or five-minute acceptance.
+All 34 authorized attempts are consumed; attempt 35 requires separate approval.

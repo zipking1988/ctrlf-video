@@ -1,5 +1,16 @@
 # Working on CtrlF Video
 
+On October 19 the user explicitly authorized merging reviewed PR #3 and exactly
+one additional deployment, 34 cumulative, for `e47b216`. Preserve all 33 prior
+release records, financial reservations, the JPY 5,000 aggregate and every existing
+cutoff. Only `max_releases` and the reviewed release pin may change. This grants
+no extra model retest, new funding, key, resource or hosting extension. CI 39146742816 deployed it successfully
+after 192 frontend and 280 Linux backend tests. Attempt 34/34 is committed; all
+prior release and financial records, three sources and nine queries are unchanged.
+The fresh backup restored locally with 752 matching files and two valid databases.
+Live landing, Review navigation, timeline and source playback passed; zero model
+requests were added. Accuracy acceptance remains failed; no attempt 35 is authorized.
+
 On October 19 the user subsequently explicitly authorized reviewed `6d96727`
 for private main, exactly one additional deployment (33 cumulative), and one
 fresh retest of “How does the lead change?” within the existing model grant.
