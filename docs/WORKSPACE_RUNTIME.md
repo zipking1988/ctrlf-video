@@ -1,6 +1,6 @@
 # CtrlF Video — Runtime and Workflow
 
-Updated: 2026-10-17. Gemini-only implementation. The split GCP deployment now permits a limited real Gemini test for one explicitly approved browser session. A complete uploaded-synthetic-video pipeline and finding save passed; broad model quality, actual UX value and settled operating costs remain unverified. See [live test limits](LIVE_GEMINI_TEST.md). See [deployment status](deployment.md). Default `fixture` sends no model requests.
+Updated: 2026-10-17. Gemini-default implementation; optional ai& Gemma preparation is described in [ai& setup](AIAND_SETUP.md). The split GCP deployment now permits a limited real Gemini test for one explicitly approved browser session. A complete uploaded-synthetic-video pipeline and finding save passed; broad model quality, actual UX value and settled operating costs remain unverified. See [live test limits](LIVE_GEMINI_TEST.md). See [deployment status](deployment.md). Default `fixture` sends no model requests.
 
 ## Local workflow
 
@@ -22,7 +22,7 @@ Before live dispatch, independently complete these prerequisites:
 4. Obtain explicit finite currency/money/primary-call/model-call and calibration authorization, with validity and supplier spending/cutoff evidence. HTTP timeouts and billing alerts do not establish a hard supplier cap.
 5. Record matching active deployment `*` and session-owner approvals through the trusted local budget tool. Runtime configuration cannot install them.
 
-Four model roles are required: vision, embed, rerank (Gemini relevance selection) and text. `provider` defaults to and only accepts `gemini`. No ASR provider is accepted. Audio questions return `audio_channel_unavailable`.
+Four model roles are required: vision, embed, rerank (Gemini relevance selection) and text. `provider` defaults to `gemini`; `gemini_aiand` selects Gemini vision/embeddings and ai& Gemma text; `aiand` selects Gemma generation plus Google text embeddings. No ASR provider is accepted. Audio questions return `audio_channel_unavailable`.
 
 ```sh
 CTRLF_RUNTIME_FILE=/absolute/private/path/runtime.json make preflight

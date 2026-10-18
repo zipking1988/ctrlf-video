@@ -49,7 +49,7 @@ Local upload, media preflight, private playback, persistent investigations, canv
 
 The first product use case remains UX research. The NBA recording has a verified local playback flow and limited live Gemini evidence; it remains a technical sample, with person-matching limitations retained in [live-test records](docs/LIVE_GEMINI_TEST.md). An actual UX recording and participant task are still needed for product validation. See [sample availability](docs/SPORTS_SAMPLE.md), [acceptance backlog](TODOS.md) and [design QA](design-qa.md).
 
-This edition is Gemini-only. The original implementation's separate workspace/repository remains preserved. [Provenance](docs/provenance.md) records the source lineage and unresolved hackathon eligibility. The repository is private; publication and deployment require separate authorization.
+Gemini is the default provider. The optional `gemini_aiand` runtime uses Gemini for visual review/embeddings and `google/gemma-4-31b-it` via ai& for text planning, selection and synthesis. This fixed split preserves frame coverage; all-Gemma visual batches failed calibration. The backend key and live text calibration pass; deployment and live video acceptance of the split remain pending. See [ai& setup](docs/AIAND_SETUP.md). The original implementation's separate workspace/repository remains preserved. [Provenance](docs/provenance.md) records the source lineage and unresolved hackathon eligibility. The repository is private; publication and deployment require separate authorization.
 
 ## Initial cloud test
 

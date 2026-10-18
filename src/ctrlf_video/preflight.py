@@ -7,23 +7,27 @@ import sys
 from ctrlf_video import __version__
 from ctrlf_video.config import ConfigurationError, Settings, load_settings
 
-GEMINI_BLOCKERS = (
-    "Live Gemini model IDs/revisions, credentials and input/output bounds need verification",
+MODEL_BLOCKERS = (
+    "Live model IDs/revisions, credentials and input/output bounds need verification",
     "Finite numeric call/money/calibration budgets have not been confirmed",
-    "Gemini request cost bounds and provider billing controls are unverified",
+    "Model request cost bounds and provider billing controls are unverified",
     "Google Cloud durable storage and Linux media isolation remain deployment prerequisites",
 )
 
 
-def report(settings: Settings) -> dict:
+def report(settings: Settings, runtime=None) -> dict:
+    if runtime is None:
+        from ctrlf_video.agent import load_runtime
+
+        runtime = load_runtime()
     tools = {name: shutil.which(name) is not None for name in ("ffmpeg", "ffprobe")}
-    blockers = list(GEMINI_BLOCKERS)
+    blockers = list(MODEL_BLOCKERS)
     if not all(tools.values()):
         blockers.append("ffmpeg and ffprobe are required for real media")
     return {
         "version": __version__,
         "mode": settings.mode,
-        "provider": "gemini",
+        "provider": runtime.provider if runtime else "gemini",
         "python": sys.version.split()[0],
         "local_tools": tools,
         "configuration": settings.model_dump(),
@@ -40,7 +44,7 @@ def report(settings: Settings) -> dict:
             "fixture workspace",
             "durable investigations and source library",
             "owned private media and bounded macOS decode",
-            "Gemini REST adapter through the same approved attempt ledger",
+            "Gemini and ai& Gemma adapters through the same approved attempt ledger",
             "idempotent chat and budget admission",
         ],
         "pending": [
@@ -57,13 +61,13 @@ def main() -> None:
 
     try:
         settings = load_settings()
-        load_runtime()
+        runtime = load_runtime()
     except (ConfigurationError, AgentError) as exc:
         print(json.dumps({"code": "invalid_config", "message": str(exc)}))
         raise SystemExit(2) from None
     print(
         json.dumps(
-            report(settings),
+            report(settings, runtime),
             ensure_ascii=False,
             indent=2,
         )

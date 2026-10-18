@@ -19,6 +19,15 @@ five-minute input file has not yet been provided; yes/ok replies are not file pa
 
 ## Product and authorized scope
 
+On October 18 the user explicitly requested ai& for video analysis using Gemini or
+“gamma” (interpreted as the catalogued Gemma model), superseding the earlier
+Gemini-only provider restriction for this integration. The user also requested help
+adding an ai& key. Generation may use the fixed ai& origin with separate media
+consent; text embeddings retain the fixed Google origin. Existing numeric budgets,
+reservations, ownership, cutoffs and release counts remain binding. ai& credits are
+separate from Google Cloud credits and do not increase spending authorization.
+Do not activate uncalibrated runtimes or treat mock tests as live acceptance.
+
 CtrlF Video ("Ctrl+F for video") is a desktop video investigation agent for AI Builder Cup 2026. Its workspace is a spatial canvas of questions, evidence frames and conclusions with multi-turn context and a source player. Mobile is outside this edition's scope.
 
 On 2026-10-14 the user requested a complete rename and a Gemini-only cleanup of this checkout, explicitly authorizing removal of the other provider integration and obsolete docs/source snapshots. The package is `ctrlf_video`; settings use `CTRLF_VIDEO_*`, runtime/infrastructure use `CTRLF_*`, and browser globals use `CtrlFVideo*`. Do not add previous-brand compatibility aliases. The original separate repository/workspace must remain untouched.

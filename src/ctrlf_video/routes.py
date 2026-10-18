@@ -253,7 +253,7 @@ def register(app, settings, root, runtime=None, transport=None):
             "owner_id": row["id"],
             "expires": row["expires"],
             "real_ready": not blockers,
-            "provider": "gemini",
+            "provider": runtime.provider if runtime else "gemini",
             "blockers": sorted(set(blockers)),
             "ttl_hours": settings.ttl_hours,
         }

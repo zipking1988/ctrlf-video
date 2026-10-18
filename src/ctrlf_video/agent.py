@@ -1,4 +1,4 @@
-"""Gemini dispatch and bounded evidence investigation. No fixture fallback."""
+"""Approved model dispatch and bounded evidence investigation. No fixture fallback."""
 
 import asyncio
 import base64
@@ -72,8 +72,9 @@ class Endpoint(BaseModel):
 
 class Runtime(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
-    provider: Literal["gemini"] = "gemini"
+    provider: Literal["gemini", "aiand", "gemini_aiand"] = "gemini"
     allow_google_media: bool = False
+    allow_aiand_media: bool = False
     vision: Endpoint
     embed: Endpoint
     rerank: Endpoint
@@ -89,6 +90,13 @@ class Runtime(BaseModel):
     attempt_seconds: int = Field(ge=1, le=120)
     resource_cutoff_reference: str
 
+    def role_provider(self, role):
+        if self.provider == "aiand" and role != "embed":
+            return "aiand"
+        if self.provider == "gemini_aiand" and role in {"text", "rerank"}:
+            return "aiand"
+        return "gemini"
+
     def blockers(self):
         errors = []
         if self.valid_until <= time.time():
@@ -97,14 +105,24 @@ class Runtime(BaseModel):
             errors.append("resource_cost_bound_unverified")
         if not re.fullmatch(r"[A-Z]{3}_MICRO", self.currency_unit):
             errors.append("invalid_currency")
-        if not self.allow_google_media:
+        if self.provider in {"gemini", "gemini_aiand"} and not self.allow_google_media:
             errors.append("google_media_not_enabled")
+        if self.provider == "aiand" and not self.allow_aiand_media:
+            errors.append("aiand_media_not_enabled")
         for role in ("vision", "embed", "rerank", "text"):
             endpoint = getattr(self, role)
-            if endpoint.base_url != "https://generativelanguage.googleapis.com/v1beta":
-                errors.append("gemini_endpoint_not_allowed")
-            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", endpoint.model):
-                errors.append("invalid_gemini_model")
+            if self.role_provider(role) == "aiand":
+                if endpoint.base_url != "https://api.aiand.com/v1":
+                    errors.append("aiand_endpoint_not_allowed")
+                if endpoint.model != "google/gemma-4-31b-it":
+                    errors.append("invalid_aiand_model")
+            else:
+                # ai& has no documented embedding endpoint. Keep the existing
+                # text-only Google retrieval channel; never fabricate vectors.
+                if endpoint.base_url != "https://generativelanguage.googleapis.com/v1beta":
+                    errors.append("gemini_endpoint_not_allowed")
+                if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", endpoint.model):
+                    errors.append("invalid_gemini_model")
             if not endpoint.model or not endpoint.revision:
                 errors.append("model_revision_missing")
             if not endpoint.key_env or not os.environ.get(endpoint.key_env):
@@ -190,14 +208,18 @@ class Provider:
         endpoint = getattr(config, role)
         if not endpoint:
             raise AgentError("channel_not_configured")
-        from ctrlf_video.gemini import prepare_request
+        supplier = config.role_provider(role)
+        if supplier == "aiand":
+            from ctrlf_video.aiand import normalize_response, prepare_request
+        else:
+            from ctrlf_video.gemini import normalize_response, prepare_request
 
         request_route, request_payload = prepare_request(role, route, payload, category)
         self.gate.acquire(category, deadline, config.attempt_seconds)
         try:
             self.check()
             identity = {
-                "provider": config.provider,
+                "provider": supplier,
                 "role": role,
                 "model": endpoint.model,
                 "revision": endpoint.revision,
@@ -226,7 +248,11 @@ class Provider:
             self.check()
             self.ledger.transition(attempt, "dispatched")
             key = os.environ.get(endpoint.key_env, "") if endpoint.key_env else ""
-            headers = {"x-goog-api-key": key}
+            headers = (
+                {"Authorization": "Bearer " + key, "X-Aiand-Metrics": "true"}
+                if supplier == "aiand"
+                else {"x-goog-api-key": key}
+            )
             try:
 
                 async def request_once():
@@ -247,7 +273,8 @@ class Provider:
                             ) as response:
                                 if response.status_code >= 400:
                                     log.warning(
-                                        "Gemini %s HTTP %s %s",
+                                        "%s %s HTTP %s %s",
+                                        supplier,
                                         role,
                                         response.status_code,
                                         provider_error((await response.aread())[:4096]),
@@ -259,8 +286,6 @@ class Provider:
                                     if len(body) > 4 * 1024**2:
                                         raise AgentError("model_output_limit")
                                 result = json.loads(body)
-                                from ctrlf_video.gemini import normalize_response
-
                                 result = normalize_response(role, result)
                                 return result
 
@@ -276,7 +301,7 @@ class Provider:
                 return result
             except (httpx.HTTPError, ValueError, TimeoutError, HTTPException) as error:
                 reason = str(error) if isinstance(error, AgentError) else type(error).__name__
-                log.warning("Gemini %s attempt outcome unknown: %s", role, reason)
+                log.warning("%s %s attempt outcome unknown: %s", supplier, role, reason)
                 if self.ledger.read_attempt(attempt, owner)["state"] == "dispatched":
                     self.ledger.transition(attempt, "unknown")
                 raise AgentError("model_unknown") from None

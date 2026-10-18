@@ -13,6 +13,13 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [ ] Fund any new model trial explicitly and agree client data/retention expectations; anonymous live analysis remains unavailable.
 - [ ] Resolve the submission and UX-validation prerequisites below. See [ALPHA.md](ALPHA.md).
 
+## ai& Gemma integration
+
+- [x] Verify the public ai& catalog lists `google/gemma-4-31b-it` with vision/video capability; prepare a bounded inline-JPEG generation adapter through existing reservations.
+- [x] Verify the supplied key and organization pricing; live structured text and single-image Gemma checks passed. Four calls reserve JPY 233 in the sole existing grant; both rejected 128-image attempts remain unknown.
+- [ ] Resolve ai& full-window input compatibility before activation; two 128-image cases failed. Keep production Gemini and existing coverage/attempt guards. No new grant or automatic fallback.
+- [ ] Deploy and run actual source analysis plus three contextual follow-ups. Mock integration tests do not satisfy live acceptance.
+
 ## Whole-video product value
 
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.

@@ -9,6 +9,8 @@ Updated: 2026-10-14. Current adapters and HTTP recovery are implemented; live pr
 | `google_media_not_enabled` | Google JPEG transmission requires trusted runtime consent |
 | `gemini_endpoint_not_allowed` / `invalid_gemini_model` | Use fixed Google API origin and verified model identifiers |
 | `model_key_missing` / `model_revision_missing` | Supply backend credentials and verified revision without exposing them |
+| `aiand_media_not_enabled` / `aiand_endpoint_not_allowed` / `invalid_aiand_model` | ai& needs separate trusted media consent, its fixed API origin and the pinned Gemma model; see [setup](AIAND_SETUP.md). |
+| `aiand_incomplete_response` / `invalid_aiand_response` | Incomplete or invalid Gemma output retains an unknown attempt; never resend automatically. |
 | `gemini_embedding_input_limit` / `gemini_request_limit` | Complete batch >100 windows or request >19 MiB; choose smaller footage, never truncate readiness |
 | `gemini_inline_jpeg_required` | Only decoded inline JPEGs are allowed; no remote media URL |
 | `audio_channel_unavailable` | This edition has no audio transcription; ask a visible-fact question |

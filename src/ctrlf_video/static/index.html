@@ -21,8 +21,8 @@
     <script src="/static/investigation-canvas.js?v=07916e301039" defer></script>
     <script src="/static/workbench-model.js?v=df1bbefe7501" defer></script>
     <script src="/static/investigation-report.js?v=b582e8235d2c" defer></script>
-    <script src="/static/workbench.js?v=e095b50bf33f" defer></script>
-    <script src="/static/workspace.js?v=224071b74479" defer></script>
+    <script src="/static/workbench.js?v=66c0744cffc9" defer></script>
+    <script src="/static/workspace.js?v=a554883a3e5f" defer></script>
     <script src="/static/app.js?v=b843099b5212" defer></script>
   </head>
   <body>
@@ -576,15 +576,15 @@
         <li><strong>Replay the evidence</strong><p>Click a timestamp to seek the source. Timeline shows the selected answer’s cited frames. Replay the surrounding footage and check unresolved claims in Still to verify.</p></li>
         <li><strong>Write and export a finding</strong><p>Choose Details & save → Write a finding. Separate observed facts from interpretation and open questions. Save, then use Menu → Export report for Markdown, JSON or HTML. The prepared clip review has a Download clip review button. Its separate Original Gemini test has its own finding editor and Export report button.</p></li>
       </ol>
-      <details><summary>What this alpha can and cannot tell you</summary><p>Gemini reviews sampled images, so brief events and small text can be missed. Whole-video review samples the complete time range in up to three windows; Review coverage & limits lists unfinished ranges. Sampling is not exhaustive event detection. Audio is not transcribed. The basketball example contains a prepared Codex source review and a separate saved Gemini test; the package demo uses synthetic preset answers. Neither establishes quality on UX studies.</p></details>
-      <details><summary>Privacy, saving and recovery</summary><p>Uploaded recordings stay on the server. Approved analysis sends sampled JPEGs and text to Google Gemini. Private access belongs to this browser’s session cookie; there is no account or cross-device recovery. Retention defaults to 24 hours; the upload screen shows the configured period. Delete recordings through Sources.</p><p>Workspace edits save automatically. If saving fails or another window changes the investigation, keep this page open and use the save indicator to recover. Export a copy before expiry or clearing cookies. Private video links still require your session; HTML can embed evidence images for a portable report. Example findings save only in this browser.</p></details>
+      <details><summary>What this alpha can and cannot tell you</summary><p>The configured model reviews sampled images, so brief events and small text can be missed. Whole-video review samples the complete time range in up to three windows; Review coverage & limits lists unfinished ranges. Sampling is not exhaustive event detection. Audio is not transcribed. The basketball example contains a prepared Codex source review and a separate saved Gemini test; the package demo uses synthetic preset answers. Neither establishes quality on UX studies.</p></details>
+      <details><summary>Privacy, saving and recovery</summary><p>Uploaded recordings stay on the server. Approved analysis sends sampled JPEGs and text to the provider shown in Model setup: Google Gemini, Gemini vision with ai& Gemma text, or ai& Gemma with Google text embeddings. Private access belongs to this browser’s session cookie; there is no account or cross-device recovery. Retention defaults to 24 hours; the upload screen shows the configured period. Delete recordings through Sources.</p><p>Workspace edits save automatically. If saving fails or another window changes the investigation, keep this page open and use the save indicator to recover. Export a copy before expiry or clearing cookies. Private video links still require your session; HTML can embed evidence images for a portable report. Example findings save only in this browser.</p></details>
       <footer><button id="guide-example" class="outline-button" type="button">Explore the clip review</button><button id="guide-demo" class="outline-button" type="button">Explore preset demo</button></footer>
     </dialog>
     <dialog id="upload-dialog" class="workspace-library upload-dialog" aria-labelledby="upload-title" aria-describedby="upload-access-summary">
       <header><div><span class="eyebrow">YOUR RECORDING</span><h2 id="upload-title">Before you upload</h2></div><button id="upload-cancel" class="icon-button" type="button" aria-label="Cancel upload">×</button></header>
       <strong id="upload-file-summary"></strong>
       <p id="upload-access-summary"></p>
-      <p>Use a recording you have permission to process. The original stays on this server. If you start approved analysis later, sampled JPEG frames and text go to Google Gemini. Audio is not transcribed.</p>
+      <p>Use a recording you have permission to process. The original stays on this server. If you start approved analysis later, sampled JPEG frames and text go to the configured provider. Model setup shows which provider receives images and text. Audio is not transcribed.</p>
       <p id="upload-retention"></p>
       <footer><button id="upload-confirm" class="primary-button" type="button">Upload video</button></footer>
     </dialog>
@@ -608,8 +608,8 @@
       <div id="agent-readiness-checks" class="agent-readiness-checks"></div>
       <details><summary>Model roles and versions</summary><div id="agent-model-roles"></div></details>
       <details><summary>Prepare model analysis</summary>
-        <ol><li>Use Gemini   <code>docs/runtime.example.json</code>, to prepare private local configuration. Template placeholders are not runnable.</li>
-          <li>Gemini Explicitly permit locally decoded sample JPEG frames to be sent to Google; Audio transcription is not supported. Keep credentials in server environment variables.</li>
+        <ol><li>Use <code>docs/runtime.example.json</code> for Gemini or <code>docs/runtime.gemini-aiand.example.json</code> for Gemini vision with Gemma text via ai& to prepare private configuration. Template placeholders are not runnable.</li>
+          <li>Explicitly permit locally decoded sample JPEG frames to be sent to the selected provider; Audio transcription is not supported. Keep credentials in server environment variables.</li>
           <li>Define finite spending and call limits, calibrate costs and resource cutoffs, then have the local operator record both budget approvals.</li>
           <li>Set <code>CTRLF_RUNTIME_FILE</code> and <code>CTRLF_VIDEO_MODE=real</code>, then restart and check again. Sources applies admission limits using the actual window count.</li></ol>
         <p>Read-only checks: <code>uv run --frozen python -m ctrlf_video.readiness</code>.Budget checks can use an existing <code>--owner</code>, This does not approve spending.</p>

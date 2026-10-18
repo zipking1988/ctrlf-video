@@ -36,7 +36,7 @@ def budget_ready(connection, owner, runtime):
 
 def readiness_report(settings, runtime, approved=False):
     checks = []
-    provider = "gemini"
+    provider = runtime.provider if runtime else "gemini"
 
     def check(id, label, passed, detail):
         checks.append(
@@ -85,6 +85,7 @@ def readiness_report(settings, runtime, approved=False):
                 "key_present": key_present,
                 "model": endpoint.model if endpoint else None,
                 "revision": endpoint.revision if endpoint else None,
+                "provider": runtime.role_provider(role) if runtime else None,
             }
         )
     required = all(r["configured"] and r["key_present"] for r in roles if not r["optional"])
@@ -93,7 +94,7 @@ def readiness_report(settings, runtime, approved=False):
         "Model configuration and credentials",
         required,
         (
-            "This check reads Gemini configuration without connecting to models. "
+            "This check reads model configuration without connecting to models. "
             "Visual review only; no audio transcription."
         ),
     )
@@ -108,12 +109,23 @@ def readiness_report(settings, runtime, approved=False):
                 "gemini_endpoint_not_allowed",
                 "invalid_gemini_model",
                 "google_media_not_enabled",
+                "aiand_endpoint_not_allowed",
+                "invalid_aiand_model",
+                "aiand_media_not_enabled",
             )
         ),
         (
-            "Locally decoded JPEG frames go to the Google Gemini API only when explicitly enabled "
+            "Locally decoded JPEG frames go to "
+            + ("ai& Gemma" if provider == "aiand" else "Google Gemini")
+            + " only when explicitly enabled "
             "in private configuration. Text and retrieval stages send no media. "
-            "Audio transcription is not supported."
+            "Audio transcription is not supported. "
+            + ("Retrieval embeddings send text to Google Gemini." if provider == "aiand" else "")
+            + (
+                " Planning, selection and synthesis send text only to ai& Gemma."
+                if provider == "gemini_aiand"
+                else ""
+            )
         ),
     )
     calibrated = bool(

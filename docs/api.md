@@ -1,6 +1,6 @@
 # CtrlF Video — API and Evidence Contracts
 
-Updated: 2026-10-14. The FastAPI `/docs` and `/openapi.json` expose concrete input models. All status endpoints report the single provider `gemini`, including unconfigured fixture mode; that label does not mean a model request has run.
+Updated: 2026-10-14. The FastAPI `/docs` and `/openapi.json` expose concrete input models. Status endpoints report the configured provider (`gemini` by default, `gemini_aiand` for Gemini vision with Gemma text, or `aiand` for Gemma generation), including fixture mode. That label does not mean a model request has run.
 
 ## Ownership and HTTP operations
 
@@ -15,7 +15,7 @@ The session response advertises `X-CTRLF-Upload-Limit` in bytes: 524288000 for a
 | `GET/PUT/DELETE /api/investigations/{id}` | Read, revision-CAS save and delete |
 | `GET/POST /api/videos` | List/upload bounded raw video bytes, never a remote URL |
 | `GET/PATCH/DELETE /api/videos/{id}` | Inspect job/media metadata, rename and delete |
-| `POST /api/videos/{id}/analyze` | Explicit approved Gemini ingestion |
+| `POST /api/videos/{id}/analyze` | Explicit approved model ingestion |
 | `POST /api/videos/{id}/retry` | Retry failed/cancelled local preflight |
 | `POST /api/videos/{id}/cancel` | Invalidate running source work |
 | `GET /media/{id}/video` | Owned private video with Range support |

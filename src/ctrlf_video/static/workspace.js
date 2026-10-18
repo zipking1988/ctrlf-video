@@ -127,7 +127,7 @@
     try {
       await refreshAccess();
       const data=await api("/api/runtime/status");
-      const provider="Gemini · AI Builder Cup";
+      const provider=data.provider === "aiand" ? "Gemma via ai& · Google text embeddings" : data.provider === "gemini_aiand" ? "Gemini vision · Gemma text via ai&" : "Gemini · AI Builder Cup";
       $("agent-setup-summary").textContent=data.dispatch_prerequisites_met
         ? `${provider}: Local prerequisites are ready. Start analysis in Sources; live model connectivity and quality remain unverified.`
         : `${provider}: Analysis is not ready. Demos, upload preflight, playback and local saving remain available.`;
@@ -152,7 +152,8 @@
     const active=()=>owns(deskId,epoch) && token===libraryEpoch;
     await flush(); if (!active()) return; libraryNotice("");
     $("library-title").textContent=kind === "videos" ? "Sources" : "Investigations";
-    $("library-intro").textContent=kind === "videos" ? "Upload checks your video locally. Start analysis sends sampled JPEG frames to Google Gemini within your approved budget. The original video stays on this server; audio is not transcribed." : `Investigations are saved in this workspace, retained for ${session.ttl_hours} hours by default. Resume or start an investigation.`;
+    const modelProvider=session.provider === "aiand" ? "ai& Gemma (text embeddings use Google Gemini)" : session.provider === "gemini_aiand" ? "Google Gemini (text analysis uses Gemma via ai&)" : "Google Gemini";
+    $("library-intro").textContent=kind === "videos" ? `Upload checks your video locally. Start analysis sends sampled JPEG frames to ${modelProvider} within your approved budget. The original video stays on this server; audio is not transcribed.` : `Investigations are saved in this workspace, retained for ${session.ttl_hours} hours by default. Resume or start an investigation.`;
     $("library-add").textContent=kind === "videos" ? "Upload video" : "New investigation";
     $("library-add").onclick=()=>{
       if(kind === "videos") {$("workspace-library").close();$("file-input").click();}
@@ -183,7 +184,7 @@
           const analyze=document.createElement("button");analyze.className="outline-button";analyze.textContent="Start analysis";
           const unknown=["unknown","model_unknown","unknown_attempt_do_not_resend"].includes(job?.error);
           analyze.disabled=unknown || !session.real_ready || !video.metadata?.windows;
-          analyze.title=unknown ? "Dispatch outcome is unknown. Operator review is required before another attempt." : analyze.disabled ? "Requires model configuration, valid calibration and approved budgets" : "Send sampled JPEG frames to Google Gemini using your approved budget";
+          analyze.title=unknown ? "Dispatch outcome is unknown. Operator review is required before another attempt." : analyze.disabled ? "Requires model configuration, valid calibration and approved budgets" : `Send sampled JPEG frames to ${modelProvider} using your approved budget`;
           analyze.onclick=async()=>{try {await api(`/api/videos/${video.id}/analyze`,"POST"); libraryNotice("Analysis accepted. Refresh to see progress."); if (currentVideo.id===video.id) watch(video.id,requestEpoch);}catch(e){libraryNotice(e.message);}};
           row.append(analyze);
         }

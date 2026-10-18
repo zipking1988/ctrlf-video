@@ -1,6 +1,6 @@
 # CtrlF Video — Architecture and Contracts
 
-Updated: 2026-10-16. This is the current technical contract for the Gemini-only edition. The cleanup removes obsolete provider plans; it does not weaken evidence, ownership, resource or budget protections. Implementation status does not waive a requirement.
+Updated: 2026-10-16. This is the current technical contract for the Gemini-default edition with an optional ai& Gemma adapter. The cleanup removes obsolete provider plans; it does not weaken evidence, ownership, resource or budget protections. Implementation status does not waive a requirement.
 
 ## System
 
@@ -19,7 +19,7 @@ BM25 + vector retrieval -> Gemini relevance selection
 text planning -> bounded visual review -> validated answer + evidence
 ```
 
-The package is `src/ctrlf_video/`. The default fixture path is synthetic and makes no model requests. Real media analysis uses the native Gemini REST adapter; no other provider dispatch or audio transcription remains.
+The package is `src/ctrlf_video/`. The default fixture path is synthetic and makes no model requests. Real media analysis uses native Gemini by default. An explicitly selected ai& adapter can use Gemma for generation while retaining Google text embeddings. No audio transcription or automatic provider fallback exists.
 
 ## Ingestion and retrieval
 
@@ -40,6 +40,14 @@ Planning requests use Gemini's structured output with a required `inspect` array
 Synthesis receives the validated source frame IDs with their decoded `t` and `t_hms`, alongside each observation. Review-window `start`/`end` remain separate and are not frame timestamps. This preserves the precise source time across the visual-review-to-summary boundary; it does not establish model semantic correctness.
 
 ## Gemini transmission and dispatch
+
+The optional ai& Gemma path is described in [ai& setup](docs/AIAND_SETUP.md).
+It sends generation requests only to `https://api.aiand.com/v1`, with distinct
+`allow_aiand_media` consent and `AIAND_API_KEY`; embeddings retain Google's
+text-only endpoint and credential. Both routes share the same atomic ledger,
+ownership, time, media and response bounds. Large-batch ai& calibration failed,
+so this path remains inactive in production. The following native Gemini rules
+continue to govern the default deployment.
 
 Only `https://generativelanguage.googleapis.com/v1beta` is accepted. Trusted runtime configuration must explicitly set `allow_google_media=true`, supply fixed verified models/revisions, backend key references, conservative per-role cost bounds and valid calibration/cutoff references.
 

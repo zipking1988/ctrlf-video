@@ -40,14 +40,20 @@ Use `CTRLF_VIDEO_COARSE_FRAMES=8 make preflight` or `CTRLF_VIDEO_CONFIG=/absolut
 | `CTRLF_BACKEND_CA_FILE` | Optional reviewed PEM CA file for a private HTTPS backend; certificate and hostname verification remain enabled |
 | `CTRLF_REQUIRE_DATA_MOUNT` | `1` requires explicit workspace volume mount; container default |
 | `PORT` | Container port, integer 1–65535; default 8080 |
-| `GEMINI_API_KEY` | Backend-only credential referenced by model endpoint `key_env` |
+| `GEMINI_API_KEY` | Backend-only Google credential referenced by model endpoint `key_env` |
+| `AIAND_API_KEY` | Backend-only ai& credential; optional Gemma generation adapter |
 
 No previous package/environment/session aliases remain. Restart and reload after renaming; storage defaults and session cookie are separate from any earlier workspace. Private data is not automatically migrated or re-owned.
 
 ## Gemini runtime
 
-[runtime.example.json](runtime.example.json) is blocked preparation, not approval. Only `provider=gemini` is accepted (also the default). Four roles are required: vision, embed, rerank/relevance selection and text. Each endpoint needs the fixed Google API base URL, a verified model/revision/key environment name and conservative cost bound. No ASR or self-hosted-provider configuration is accepted.
+[runtime.example.json](runtime.example.json) is blocked preparation, not approval. `provider=gemini` is the default. `provider=gemini_aiand` selects Gemini vision/embeddings and ai& Gemma text; `provider=aiand` selects all-Gemma generation and keeps Google text embeddings; see [ai& setup](AIAND_SETUP.md). Four roles are required: vision, embed, rerank/relevance selection and text. Each endpoint needs its fixed provider API base URL, a verified model/revision/key environment name and conservative cost bound. ai& generation is restricted to `https://api.aiand.com/v1` and `google/gemma-4-31b-it`; embeddings remain at Google's fixed API origin. No ASR or self-hosted-provider configuration is accepted.
 
 `allow_google_media` defaults false. Locally decoded JPEG transmission requires deliberate trusted consent. `valid_until`, calibration/cutoff references, currency and active two-level budgets independently gate dispatch. Never turn placeholder costs or extended expiry into permission to spend. Optional trusted `query_index_budget_versions` (default `[]`, at most eight bounded version IDs) permits query-only reuse of ready indices from listed prior grants when provider/model/revisions match. Every new query still requires and charges current-version owner/deployment approvals. It does not change index provenance, resume ingestion or reset financial history.
+
+`allow_aiand_media` also defaults false and is independent of Google consent.
+The optional [ai& template](runtime.aiand.example.json) remains blocked. Its
+full-window compatibility is unverified after two rejected 128-image tests;
+do not activate it based on successful single-image calibration alone.
 
 `make preflight` remains a deployment-acceptance report, exits 2 in real mode and never claims readiness. `make agent-check` dynamically reads local prerequisites, can inspect an existing owner's approvals, creates no storage and calls no model; passing does not prove live acceptance. See [runtime](WORKSPACE_RUNTIME.md) and [deployment](deployment.md).
