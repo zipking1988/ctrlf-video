@@ -8,16 +8,17 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Fix upload-to-Review refresh, hash navigation, unindexed draft editing and in-dialog rename recovery.
 - [x] Surface unresolved scope and failure recovery beside answers; preserve evidence and model admission gates.
 - [x] Obtain authorization for one additional reviewed alpha deployment attempt (cumulative 26); retain all 25 records and pin the reviewed commit. Main CI is the authoritative deployment result.
-- [x] Deploy reviewed `9d2dad0` through main CI, verify public replay/download/finding export, and restore-check a private local backup of both databases. Release allowance is consumed at 26/26.
+- [x] Deploy reviewed `9d2dad0` through main CI, verify public replay/download/finding export, and restore-check a private local backup of both databases. This consumed the then-authorized 26/26 allowance; the later 29-attempt authorization is recorded below.
 - [x] Update the editable 14-slide deck and 120.62-second captioned UI demonstration locally. Publishing/submission remains separate.
 - [ ] Fund any new model trial explicitly and agree client data/retention expectations; anonymous live analysis remains unavailable.
 - [ ] Resolve the submission and UX-validation prerequisites below. See [ALPHA.md](ALPHA.md).
 
 ## Whole-video product value
 
-- [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation and has not been deployed.
-- [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Not deployed.
-- [ ] Enable and verify genuine Gemini follow-up questions with an explicitly funded owner/session and a newly reviewed deployment attempt. Existing grants are revoked and release allowance is consumed at 26/26.
+- [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.
+- [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Deployed in `1a980ae`.
+- [x] Install the October 18 JPY 2,000 / 60-call / eight-index-call grant for the explicitly confirmed current browser owner, preserving historical records; deploy reviewed `1a980ae` as attempt 27 of 29.
+- [ ] Verify an actual five-minute video and at least three genuine contextual Gemini follow-ups. The concrete real input file is still missing. No new model calls have been made; preset notes and the synthetic five-minute decoder fixture cannot satisfy acceptance.
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
@@ -45,7 +46,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 
 - [x] Verify account-accessible generation/embedding IDs and revisions, live JSON/image dispatch and both embedding task types.
 - [ ] Validate over-limit embedding inputs and a representative multilingual dataset against the real provider.
-- [x] Record the explicit JPY 3,000 authorization, later JPY 1,245 cumulative model ceiling, retained historical reservations and finite per-role/attempt/time bounds. The October 17 one-question grant is complete and all model grants are revoked; see [live test limits](docs/LIVE_GEMINI_TEST.md).
+- [x] Record the explicit JPY 3,000 authorization, later JPY 1,245 cumulative model ceiling, retained historical reservations and finite per-role/attempt/time bounds. The October 17 one-question grant is complete and its grants remain revoked; the separately authorized October 18 grant is recorded above; see [live test limits](docs/LIVE_GEMINI_TEST.md).
 - [x] Run one uploaded synthetic clip through real ingestion, retrieval, visual verification, synthesis, editable finding saving and refresh after a real-mode rollback.
 - [ ] Resolve observed spatial wording errors (the first live answer called a left-of-center box centered); preserve source-linked human corrections.
 - [ ] Run authorized ingestion -> question -> follow-up -> actual source evidence -> findings/export -> refresh/restore.
@@ -63,7 +64,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Download a consistent initial local backup; verify its checksum, both SQLite databases, source media and private configuration.
 - [x] Implement test-gated CI/CD, finite main-only deployment access, backend backup/restore checks and failure rollback regressions.
 - [x] Record the successful hosted frontend/backend pipeline, live forced-failure rollback and independently verified local recovery backup; see [deployment evidence](docs/deployment.md#release-process-and-cicd).
-- [ ] Reconcile actual cloud spend against the JPY 3,000 total; the consumed 26-attempt CI backstop is an engineering setting, not a money meter.
+- [ ] Reconcile actual cloud spend against the newly authorized JPY 5,000 total; the 29-attempt release backstop is an engineering setting, not a money meter.
 - [ ] Verify containerized Linux decoding/file/network isolation and resource bounds without disabling protection before using that deployment target.
 - [ ] Validate disk encryption, expiry/deletion, restart recovery, consistent backups and restoration without resurrecting deleted media.
 - [ ] Test bounded concurrent query/ingestion workloads, cancellation/deletion races and capacity release on the target host.

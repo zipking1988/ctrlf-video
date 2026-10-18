@@ -11,6 +11,11 @@ JPY 1,162 historical model reservations, JPY 1,500 infrastructure/pending reserv
 and JPY 338 buffer. Do not reactivate revoked unused funding. All October 19
 admission, model, IAM and cleanup cutoffs remain unchanged. No public enrollment,
 source publication, automatic retry, key creation or hosting extension is granted.
+The former funded session and its private sources had expired under the existing
+24-hour retention. The user subsequently answered yes to binding this sole new
+grant to the current browser workspace named `Live alpha acceptance · 2026-10-18`.
+Do not restore the expired sources or fund additional sessions. A concrete real
+five-minute input file has not yet been provided; yes/ok replies are not file paths.
 
 ## Product and authorized scope
 

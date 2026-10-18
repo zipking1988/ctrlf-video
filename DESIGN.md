@@ -23,7 +23,7 @@ out-of-range times are not answered. Notes, draft and question context persist
 in this browser under a source-specific key; the original saved Gemini result
 and private investigations remain separate. The old finding editor now starts
 with the reviewed example when empty, preserving any existing visitor draft.
-This change is a local candidate; hosted revision `9d2dad0` remains unchanged.
+This follow-up subsequently deployed in reviewed `1a980ae` on October 18. It does not establish the pending live five-minute acceptance.
 
 The example also offers an explicit path into the existing private workspace:
 prepare the verified public clip, confirm its normal upload disclosure, and keep

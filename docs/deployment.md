@@ -339,6 +339,23 @@ locally: all 30 files and both SQLite databases passed verification. The existin
 final cutoff backup/cleanup remains required. Markdown-only handoff updates are
 excluded from deployment by the workflow's `paths-ignore` rule.
 
+Later October 18, the user explicitly approved JPY 5,000 aggregate spending,
+one fresh JPY 2,000 / 60-call / eight-index-call grant and three further reviewed
+deployment attempts. The release configuration now permits 29 cumulative attempts
+and retains all 26 earlier records. The user confirmed the sole new grant's
+binding to the current named browser workspace after the old session expired.
+The billing alert amount changed to JPY 5,000; all project/date/credit/threshold
+filters and all model/release/IAM/cleanup cutoffs stayed unchanged.
+
+Attempt 27 deployed reviewed private-main commit `1a980ae` successfully through
+[CI 39100631476](https://github.com/zipking1988/ctrlf-video/actions/runs/39100631476).
+Upload is the primary landing action; real whole-video answers expose generated
+observations and direct contextual follow-up. Grant installation and CI sent zero
+new model requests. Actual five-minute source input and three-follow-up acceptance
+remain pending; prepared notes are not acceptance evidence. Two release attempts
+remain. The grant's consistent local backup passed all 34 file hashes and both
+database integrity checks. See [live test record](LIVE_GEMINI_TEST.md).
+
 Recovery entry points on the VM (trusted operator only):
 
 ```sh

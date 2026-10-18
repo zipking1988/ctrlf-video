@@ -6,11 +6,19 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 **Desktop alpha:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. Main CI records the deployed revision. New live analysis still requires a funded session; this is a supervised alpha, not production acceptance.
 
+October 18 update: private main `1a980ae` is deployed, with real upload as the
+primary entry and source-linked observations plus a visible follow-up action in
+actual whole-video answers. One explicitly approved current browser session has
+a JPY 2,000 / 60-call / eight-index-call grant inside the JPY 5,000 aggregate
+ceiling. A concrete real five-minute input is still awaited; fresh whole-video
+and three-follow-up acceptance has not run. Prepared review search does not count
+as this acceptance. See [funding and validation status](docs/LIVE_GEMINI_TEST.md).
+
 ## Workspace
 
 The default **Review** view places one video above a compact chat in a single scrolling page. **Timeline** reveals the selected answer's actual cited frames inside the chat; click a timestamp to replay the original source. It is an index of citations, not an exhaustive video breakdown. **Canvas**, research context, findings and report export remain available through the menu. `/#review` opens the workspace directly.
 
-First-time visitors see **Explore the clip review** and **Upload a video**. The public [basketball example](https://ctrlfvideo.com/#example) now shows a prepared review of the entire 70.2-second excerpt: six chronological sections, source-frame comparisons and a downloadable report. Its useful detail is the broadcast score changing from Atlanta 62 to 61 at source times 36.036 and 37.037 seconds. Codex prepared this editorial review by inspecting 71 locally decoded frames; it is explicitly **not a new result from the app's Gemini pipeline**. The original partial Gemini scoreboard answer, visitor finding editor and six-attempt development history remain separately labeled below it. No sign-in or model request is needed to replay or export the prepared review. See [judge access](docs/JUDGE_WALKTHROUGH.md).
+First-time visitors see **Upload a video** as the primary action and **View recorded example** as the secondary action. The public [basketball example](https://ctrlfvideo.com/#example) now shows a prepared review of the entire 70.2-second excerpt: six chronological sections, source-frame comparisons and a downloadable report. Its useful detail is the broadcast score changing from Atlanta 62 to 61 at source times 36.036 and 37.037 seconds. Codex prepared this editorial review by inspecting 71 locally decoded frames; it is explicitly **not a new result from the app's Gemini pipeline**. The original partial Gemini scoreboard answer, visitor finding editor and six-attempt development history remain separately labeled below it. No sign-in or model request is needed to replay or export the prepared review. See [judge access](docs/JUDGE_WALKTHROUGH.md).
 
 **Whole-video analysis:** for an indexed source and funded session, choose **Draft a whole-video breakdown**, review the editable prompt, then send. The explicit `Break down the whole video.` prompt reviews the complete source time range in at most three 120-second windows with five-second overlaps (maximum 350 seconds / 5:50). It bypasses relevance filtering so the end of a five-minute clip cannot be omitted by search. Results organize sequence, changes, patterns to verify and limits. Coverage warnings distinguish sampled windows from complete event detection; failed windows retain earlier evidence and list missing ranges. New live validation is pending; mock tests do not establish sports analysis quality. The starter never overwrites a nonempty draft or sends a request automatically.
 

@@ -148,3 +148,27 @@ personal account, project and billing-project flags documented in the deployment
 handoff. The remaining gate is finite model/release authorization, not missing
 IAM access. No funding, model call, release or cloud resource changed. The deck
 and demo continue to describe the deployed version, not this local candidate.
+
+## Funded real-alpha deployment (October 18)
+
+The user approved JPY 5,000 aggregate spending, a fresh JPY 2,000 / 60-attempt /
+eight-index-call grant, and three more deployments (29 cumulative). After the old
+session expired, the user confirmed binding the sole new grant to the current
+named browser workspace. The grant is installed; all historical attempts remain.
+The project billing alert amount alone changed to JPY 5,000.
+
+Private main `1a980ae` deployed successfully as attempt 27 through
+[CI 39100631476](https://github.com/zipking1988/ctrlf-video/actions/runs/39100631476):
+173 frontend tests and 255 Linux backend tests passed. Production HTML, browser
+bundle, CSS and persistence module matched the reviewed local files byte-for-byte.
+The server reports committed, 27/29 releases, 39 retained historical model
+attempts, and zero calls/primary calls/money used by the fresh grant. The browser
+readiness page confirms configuration and session/deployment budget prerequisites.
+The grant backup restored locally: all 34 files and both database checks passed.
+
+Real whole-video answers now render their actual event observations with source
+buttons and an explicit contextual follow-up action. Upload is the primary entry.
+No live five-minute model validation has run: no actual five-minute source path
+has been supplied. The real available basketball clip is only 70.2 seconds and
+the five-minute decoder fixture is synthetic. Neither is substituted for the
+requested acceptance; prepared-note search is not accepted as model conversation.

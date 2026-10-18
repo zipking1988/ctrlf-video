@@ -1,6 +1,6 @@
 # CtrlF Video — Alpha handoff
 
-Prepared October 18, 2026 (JST). This is a desktop **alpha for a guided demo and supervised evaluation**, not a claim of production readiness or validated UX-research value. Reviewed commit `9d2dad0` is deployed at [ctrlfvideo.com](https://ctrlfvideo.com/#example); [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39089788904) passed. The original separate workspace remains untouched.
+Prepared October 18, 2026 (JST). This is a desktop **alpha for a guided demo and supervised evaluation**, not a claim of production readiness or validated UX-research value. Reviewed commit `1a980ae` is deployed at [ctrlfvideo.com](https://ctrlfvideo.com/); [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39100631476) passed. Upload is the primary entry. Real whole-video results expose their own source-linked observations and a visible contextual follow-up action. The original separate workspace remains untouched.
 
 ## What a visitor can do
 
@@ -10,7 +10,7 @@ Prepared October 18, 2026 (JST). This is a desktop **alpha for a guided demo and
 - Upload authorized footage for bounded preflight and private playback, retain a question draft, rename/delete sources, and return to saved investigations. The upload dialog states the size limit, analysis access and retention before sending the file.
 - Use Quick guide from Home or the workspace menu. Review remains one video above the conversation; Canvas is optional.
 
-New analysis of uploaded footage requires an approved session. Current model grants are closed. Uploading does not grant analysis access or start a paid request. There is no public enrollment, account login, cross-device recovery, audio transcription or multi-recording aggregation.
+New analysis of uploaded footage requires an approved session. On October 18 a single current browser owner received the explicitly authorized JPY 2,000 / 60-call / eight-index-call grant within a JPY 5,000 aggregate ceiling. Actual five-minute analysis and three contextual follow-ups are pending a concrete real input file; setup readiness is not live acceptance. Uploading does not grant analysis access or start a paid request. There is no public enrollment, account login, cross-device recovery, audio transcription or multi-recording aggregation. See [live test limits](docs/LIVE_GEMINI_TEST.md).
 
 ## Local preview
 
@@ -43,7 +43,7 @@ Save failures and revision conflicts require recovery before navigation that wou
 
 ## Release gates
 
-The user authorized review of PR #2 and one additional alpha deployment attempt on October 18. PR #2 merged into private main; cumulative attempt 26 successfully deployed `9d2dad0`, with all previous records retained. The allowance is now consumed at 26/26. The JPY 3,000 total and October 19 cutoffs remain unchanged. No new models, grants, resources or hosting extension were added. See [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39089788904) and [deployment controls](docs/deployment.md#release-process-and-cicd).
+PR #2 merged into private main and attempt 26 deployed `9d2dad0`. The user then explicitly raised the aggregate ceiling to JPY 5,000, authorized a fresh finite model grant and three further deployments, retaining all 26 records. Attempt 27 successfully deployed `1a980ae`; two reviewed attempts remain under cumulative limit 29. The new grant is for one confirmed current session only. All October 19 cutoffs remain unchanged. See [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39100631476) and [deployment controls](docs/deployment.md#release-process-and-cicd).
 
 The public recorded example remains available only while the existing temporary deployment runs. Model validity ends October 19 at 22:00 JST; hosting authorization ends at 23:59 JST. The existing backup/cleanup process must remain in place. Continued judge/client access needs a new hosting agreement and finite budget.
 

@@ -16,11 +16,29 @@ previous records), including private main pushes and fixes. Model and new workfl
 admission still close October 19 at 22:00 JST; later recovery/cleanup cutoffs are
 unchanged. Installation and live outcomes will be recorded separately below.
 
-Updated October 17, 2026. The user authorized real uploaded-video testing within the existing **JPY 3,000 aggregate cloud/model ceiling**, ending October 19 at 23:59 JST. This does not increase that ceiling or extend hosting. Real mode is active for the approved browser session. One uploaded 18-second synthetic clip completed ingestion, retrieval, visual verification, synthesis and editable finding saving. This is technical validation, not broad accuracy or UX acceptance.
+The fresh grant `live_jpy5000_alpha_20261018_v4` is installed for deployment and
+one current browser owner. After the old session naturally expired, the user
+explicitly confirmed binding this sole grant to `Live alpha acceptance · 2026-10-18`.
+The old private sources had expired and remain deleted. All 39 old cloud attempt
+rows and JPY 1,162 cumulative historical model reservations are retained; no old
+unused grant was reactivated. Installation added zero model requests.
 
-Current spending state: the October 17 one-question test below is complete and
-all model grants are revoked. Existing answers and source playback remain usable;
-new model work is not currently funded.
+The project-specific billing alert was changed from JPY 3,000 to JPY 5,000 only;
+project filtering, dates, excluded credits and alert thresholds are unchanged.
+This is an alert, not a supplier hard cap or a reconciled balance. The post-change
+backup restored locally with all 34 file hashes and both SQLite integrity checks
+passing (SHA-256 `878db3661208c3c808062338578335f1b5b946b54b29e1741f7eb2a80444b4a6`).
+The current browser's read-only setup check confirms funded-session prerequisites.
+Actual five-minute source input and live analysis/follow-up acceptance remain
+pending. The available real basketball sample is 70.2 seconds; the local five-minute
+decoder fixture is synthetic and will not be substituted for this acceptance.
+
+## Historical October 17 status
+
+On October 17, 2026 the user authorized real uploaded-video testing within the then **JPY 3,000 aggregate cloud/model ceiling**, ending October 19 at 23:59 JST. One uploaded 18-second synthetic clip completed ingestion, retrieval, visual verification, synthesis and editable finding saving. This is technical validation, not broad accuracy or UX acceptance. The October 18 allocation above supersedes this historical ceiling.
+
+At the end of the October 17 one-question test, all then-existing model grants
+were revoked. The subsequent October 18 grant is separately recorded above.
 
 ## October 17 one-question authorization and result
 
