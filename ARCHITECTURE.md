@@ -25,6 +25,11 @@ The package is `src/ctrlf_video/`. The default fixture path is synthetic and mak
 
 Preflight reads actual duration, dimensions, audio presence and frame timestamps. Prefer scene boundaries while enforcing windows <=120 seconds with 5-second overlap. Sampling uses decoded source PTS rather than invented evenly spaced timestamps.
 
+When all remaining footage fits within 120 seconds, the final indexing window
+ends at the actual duration. A scene near the last decoded PTS must not create
+another paid window for a fractional-frame tail plus the overlap. Existing
+indices and financial reservations are preserved.
+
 Coarse description samples 8–16 frames per window, validates a complete one-to-one frame/caption mapping and checkpoints by generation. Embed every complete source window; a synchronous batch currently supports at most 100 windows. Oversized sources are rejected before ingestion model calls, not truncated into a partial ready index. Embedding requests disable automatic truncation.
 
 Publication requires complete visual segments, vectors and existing evidence files under the current generation. Failures/cancellation cannot publish readiness. Cached work and frozen configuration must match exactly; no old-provider/checkpoint defaults are inferred.
@@ -38,6 +43,13 @@ An empty relevance-selection list falls back to the highest hybrid candidates up
 Planning requests use Gemini's structured output with a required `inspect` array of integers, and explicitly separate window selection from answering the user's question. Server-side validation still rejects missing fields, noninteger/out-of-range indices and more than three selections before any visual review. A valid JSON answer to the research question is not accepted as a plan or as evidence. The optional schema is included in the existing request fingerprint and bounded syntax repair; ingest requests are unchanged.
 
 Synthesis receives the validated source frame IDs with their decoded `t` and `t_hms`, alongside each observation. Review-window `start`/`end` remain separate and are not frame timestamps. This preserves the precise source time across the visual-review-to-summary boundary; it does not establish model semantic correctness.
+
+Follow-up context contains untrusted prior model claims with validated source
+references; reference validation does not verify their factual truth. Visual
+review must re-check contradictions against current frames. Visible text/counter
+changes need before/after values tied to individual frames, and synthesis must
+not present an interval’s final state as already true at its first frame. Answers
+use plain text and source timestamps rather than internal frame IDs.
 
 ## Gemini transmission and dispatch
 

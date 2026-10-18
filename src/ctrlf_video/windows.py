@@ -37,7 +37,10 @@ def plan_windows(duration: float, scene_boundaries: tuple[float, ...] = ()) -> l
         # A cut must advance by more than overlap, or a short scene could stall the loop.
         cut_index = bisect_right(boundaries, hard_end) - 1
         cut = boundaries[cut_index] if cut_index >= 0 else 0
-        end = cut if cut > start + 5 else hard_end
+        # Once the remaining footage fits, include its real end. Selecting a
+        # scene at the last decoded PTS would otherwise create another paid
+        # window for a fractional-frame tail plus five seconds of overlap.
+        end = cut if hard_end < duration and cut > start + 5 else hard_end
         result.append(Window(len(result), start, end))
         if end == duration:
             break

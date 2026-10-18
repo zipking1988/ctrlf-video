@@ -91,3 +91,12 @@ strategy is reviewed and live-verified within existing bounds. Do not silently
 reduce timeline coverage or resend the two unknown attempts. The fixed split uses Gemini for those visual requests and Gemma for text; it
 must pass its own deployed source/follow-up check before claiming live operation.
 The sole existing model grant and all historical charges remain intact.
+
+The split deployed in `7f5f14e` as release 28/29. Its actual 70.203-second source
+completed indexing, a whole-clip breakdown and one contextual question. The
+breakdown had eight findings/16 citations, but overstated score-change timing;
+the first follow-up repeated those claims. Those results remain in the audit.
+The subsequent fix removes the misleading “verified evidence” label from prior
+model prose, requires frame-specific counter comparisons, and prevents a
+near-tail scene from adding a redundant index window. Live re-checks remain
+pending at this commit. This is not five-minute or client-quality acceptance.

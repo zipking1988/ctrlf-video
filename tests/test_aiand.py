@@ -180,6 +180,25 @@ async def test_aiand_ingestion_whole_video_three_followups_and_owned_evidence(
         with app.state.agent.ledger._connect() as conn:
             rows = conn.execute("SELECT state FROM attempts").fetchall()
         assert len(rows) == len(calls) and all(r["state"] == "completed" for r in rows)
+        contextual = [
+            json.dumps(payload)
+            for _, payload in calls
+            if "Selected prior question" in json.dumps(payload)
+        ]
+        assert contextual and all(
+            "untrusted prior model claims" in payload for payload in contextual
+        )
+        assert all(
+            "Selected prior question and verified evidence" not in payload for payload in contextual
+        )
+        visual = [
+            json.dumps(payload)
+            for _, payload in calls
+            if "inlineData" in json.dumps(payload) or "data:image" in json.dumps(payload)
+        ]
+        assert any(
+            "correct contradictions" in payload and "before" in payload for payload in visual
+        )
         if mode == "gemini_aiand":
             assert all(
                 "data:image" not in json.dumps(payload)

@@ -91,7 +91,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
           </div>}
           <div className="simple-citations">
             {moments.map(frame => <button type="button" key={`${frame.uri}:${frame.t}`} onClick={() => replay(frame)} aria-label={`Replay source ${sourceClock(frame.t)}`}>{sourceClock(frame.t)}{icon("play")}</button>)}
-            <span>{query.mode === "real" ? "Saved Gemini result" : "Preset demo"} · {({ok:"Cited result",partial:"Partial",error:"Not completed",no_result:"No matching evidence"})[query.response.status]}</span>
+            <span>{query.mode === "real" ? "Saved model result" : "Preset demo"} · {({ok:"Cited result",partial:"Partial",error:"Not completed",no_result:"No matching evidence"})[query.response.status]}</span>
             {details}
           </div>
           <section id={timelineId} className="simple-cited-timeline" ref={timeline} hidden={!open} aria-label="Cited timeline" onKeyDown={timelineKeyDown}>
