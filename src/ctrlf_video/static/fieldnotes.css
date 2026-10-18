@@ -986,3 +986,20 @@ body.recorded-view .research-welcome { display: none; }
 .analysis-evidence-grid figure time { display: block; padding: 7px; }
 .analysis-timeline button:focus-visible, .analysis-timeline [tabindex="0"]:focus-visible { outline: 2px solid #0b625d; outline-offset: 3px; }
 @media (max-width: 850px) { .analysis-observation-detail { grid-template-columns: 1fr; } .analysis-timeline-toolbar { flex-wrap: wrap; } }
+
+/* One continuing conversation; stored turns remain available without new calls. */
+.simple-conversation-heading { margin: 0 0 24px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.simple-conversation-heading h2 { margin: 0; font-size: 14px; font-weight: 650; }
+.simple-conversation-heading h2 span { margin-left: 8px; font-size: 11px; color: var(--muted); font-weight: 400; }
+.simple-conversation-heading > p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.simple-chat-thread { display: grid; gap: 24px; list-style: none; padding: 0; margin: 0; }
+.simple-chat-thread > li { min-width: 0; }
+.simple-saved-turn { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.simple-saved-response { margin-top: 10px; color: var(--muted); font-size: 12px; }
+.simple-saved-response > summary { cursor: pointer; padding: 6px 0; }
+.simple-saved-answer-text, .simple-saved-question { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; color: var(--text); }
+.simple-saved-question { font-size: 12px; color: var(--muted); }
+.simple-saved-turn-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.simple-saved-turn-actions .text-button { min-height: 32px; padding: 4px 0; font-size: 12px; }
+
+.simple-saved-question-label { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }

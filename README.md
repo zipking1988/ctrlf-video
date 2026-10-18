@@ -6,14 +6,21 @@ Ask visual questions about footage, follow up on evidence, and arrange questions
 
 **Desktop alpha:** see [ALPHA.md](ALPHA.md) for the current handoff, a short demo script and release limits. The in-app **Quick guide** explains the review workflow, access, retention and recovery. Main CI records the deployed revision. New live analysis still requires a funded session; this is a supervised alpha, not production acceptance.
 
-October 18 update: private main `0ffd59e` is deployed, consuming release 29/29.
-The backend ai& key is verified; Gemini reviews frames and Gemma handles text.
-An actual 70.203-second source completed indexing, a whole-clip question and
-three genuine contextual follow-ups. Timing errors, contradictory observations
-and inadequate game-sequence analysis mean accuracy acceptance failed. A real
-five-minute input is still awaited. The sole JPY 2,000 grant has JPY 751 reserved,
-18/60 calls and 2/8 indexing calls used; historical charges remain intact inside
-the JPY 5,000 aggregate ceiling. See [funding and validation status](docs/LIVE_GEMINI_TEST.md).
+October 19 update: reviewed private-main code `9ad193d` is deployed as release
+31/31. CI passed 178 frontend and 271 Linux backend tests. The subsequent real
+final-ball retest completed one visual call but still missed a later action;
+accuracy acceptance fails and a real five-minute input remains missing. V4 reserves
+JPY 935, 24/60 calls and 2/8 indexing calls; JPY 1,162 historical reservations stay
+charged within the unchanged JPY 5,000 aggregate. These are conservative
+reservations, not settled invoice charges or free credits. See the
+[funding and validation record](docs/LIVE_GEMINI_TEST.md).
+
+A subsequent **local, undeployed conversation candidate** makes the ongoing flow
+visible: saved questions stay in order, original replies expand in place, and any
+supported answer can anchor another question while preserving the draft. A
+whole-video breakdown is one turn in this conversation. The public recorded
+example remains a saved-result walkthrough. This UI work adds no model call or
+release; all 31 deployment attempts are consumed.
 
 ## Workspace
 
@@ -32,7 +39,7 @@ Before transfer, the upload dialog explains session access, server storage, conf
 The landing explains one concrete workflow: ask about visible footage → replay a cited moment → save a finding and export. Approved Gemini analysis searches descriptions of sampled frames and reviews candidate segments; sampling can miss brief events. New analysis of uploaded videos requires an approved session. Each investigation handles one recording. Cross-session aggregation and UX-study usefulness remain unverified; AskTape is only an exploratory working name. Existing exports are Markdown, JSON and HTML.
 
 - **Questions:** ask or follow up below the video, then replay supporting timestamps. In Review, **Still to verify** exposes unresolved claims; **Details & save** retains the full submitted prompt and earlier questions. Canvas keeps its research panel. Drafts survive view switching and refresh.
-- **Saved answers:** Review keeps earlier questions under Details & save. The canvas question area offers up to three existing answers from the current recording, opening their original results without another model request. These are saved results to check, not new analysis or a claim that they are correct. A real result without events cannot anchor a follow-up. When live analysis is unavailable, Review explicitly switches to saved-results mode, hides Send, and offers View saved answers; Enter opens that recovery path while keeping the draft. Progress and recoverable errors appear beside the composer; unavailable model access is explained before a new request is admitted by the UI.
+- **Saved answers:** Deployed release 31 keeps earlier questions under Details & save; the undeployed local conversation candidate exposes them in the chronological thread. The canvas question area offers up to three existing answers from the current recording, opening their original results without another model request. These are saved results to check, not new analysis or a claim that they are correct. A real result without events cannot anchor a follow-up. When live analysis is unavailable, Review explicitly switches to saved-results mode, hides Send, and offers View saved answers; Enter opens that recovery path while keeping the draft. Progress and recoverable errors appear beside the composer; unavailable model access is explained before a new request is admitted by the UI.
 - **Source player:** watch the recording above the chat. In Canvas, the compact bottom dock can be expanded or hidden while organizing evidence.
 - **Finding editor:** choose **Details & save → Write a finding**, or open a saved finding through the menu. Edit its title, observed facts, interpretation and open questions. Observed facts update the canvas summary while the original answer and evidence remain available.
 - **Research context:** choose **Menu → Recording context** to record the participant's task and whether the recording is a UX study or a technical sample. Each question captures the context submitted with it.

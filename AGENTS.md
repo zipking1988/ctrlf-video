@@ -32,6 +32,13 @@ five-minute input file has not yet been provided; yes/ok replies are not file pa
 
 ## Product and authorized scope
 
+On October 19 the user confirmed the existing visual layout and clarified that
+this is a continuing, open-ended conversation about a video. Users can ask a new
+visual question or follow earlier evidence without ending the investigation after
+one answer. Preserve original turns/context/source links; never substitute saved
+or prepared replies for fresh analysis. A local conversation-display candidate is
+under review; this clarification grants no deployment 32 or additional funding.
+
 On October 18 the user explicitly requested ai& for video analysis using Gemini or
 “gamma” (interpreted as the catalogued Gemma model), superseding the earlier
 Gemini-only provider restriction for this integration. The user also requested help

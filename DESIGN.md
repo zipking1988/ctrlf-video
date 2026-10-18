@@ -75,6 +75,24 @@ breakdown during an active request now explains the wait instead of silently
 doing nothing. These changes deployed in `9ad193d`; all 31 authorized releases
 are used. The fresh model retest still failed visual accuracy.
 
+## Continuing conversation clarification (October 19)
+
+The user confirmed the current layout and clarified the core interaction: keep
+asking open-ended visual questions about the same recording, change topics or
+follow earlier evidence, and receive source-linked key information each time.
+A whole-video breakdown is one possible opening, not the end of the workflow.
+Prepared answers cannot substitute for new analysis. Unsupported questions and
+uncertainty remain explicit; conversation persistence does not prove model accuracy.
+
+The local candidate retains the one-video-above-chat layout and shows saved turns
+in chronological order. Previous questions remain visible, their original answers
+expand in place, and each can open its evidence or become a follow-up anchor.
+Long question previews are bounded; expanding the answer reveals the full prompt.
+Changing the active turn preserves other open replies and the composer draft.
+The recorded public example remains a saved result, without an active conversation.
+These changes are locally verified and undeployed; release 31 remains the live
+revision and no release 32 is authorized. No model, runtime or funding changes.
+
 ## Product experience
 
 The latest selected Review design is the third displayed simple-video concept, `exec-36afa9ec-45e7-4acb-8233-0088b3a0b71c.png`. Review uses one centered video above a compact chat, one natural page scroll, a thin header and an on-demand **Timeline** inside the answer. The rail, repeated introduction and research setup are removed from the default surface; Canvas, recording context, findings and exports remain in the menu. Timeline lists real frame citations at absolute source times, never inferred continuous chapters or exhaustive coverage. Details & save retains the full submitted question and unresolved claims, and the composer preserves drafts and unavailable-analysis feedback. The generated visual uses a shorter question/answer than the real recorded result; the implementation preserves the actual answer and exposes the full prompt in Details. This local redesign does not grant model access, publish source or deploy itself. Earlier dated layout notes below record the previous directions.

@@ -4,7 +4,25 @@ import {citedMoments, sourceClock} from "./review-timeline.mjs";
 import {questionLabel, isBreakdown} from "./question-shortcuts.mjs";
 import AnalysisTimeline from "./analysis-timeline.jsx";
 
-export default function SimpleReview({state, ui, icon, metaTarget, playerId = "player", onSaveFinding, newQuestionLabel = "New question"}) {
+function SavedTurn({record, state, ui}) {
+  const {query} = record;
+  const supported = ["ok", "partial"].includes(query.response.status) && query.response.events.length > 0;
+  const status = {ok:"Cited result", partial:"Partial", error:"Not completed", no_result:"No matching evidence"}[query.response.status];
+  return <div className="simple-saved-turn">
+    <p className="simple-user-message"><span className="simple-saved-question-label">{questionLabel(query.question)}</span></p>
+    <details className="simple-saved-response">
+      <summary>Saved answer · {status}</summary>
+      <p className="simple-saved-question"><strong>Full question</strong><br/>{query.question}</p>
+      <p className="simple-saved-answer-text">{query.response.answer}</p>
+      <div className="simple-saved-turn-actions">
+        <button type="button" className="text-button" aria-label={`Open answer and source evidence for: ${query.question}`} onClick={() => ui()?.select(record.id)}>Open answer & evidence</button>
+        {supported && <button type="button" className="text-button" disabled={state.local} aria-label={`Continue conversation from: ${query.question}`} onClick={() => ui()?.continueFrom(record.id)}>Ask a follow-up</button>}
+      </div>
+    </details>
+  </div>;
+}
+
+export default function SimpleReview({state, ui, icon, metaTarget, playerId = "player", onSaveFinding, newQuestionLabel = "New question", conversationMode = true}) {
   const selected = state.records.find(record => record.id === state.selectedId) || state.records.at(-1);
   const query = selected?.query;
   const breakdown = !!query && isBreakdown(query.question);
@@ -49,7 +67,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
             {query.mode === "real" && <p>Sampled visual evidence; audio is not transcribed. Replay the source to check the claim.</p>}
             {["ok","partial"].includes(query.response.status) && <button type="button" className="text-button" onClick={save}>Write a finding</button>}
             <button type="button" className="text-button" onClick={() => ui()?.newQuestion()}>{newQuestionLabel}</button>
-            {state.records.length > 1 && <details className="simple-question-history"><summary>Earlier questions ({state.records.length-1})</summary>
+            {!conversationMode && state.records.length > 1 && <details className="simple-question-history"><summary>Earlier questions ({state.records.length-1})</summary>
               {state.records.filter(record => record.id !== selected.id).map(record => <button type="button" key={record.id} onClick={() => ui()?.select(record.id)}>{record.query.question}</button>)}
             </details>}
           </details>
@@ -64,15 +82,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
     </li>)}</ol> : <p>No cited moments for this question. Open a saved answer or start a new question.</p>}
     <p className="simple-timeline-scope">{analysis ? (breakdown ? "These are cited observations from sampled windows. Check Review coverage & limits for unfinished ranges; sampling does not prove every event was detected." : "Other moments were not exhaustively reviewed. This lists citations, not a full-video breakdown.") : "Synthetic demo · preset moments, no model calls."}</p>
   </section> : null;
-  return <>
-    {target && createPortal(<div className="simple-source-meta">
-      <span>{state.sourceInfo?.name || "Package positions · Synthetic demo"}</span>
-      <button type="button" className="simple-timeline-toggle" ref={timelineTrigger} aria-expanded={open} aria-controls={timelineId} onClick={() => setTimelineFor(open ? `closed:${key}` : key)}>
-        {icon("list")}Timeline<span className="simple-timeline-count">{moments.length}</span>
-      </button>
-    </div>, target)}
-    <section key={key} className="simple-conversation" aria-label="Video conversation">
-      {query ? <>
+  const activeTurn = (query ? <>
         <p className="simple-user-message">{questionLabel(query.question)}</p>
         <article className="simple-answer" aria-label="Answer and source citations">
           <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : breakdown ? "Whole-video breakdown" : "Answer"}</span></div>
@@ -80,7 +90,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
             {citedTimeline}
             <details className="simple-generated-summary"><summary>Read generated summary · check against the source</summary><p className="simple-answer-text">{query.response.answer}</p></details>
           </> : <p className="simple-answer-text">{query.response.answer}</p>}
-          {query.mode === "real" && ["ok","partial"].includes(query.response.status) && !!query.response.events.length && <div className="live-answer-actions">
+          {conversationMode && query.mode === "real" && ["ok","partial"].includes(query.response.status) && !!query.response.events.length && <div className="live-answer-actions">
             <button type="button" className="primary-button" disabled={state.local} onClick={()=>ui()?.continueFrom(selected.id)}>Follow up on this answer {icon("arrow-right")}</button>
             <button type="button" className="outline-button" onClick={save}>Write a finding</button>
             <small>{query.usedContext ? "This answer used the selected earlier answer as context." : "Follow-up questions use this answer and its source evidence as context."}</small>
@@ -92,7 +102,7 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
           {query.response.status === "no_result" && <p className="simple-result-scope">No matching evidence was returned. This does not prove the event never occurred; replay the source or ask about a more specific visible detail.</p>}
           {query.response.status === "error" && <div className="simple-result-recovery">
             {query.response.errors.map((error,index) => <div key={index}>{error.code === "whole_video_review_limit" ? <p>Whole-video review supports clips up to 5:50. Choose a shorter recording, or ask a question about a specific visible moment.</p> : <><p>{error.message}</p><p>{error.suggested_action}</p></>}</div>)}
-            <p>This question did not complete. It cannot anchor a follow-up. Your earlier answers remain available in Details & save.</p>
+            <p>This question did not complete. It cannot anchor a follow-up. {conversationMode ? "Your earlier answers remain in this conversation." : "Your earlier answers remain available in Details & save."}</p>
             <button type="button" className="outline-button" onClick={() => ui()?.newQuestion()}>Start a new question</button>
           </div>}
           <div className="simple-citations">
@@ -109,7 +119,26 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
         {fixture && !state.local && <button type="button" className="outline-button" onClick={() => ui()?.askDemoQuestion("When is the package at the center?")}>Try: When is the package at the center?</button>}
         {state.local && <button type="button" className="text-button" onClick={() => ui()?.sources()}>Check analysis status</button>}
         <section id={timelineId} className="simple-cited-timeline" ref={timeline} hidden={!open} aria-label="Cited timeline" onKeyDown={timelineKeyDown}><h2>Cited timeline</h2><p>No cited moments yet. Ask a question or open a saved answer.</p></section>
-      </div>}
+      </div>);
+  return <>
+    {target && createPortal(<div className="simple-source-meta">
+      <span>{state.sourceInfo?.name || "Package positions · Synthetic demo"}</span>
+      <button type="button" className="simple-timeline-toggle" ref={timelineTrigger} aria-expanded={open} aria-controls={timelineId} onClick={() => setTimelineFor(open ? `closed:${key}` : key)}>
+        {icon("list")}Timeline<span className="simple-timeline-count">{moments.length}</span>
+      </button>
+    </div>, target)}
+    <section key={conversationMode ? `${state.sourceInfo?.id}:${state.epoch}` : key} className="simple-conversation" aria-label="Video conversation">
+      {conversationMode ? <>
+        <header className="simple-conversation-heading">
+          <h2>Conversation <span>{state.records.length} {state.records.length === 1 ? "question" : "questions"}</span></h2>
+          <p>{fixture ? "Synthetic demo · preset answers, no model calls." : state.local ? "Keep your questions here while analysis is unavailable." : "Keep asking about this video. Follow a detail or explore something new."}</p>
+        </header>
+        {state.records.length ? <ol className="simple-chat-thread" aria-label="Questions and saved answers">
+          {state.records.map(record => <li key={record.id} aria-current={record.id === selected?.id ? "true" : undefined}>
+            {record.id === selected?.id ? activeTurn : <SavedTurn record={record} state={state} ui={ui}/>}
+          </li>)}
+        </ol> : activeTurn}
+      </> : activeTurn}
     </section>
   </>;
 }

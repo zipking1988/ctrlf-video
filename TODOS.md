@@ -28,6 +28,9 @@ Updated: 2026-10-19. This is the current acceptance backlog, consolidated from o
 
 ## Whole-video product value
 
+- [x] Prepare and browser-check the October 19 local continuing-conversation UI: visible chronological turns, original saved replies, prior-turn follow-ups, retained draft and stable expanded replies. 181 frontend tests pass; no new model calls or deployment. The public saved example remains explicitly separate.
+- [ ] Deploy the reviewed conversation UI only under a separate finite release authorization; all 31 current attempts are consumed. Visual-analysis accuracy and genuine five-minute acceptance remain open.
+
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation; it subsequently shipped in `1a980ae`.
 - [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Deployed in `1a980ae`.
 - [x] Install the October 18 JPY 2,000 / 60-call / eight-index-call grant for the explicitly confirmed current browser owner, preserving historical records; deploy reviewed `1a980ae` as attempt 27 of 29.

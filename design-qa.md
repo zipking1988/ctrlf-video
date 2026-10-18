@@ -474,3 +474,45 @@ The independent testing/maintainability reviewers found that the new Sources rai
 The accessibility review found three contrast issues: amber keyboard outlines inherited by the white menu, white text/icons on the expanded menu trigger, and muted playback-recovery text on the teal dock. Menu focus is now teal; the expanded trigger uses coral with dark text/icons; Reload video uses light text and amber hover. Browser inspection verified the computed colors and keyboard focus; local evidence: `.ctrlf-video-eval/fieldnotes/review-menu.png`.
 
 After these fixes, the independent native reviewers and fresh adversarial reviewer reported no remaining actionable findings. Updated checks: 108 frontend tests and 218 backend tests passed, with the macOS Linux-isolation skip unchanged; build, lint/format, contract exports and whitespace checks passed. These reviews use the current Codex harness, not a separately claimed external provider. The real-mode workflow selection, spending approvals, historical reservations and deployment cutoffs remain unchanged.
+
+## October 19 continuing-conversation local candidate
+
+# Conversation UI design QA
+
+final result: passed
+
+Scope: a local continuing-conversation display change to the user-approved Review layout. This is not a model-accuracy or release-32 acceptance.
+
+- Source visual truth: `.ctrlf-video-eval/conversation-20261019/03-baseline-same-saved-results.png` (reviewed release-31 component rendered with the same retained actual four model results).
+- Implementation: `.ctrlf-video-eval/conversation-20261019/04-continuing-conversation.png`.
+- Focused thread: `.ctrlf-video-eval/conversation-20261019/05-visible-thread.png`.
+- Combined full-view comparison: `.ctrlf-video-eval/conversation-20261019/06-comparison.png`; both images placed together and inspected in the in-app browser.
+- Viewport/pixels: 1280×720 CSS and image pixels in both captures, density 1, no normalization. Four saved questions, selected fourth answer, same unsent draft, paused source 13.013s; timeline and coverage closed. Video native hover controls may differ slightly. QA controls/banner are harness-only and identical between baseline/candidate.
+
+## Findings and iterations
+
+- Initial P2: line clamping the padded bubble leaked a cropped fourth line from long questions. Fixed by clamping an inner span; full prompt remains in the expanded saved response. Post-fix focused capture 05 has clean three-line summaries and no cropped glyphs.
+- Context-switch review: the conversation section used the selected-answer key and remounted other open replies. Changed its key to source/epoch. Browser verification opened two saved replies, switched context to the first and confirmed the second remained expanded with the draft retained.
+- Recorded-result boundary: the old saved-example answer exposed an inactive live follow-up control. A regression failed before gating live-answer actions on conversation mode; the local public example was then browser-checked with that control absent and saved-result/finding actions retained (07-recorded-example-boundary.png).
+- No remaining actionable P0/P1/P2 findings in this scoped desktop pass.
+
+## Required fidelity surfaces
+
+- Fonts/typography: existing Instrument family and fallbacks retained. Same 15px question bubbles and 1.6 line height; supporting heading/status uses the existing smaller hierarchy. Full prompts and old model prose preserved, including known wrong claims.
+- Spacing/layout: original centered 760px source/content column and one page scroll retained. Conversation list and small heading are intentional additions. Compact saved turns have consistent borders/gaps; input does not overlay evidence.
+- Colors/tokens: existing paper, mint question bubbles, text/muted and line variables reused. Corrected an undefined ink token to the existing text token for saved answer prose.
+- Images/assets: same original source and retained cited frames, no generated substitute, new icon/font asset or altered video. Source playback and a 13.013-second prior-answer replay checked.
+- Copy/content: ongoing-question guidance is explicit; saved replies say saved, partial states and original uncertainty remain. Recorded public example disables conversation mode. Read-only preview cannot submit new questions.
+
+## Primary interactions and verification limits
+
+Browser-checked: open original saved answer; inspect full prompt; choose its follow-up; preserve draft/all four turns; clear context for a new topic; preserve another expanded reply on selection; replay selected earlier answer source. 181 frontend tests and frontend build pass; lint/format/contracts pass. Backend unchanged, so no new backend or paid test was run for this display change. Console/navigation telemetry unavailable in native IAB; not claimed clean. Full assistive-technology, zoom and mobile compliance are outside this pass.
+
+## Implementation checklist
+
+- [x] Preserve current video/chat layout and recorded-example boundaries.
+- [x] Expose chronological conversation and original replies.
+- [x] Preserve context anchors, draft and expanded replies.
+- [x] Fix visible text clipping and compare actual screenshots.
+- [x] Build and run relevant frontend regressions.
+- [ ] Production deployment: not authorized beyond the consumed 31 attempts.

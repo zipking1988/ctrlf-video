@@ -150,7 +150,7 @@ export default function RecordedExample({icon}) {
         <ClipReview seek={seek} download={download} prepareWorkspace={prepareWorkspace} preparing={preparing} prepareError={prepareError}/>
         {status && <p className="example-status" role="status">{status}</p>}
         <details className="example-original-result"><summary>Original Gemini test · one scoreboard question</summary><p>This separate saved test verifies one visible fact. It is not the source of the prepared clip review above.</p>
-        <SimpleReview state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={null} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={editFinding}/>
+        <SimpleReview conversationMode={false} state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={null} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={editFinding}/>
         <div className="example-next"><span>Saved real Gemini result · No new analysis</span><button className="outline-button" onClick={()=>editing ? setEditing(false) : editFinding()}>{editing ? "Hide finding" : "Write a finding"}{icon("stack")}</button></div>
         {editing && <section ref={editor} className="example-finding" aria-label="Write a source-linked finding">
           <header><div><h2>Your finding</h2><p>Write what you checked. The source citation stays attached.</p></div><button className="text-button" onClick={()=>{setDraft({...sample.reviewed_finding});setStatus("Existing human review copied into your draft. Check it before saving.");}}>Use reviewed example</button></header>
