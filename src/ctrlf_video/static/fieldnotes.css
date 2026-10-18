@@ -607,8 +607,7 @@
 .fieldnotes.canvas-first.review-desk.review-first .composer-area { order: 1; position: relative; inset: auto; transform: none; width: 100%; max-width: none; margin: 0; padding: 14px 0 0; border: 0; background: transparent; }
 .fieldnotes.canvas-first.review-desk.review-first .composer-area form { display: grid; grid-template-columns: minmax(0,1fr) 36px; grid-template-rows: auto auto; gap: 5px 12px; height: auto; padding: 12px 14px; border: 1px solid #d6ddd5; border-radius: 13px; background: #fffefa; box-shadow: 0 2px 6px #192b3004; }
 .fieldnotes.canvas-first.review-desk.review-first .composer-context { grid-column: 1 / -1; grid-row: 1; min-height: 0; margin: 0; font-size: 10px; }
-.fieldnotes.canvas-first.review-desk.review-first .composer-context label { padding: 0; font-size: 10px; color: var(--muted); font-weight: 450; background: transparent; }
-.fieldnotes.canvas-first.review-desk.review-first .composer-context:has(#clear-context[hidden]) { display: none; }
+.fieldnotes.canvas-first.review-desk.review-first .composer-context label { padding: 0; font-size: 12px; color: var(--muted); font-weight: 450; background: transparent; }
 .fieldnotes.canvas-first.review-desk.review-first #clear-context { margin-left: auto; padding: 2px; min-height: 20px; font-size: 10px; }
 .fieldnotes.canvas-first.review-desk.review-first .composer-area textarea { grid-column: 1; grid-row: 2; min-height: 30px; height: 30px; max-height: 120px; margin: 0; padding: 5px 0; resize: vertical; font-size: 15px; line-height: 1.5; border: 0; background: transparent; box-shadow: none; }
 .fieldnotes.canvas-first.review-desk.review-first .composer-tools { grid-column: 2; grid-row: 2; height: 32px; margin: 0; }
@@ -641,8 +640,8 @@
 .simple-cited-timeline li button { grid-template-columns: 84px 120px minmax(0,1fr); gap: 16px; padding: 8px 10px; }
 .simple-cited-timeline li img { width: 120px; height: 67.5px; border-radius: 6px; }
 .simple-timeline-scope { margin-top: 10px; padding-top: 10px; }
-.fieldnotes.canvas-first.review-desk.review-first #clear-context { min-height: 14px; padding: 0; }
-.fieldnotes.canvas-first.review-desk.review-first .composer-context { line-height: 14px; }
+.fieldnotes.canvas-first.review-desk.review-first #clear-context { min-height: 28px; padding: 4px 0; font-size: 12px; }
+.fieldnotes.canvas-first.review-desk.review-first .composer-context { min-height: 28px; line-height: 18px; }
 .simple-answer-details { margin: 0 0 0 auto; flex: none; }
 .simple-answer-details > summary { padding: 3px 0; white-space: nowrap; }
 .simple-answer-details[open] { flex: 1 0 100%; margin: 8px 0 0; }
