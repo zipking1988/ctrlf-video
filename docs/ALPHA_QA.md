@@ -73,3 +73,29 @@ New live whole-video quality testing remains unrun because all existing model
 grants are revoked. No model funding, cap, expiry, private-media permission or
 hosting extension was changed. The single additional deployment attempt remains
 bound to the final reviewed SHA; main CI determines its actual deployment result.
+
+## Final deployed verification
+
+PR #2 merged to private main at `9d2dad07d853aafada54e311f80fc399d97aab05`.
+[Main CI 39089788904](https://github.com/zipking1988/ctrlf-video/actions/runs/39089788904)
+passed 162 frontend and 255 Linux backend tests and deployed both components.
+The release manager reports `committed`, with 26 retained attempts out of 26.
+The operator verified unchanged financial-ledger and runtime hashes, 39 retained
+model attempts and zero active grants. Release count is not a billing balance.
+
+A fresh production browser at `https://ctrlfvideo.com/#example` passed no-sign-in
+entry, all six review sections, exact before/after source seeks, real Markdown
+download with provenance, and original Gemini finding save/report opening.
+The session endpoint returns the 30 MiB cap and `real_ready: false` with
+`budget_not_approved_or_insufficient`. This is a funding gate, not a cloud IAM error.
+
+The release backup was downloaded privately and restored into local scratch.
+All 30 file hashes and both SQLite integrity checks passed. Its SHA-256 is
+`8ebed0203d829208f1c8e054502cdbc127d76bc3fa04b2a7ca8a1848207a2456`.
+The final cutoff backup/cleanup process is still required for later writes.
+
+The updated 14-slide editable presentation passed package, layout and native-table
+validation and visual inspection. The captioned UI demonstration is 120.62 seconds
+at 1280×720, with local synthetic narration and no paid media generation. Both
+remain private local deliverables under `.ctrlf-video-eval/alpha-2026-10-18/`.
+Neither artifact claims fresh Gemini whole-video quality or a human usability study.

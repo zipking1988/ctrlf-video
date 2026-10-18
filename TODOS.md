@@ -8,6 +8,8 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Fix upload-to-Review refresh, hash navigation, unindexed draft editing and in-dialog rename recovery.
 - [x] Surface unresolved scope and failure recovery beside answers; preserve evidence and model admission gates.
 - [x] Obtain authorization for one additional reviewed alpha deployment attempt (cumulative 26); retain all 25 records and pin the reviewed commit. Main CI is the authoritative deployment result.
+- [x] Deploy reviewed `9d2dad0` through main CI, verify public replay/download/finding export, and restore-check a private local backup of both databases. Release allowance is consumed at 26/26.
+- [x] Update the editable 14-slide deck and 120.62-second captioned UI demonstration locally. Publishing/submission remains separate.
 - [ ] Fund any new model trial explicitly and agree client data/retention expectations; anonymous live analysis remains unavailable.
 - [ ] Resolve the submission and UX-validation prerequisites below. See [ALPHA.md](ALPHA.md).
 

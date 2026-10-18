@@ -329,6 +329,16 @@ An inherited work account can report `compute.instances.get` denied even when
 this saved personal account already has access. No global account switch or
 additional IAM grant is needed for that mismatch.
 
+Attempt 26 completed successfully on October 18: reviewed `9d2dad0` was pushed
+to private main and [CI 39089788904](https://github.com/zipking1988/ctrlf-video/actions/runs/39089788904)
+deployed both components. The release state is `committed`, with 26/26 attempts
+retained. Financial-ledger and runtime hashes are unchanged; no model grant was
+added. The consistent release backup was downloaded under
+`.ctrlf-video-eval/cloud-backups/2026-10-18-alpha26/` and independently restored
+locally: all 30 files and both SQLite databases passed verification. The existing
+final cutoff backup/cleanup remains required. Markdown-only handoff updates are
+excluded from deployment by the workflow's `paths-ignore` rule.
+
 Recovery entry points on the VM (trusted operator only):
 
 ```sh

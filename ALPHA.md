@@ -1,10 +1,11 @@
 # CtrlF Video — Alpha handoff
 
-Prepared October 18, 2026 (JST). This is a desktop **alpha candidate for a guided demo and supervised evaluation**, not a claim of production readiness or validated UX-research value. Check the latest main CI deployment result for the hosted revision. The original separate workspace remains untouched.
+Prepared October 18, 2026 (JST). This is a desktop **alpha for a guided demo and supervised evaluation**, not a claim of production readiness or validated UX-research value. Reviewed commit `9d2dad0` is deployed at [ctrlfvideo.com](https://ctrlfvideo.com/#example); [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39089788904) passed. The original separate workspace remains untouched.
 
 ## What a visitor can do
 
-- Open the recorded Gemini example without signing in, replay its actual source citation at 00:01.001, write a finding, save in the browser and export Markdown, JSON or HTML with an evidence image.
+- Open a prepared six-section review of the 70.2-second basketball excerpt without signing in, compare the 62 → 61 score-display revision, replay its source and download the review. Codex source-frame inspection is explicitly separate from the saved Gemini test.
+- Open the original Gemini test below the review, replay its actual source citation at 00:01.001, write a finding, save in the browser and export Markdown, JSON or HTML with an evidence image.
 - Explore synthetic preset conversations, follow their source timestamps, organize evidence on Canvas, edit findings and export a report. These answers are visibly labeled and incur no model calls.
 - Upload authorized footage for bounded preflight and private playback, retain a question draft, rename/delete sources, and return to saved investigations. The upload dialog states the size limit, analysis access and retention before sending the file.
 - Use Quick guide from Home or the workspace menu. Review remains one video above the conversation; Canvas is optional.
@@ -26,11 +27,11 @@ Open `http://127.0.0.1:8765/#start`. Default fixture mode makes no model request
 
 ## A 2-minute demonstration
 
-1. **0:00–0:20 — Problem.** “CtrlF Video turns a visual question into a moment you can replay and a finding you can check.” Open the recorded example. Identify it as a saved real Gemini test on a sports technical sample, not a UX study or a live request.
-2. **0:20–0:50 — Verify.** Read the scoreboard answer. Open Still to verify, then replay 00:01.001 and surrounding footage. Show that the result remains partial and sampling is not exhaustive.
-3. **0:50–1:25 — Make a finding.** Write an observation, or explicitly copy the existing human review and label it as such. Keep interpretation and open questions separate. Save the finding.
-4. **1:25–1:50 — Deliver.** Export HTML with evidence. Explain that the JPEG travels with the report while original video playback needs its source link. JSON and Markdown retain the source references too.
-5. **1:50–2:00 — Scope.** “Next validation is an authorized UX recording with manually checked events. Fresh uploads currently support playback; new Gemini analysis requires a funded session.”
+1. **0:00–0:27 — Sequence.** Open Explore the clip review. Explain its six chronological sections and the displayed lead change. Identify the prepared Codex review and the separate historical Gemini test.
+2. **0:27–0:46 — Verify a change.** Compare Atlanta 62 at 00:36.036 with 61 at 00:37.037. Click both source citations. The display changes; whether it reflects an official correction or a graphic error is unknown.
+3. **0:46–1:16 — Keep the evidence.** Read the sequence and limits, then download the review. Open the original Gemini finding/report separately to demonstrate editable notes.
+4. **1:16–1:34 — Your recording.** Show the upload disclosure and editable whole-video draft starter. Explain the 5:50 limit and the indexed-source/funded-session prerequisites.
+5. **1:34–2:01 — Scope.** Automated first-use and recovery tests passed. Fresh whole-video Gemini quality and actual first-time human comprehension remain unverified. Return to the source comparison.
 
 Use Menu → Demo library for a separate interactive demonstration of follow-ups and Canvas, explicitly labeled as preset responses. Do not present that sequence as a new Gemini run.
 
@@ -42,7 +43,7 @@ Save failures and revision conflicts require recovery before navigation that wou
 
 ## Release gates
 
-The user authorized review of PR #2 and one additional alpha deployment attempt on October 18. This is cumulative attempt 26, with all previous records retained and the candidate pinned to its reviewed commit. The JPY 3,000 total and October 19 cutoffs remain unchanged. No new models, grants, resources or hosting extension are included. See the latest main CI deployment result for completion and [deployment controls](docs/deployment.md#release-process-and-cicd) for the exact operator gate.
+The user authorized review of PR #2 and one additional alpha deployment attempt on October 18. PR #2 merged into private main; cumulative attempt 26 successfully deployed `9d2dad0`, with all previous records retained. The allowance is now consumed at 26/26. The JPY 3,000 total and October 19 cutoffs remain unchanged. No new models, grants, resources or hosting extension were added. See [main CI](https://github.com/zipking1988/ctrlf-video/actions/runs/39089788904) and [deployment controls](docs/deployment.md#release-process-and-cicd).
 
 The public recorded example remains available only while the existing temporary deployment runs. Model validity ends October 19 at 22:00 JST; hosting authorization ends at 23:59 JST. The existing backup/cleanup process must remain in place. Continued judge/client access needs a new hosting agreement and finite budget.
 
