@@ -280,7 +280,8 @@
       return `This file is too large. Choose a video up to ${Math.floor(session.upload_max_bytes/1024**2)} MiB, or trim/compress a copy first. Your current investigation is unchanged.`;
     return "";
   }
-  function reviewUpload(file) {
+  function reviewUpload(file, options={}) {
+    const initialDraft=typeof options.initialDraft === "string" ? options.initialDraft.slice(0,2000) : "";
     const problem=uploadProblem(file);
     if (problem) {ui().notify(problem);return;}
     const context={id:current?.id,epoch:requestEpoch};
@@ -293,13 +294,14 @@
     $("upload-confirm").onclick=()=>{
       $("upload-dialog").close();
       if (!owns(context.id,context.epoch)) {ui().notify("Your investigation changed. Choose the file again to upload here.");return;}
-      upload(file);
+      upload(file,{initialDraft});
     };
     $("upload-cancel").onclick=()=>$("upload-dialog").close();
     $("upload-dialog").showModal();
   }
   let uploading=false;
-  async function upload(file) {
+  async function upload(file, options={}) {
+    const initialDraft=typeof options.initialDraft === "string" ? options.initialDraft.slice(0,2000) : "";
     const problem=uploadProblem(file);
     if (problem) {ui().notify(problem);return;}
     if (uploading) {ui().notify("An upload is already in progress. Wait for it to finish before choosing another video.");return;}
@@ -330,6 +332,9 @@
       // Creation advances navigation itself; only a later navigation is stale.
       completionEpoch=requestEpoch;
       if (!await creating) return;
+      // Keep any draft typed while creation/save was in flight. The prepared
+      // question is a draft only, never a saved-result context anchor or dispatch.
+      if(initialDraft && !snapshot().ui?.draft?.trim()) {ui().restoreDraft(initialDraft);changed();}
       ui().notify("Upload complete. Preflight is running; check Sources for progress.");
       ui().showSource();
     }catch(error){if(requestEpoch===completionEpoch) ui().notify(uploaded

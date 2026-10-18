@@ -122,3 +122,29 @@ the in-app browser. This is not a human usability study.
 No backend/model dispatch, funding change or deployment occurred. The production
 revision remains `9d2dad0`, and the 26/26 release allowance remains consumed.
 True live conversation remains an unmet acceptance requirement.
+
+## Local example-to-workspace entry
+
+The follow-up candidate now separates local note lookup from a path into the
+existing real analysis workspace. Preparing the example fetches only the fixed
+public MP4, enforces a 30 MiB stream bound and verifies its SHA-256 before opening
+the normal upload disclosure. The user's question is handed over as a draft.
+Navigation cancels preparation; public notes are not private context anchors;
+drafts typed during investigation creation are preserved. No model is dispatched
+by preparation or upload.
+
+All 173 frontend tests, `make check`, the generated build and whitespace checks
+passed. New regressions cover changed media, type/size rejection, cancellation,
+initial-draft persistence, concurrent typing and late navigation. In-app browser
+checks confirmed cancel/re-entry retains the question, explicit local upload
+creates the owned source investigation, and refresh restores the question draft.
+The UI correctly shows live questions off in this fixture session. This does not
+verify model analysis or answer quality.
+
+A read-only cloud check again confirmed deployed `9d2dad0`, 26/26 release records,
+zero active model grants, 39 retained model attempts, unchanged financial/runtime
+hashes and the verified two-database backup. Cloud access works with the explicit
+personal account, project and billing-project flags documented in the deployment
+handoff. The remaining gate is finite model/release authorization, not missing
+IAM access. No funding, model call, release or cloud resource changed. The deck
+and demo continue to describe the deployed version, not this local candidate.

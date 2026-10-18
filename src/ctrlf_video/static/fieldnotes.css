@@ -878,3 +878,9 @@ body.recorded-view .research-welcome { display: none; }
 .clip-full-review .clip-heading h2 { font-size: 28px; }
 .review-discovery button:focus-visible, .review-discovery textarea:focus-visible { outline: 2px solid #176c56; outline-offset: 3px; }
 @media (max-width: 1100px) { .finding-grid { grid-template-columns: 1fr; } .review-finding { padding: 16px; } .finding-heading { flex-wrap: wrap; } }
+.review-live-entry { margin-top: 24px; padding: 20px; border: 1px solid #b8cfc1; border-radius: 8px; background: #eaf1e8; }
+.review-live-entry h2 { margin-top: 0; }
+.review-live-entry p { font-size: 13px; max-width: 650px; }
+.review-live-entry small { display: block; margin-top: 12px; font-size: 11px; line-height: 1.6; color: #526663; }
+.review-live-entry [role="alert"] { color: #963c32; }
+.review-question-actions { flex-wrap: wrap; }

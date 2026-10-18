@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {sourceClock} from './review-timeline.mjs';
 import {reviewDocuments, searchReview, reviewStorageKey, restoreReviewState, savedReviewMarkdown} from './review-evidence.mjs';
 
-export default function ReviewConversation({review,seek,download}) {
+export default function ReviewConversation({review,seek,download,prepareWorkspace,preparing,prepareError}) {
   const docs=reviewDocuments(review),key=reviewStorageKey(review);
   const [state,setState]=useState(()=>{try{return restoreReviewState(review,localStorage.getItem(key));}catch{return restoreReviewState(review,null);}});
   const [storageError,setStorageError]=useState(false),[notice,setNotice]=useState('');
@@ -41,8 +41,15 @@ export default function ReviewConversation({review,seek,download}) {
       <footer><button type="button" className="text-button" onClick={()=>focusFinding(doc)}>Ask about this</button><button type="button" className="text-button" aria-pressed={state.savedIds.includes(doc.id)} onClick={()=>toggleSave(doc)}>{state.savedIds.includes(doc.id)?'Saved':'Save finding'}</button></footer>
     </article>)}</div>
     {!!state.savedIds.length && <section className="review-saved" aria-label="Saved review findings"><strong>{state.savedIds.length} saved {state.savedIds.length===1?'finding':'findings'}</strong><span>{storageError?'Kept in this tab only':'Saved in this browser'}</span><button type="button" className="outline-button" onClick={()=>download(savedReviewMarkdown(review,state.savedIds,location.origin),'md','text/markdown;charset=utf-8')}>Export saved findings</button></section>}
+    <section className="review-live-entry" aria-labelledby="review-live-heading">
+      <h2 id="review-live-heading">Ask Gemini about this video</h2>
+      <p>Make a private workspace copy, then use its real analysis and follow-up conversation. Analysis requires an approved, funded session; copying this clip does not enable it.</p>
+      <button type="button" className="primary-button" disabled={preparing || !prepareWorkspace} onClick={()=>prepareWorkspace(state.draft)}>{preparing?'Preparing the verified clip…':'Prepare this clip for questions'}</button>
+      <small>Your typed question stays a draft. The next screen explains storage and access before upload. No model request starts here.</small>
+      {prepareError && <p role="alert">{prepareError}</p>}
+    </section>
     <section className="review-questions" aria-labelledby="review-question-heading">
-      <header><h2 id="review-question-heading">Ask about these findings</h2><span className="finding-mode">Live Gemini off</span></header>
+      <header><h2 id="review-question-heading">Search the existing review</h2><span className="finding-mode">Live Gemini off</span></header>
       <p id="review-question-scope">Search the checked notes below, with follow-up context and source timestamps. This searches existing evidence; it does not analyze new frames or generate an AI answer.</p>
       {!!state.turns.length && <div className="review-conversation" aria-label="Review questions">{state.turns.map((turn,index)=>{
         const result=searchReview(review,turn.question,turn.contextIds);
@@ -54,9 +61,9 @@ export default function ReviewConversation({review,seek,download}) {
       })}</div>}
       <form onSubmit={event=>{event.preventDefault();submit();}}>
         {!!state.contextIds.length && <div className="review-context"><span>Following up on: {state.contextIds.map(id=>docs.find(d=>d.id===id)?.title).join(' · ')}</span><button type="button" className="text-button" onClick={()=>setState(old=>({...old,contextIds:[]}))}>Clear context</button></div>}
-        <label htmlFor="review-evidence-question">Your question</label>
-        <textarea ref={input} id="review-evidence-question" rows={2} maxLength={2000} placeholder="Why does 62 become 61? What happens at 00:43?" aria-describedby="review-question-scope" value={state.draft} onChange={event=>setState(old=>({...old,draft:event.target.value}))} onKeyDown={event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.nativeEvent.isComposing){event.preventDefault();submit();}}}/>
-        <div className="review-question-actions"><small>Enter to search · Shift+Enter for a new line</small><button type="submit" className="primary-button" disabled={!state.draft.trim()}>Search reviewed evidence</button></div>
+        <label htmlFor="review-evidence-question">Question draft</label>
+        <textarea ref={input} id="review-evidence-question" rows={2} maxLength={2000} placeholder="Draft a question for the workspace, or search the notes here…" aria-describedby="review-question-scope" value={state.draft} onChange={event=>setState(old=>({...old,draft:event.target.value}))} onKeyDown={event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.nativeEvent.isComposing){event.preventDefault();submit();}}}/>
+        <div className="review-question-actions"><small>Enter to search · Shift+Enter for a new line</small><button type="submit" className="outline-button" disabled={!state.draft.trim()}>Search reviewed evidence</button><button type="button" className="primary-button" disabled={!state.draft.trim() || preparing || !prepareWorkspace} onClick={()=>prepareWorkspace(state.draft)}>Prepare in workspace</button></div>
       </form>
       <div className="review-question-starters" aria-label="Suggested review questions">{(state.contextIds.length?['Show the evidence','Why?','What happens next?']:['How does the lead change?','Why does the score go from 62 to 61?','What happens at 00:43?']).map(question=><button type="button" className="outline-button" key={question} onClick={()=>{setState(old=>({...old,draft:old.draft.trim()?old.draft:question}));input.current?.focus();}}>{question}</button>)}</div>
       <p className="review-live-limit">For questions beyond these notes, a new Gemini analysis needs an approved, funded workspace. This public example has no live model access.</p>

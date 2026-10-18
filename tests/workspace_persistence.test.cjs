@@ -133,6 +133,27 @@ test("successful upload saves the previous draft and opens the new investigation
   assert.match(h.get("notice").textContent, /Upload complete/);
 });
 
+test("prepared example question transfers only as a draft into the new owned investigation", async () => {
+  const h=await harness();
+  h.get("question").value="Existing private draft";
+  await h.window.CtrlFVideoPersistence.upload({name:"Basketball.mp4",type:"video/mp4",size:1024},{initialDraft:"Why does the score decrease?"});
+  assert.equal(h.get("question").value,"Why does the score decrease?");
+  assert.equal(h.desks.get("desk-A").state.ui.draft,"Existing private draft");
+  await h.window.CtrlFVideoPersistence.flush();
+  assert.equal(h.desks.get("new-demo").state.ui.draft,"Why does the score decrease?");
+  assert.equal(h.store.getSnapshot().records.length,0);
+  assert.equal(h.calls.some(c=>/analyze|chat/.test(c.url)),false);
+});
+
+test("prepared question does not overwrite text entered while the new desk is saving", async () => {
+  const h=await harness(),saving=deferred();let held=false;
+  h.setOverride(c=>{if(c.url==="/api/investigations/new-demo" && c.method==="PUT" && !held){held=true;return saving.promise;}});
+  const uploading=h.window.CtrlFVideoPersistence.upload({name:"Basketball.mp4",type:"video/mp4",size:1024},{initialDraft:"Prepared question"});
+  await tick();assert.equal(held,true);h.get("question").value="Newly typed question";
+  saving.resolve(response({revision:2}));await uploading;
+  assert.equal(h.get("question").value,"Newly typed question");
+});
+
 test("uploaded source creation failure keeps the draft and explains recovery without another upload", async () => {
   const h = await harness();
   h.get("question").value = "Keep the original draft";
@@ -148,7 +169,7 @@ test("uploaded source creation failure keeps the draft and explains recovery wit
 test("late uploaded source creation failure cannot notify a newer investigation", async () => {
   const h = await harness(), creating = deferred();
   h.setOverride(c => c.url === "/api/investigations" && c.method === "POST" ? creating.promise : undefined);
-  const uploading = h.window.CtrlFVideoPersistence.upload({ name: "recording.mp4", type: "video/mp4", size: 1024 });
+  const uploading = h.window.CtrlFVideoPersistence.upload({ name: "recording.mp4", type: "video/mp4", size: 1024 }, {initialDraft:"Must not leak to desk B"});
   await tick();
   assert.ok(h.calls.some(c => c.url === "/api/investigations" && c.method === "POST"));
   await h.window.testWorkspace.openDesk("desk-B");

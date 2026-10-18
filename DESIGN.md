@@ -18,6 +18,15 @@ and private investigations remain separate. The old finding editor now starts
 with the reviewed example when empty, preserving any existing visitor draft.
 This change is a local candidate; hosted revision `9d2dad0` remains unchanged.
 
+The example also offers an explicit path into the existing private workspace:
+prepare the verified public clip, confirm its normal upload disclosure, and keep
+the visitor's question as a draft. This copies only the fixed, size-bounded,
+SHA-256-checked public source. Navigation cancels preparation. Existing desk
+changes are drained first, and a draft typed during creation takes precedence.
+Public review answers never become private conversation anchors. The separate
+local note search remains labeled; real analysis still requires active funding
+and a deliberate start in the workspace. Uploading does not dispatch a model.
+
 The user rejected scoreboard-only value framing. The landing now leads with sequence review and an actual 62 → 61 score-display revision. The example begins with a prepared Codex source review: six chronological sections across the 70.2-second excerpt, side-by-side source frames, clickable absolute timestamps, explicit sampling/attribution and a Markdown download. The original Gemini result and browser-local finding editor remain in a separately labeled disclosure. This does not claim that the prepared review was produced by the application's model pipeline.
 
 Private recordings expose **Draft a whole-video breakdown** even after earlier answers exist. It preserves existing text and never submits automatically. Whole-video results open their evidence timeline and coverage/limits by default. Existing one-video-above-chat layout and desktop scope remain. The older descriptions below document the preceding design.

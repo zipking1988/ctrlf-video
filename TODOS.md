@@ -16,6 +16,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 ## Whole-video product value
 
 - [x] Add a local finding-first example with direct save/export and contextual search of reviewed notes. This is not live AI conversation and has not been deployed.
+- [x] Connect the public sample to the owned upload flow with a verified source copy and a preserved question draft. Confirm cancellation, upload and refresh locally; no analysis starts automatically. Not deployed.
 - [ ] Enable and verify genuine Gemini follow-up questions with an explicitly funded owner/session and a newly reviewed deployment attempt. Existing grants are revoked and release allowance is consumed at 26/26.
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
@@ -62,7 +63,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Download a consistent initial local backup; verify its checksum, both SQLite databases, source media and private configuration.
 - [x] Implement test-gated CI/CD, finite main-only deployment access, backend backup/restore checks and failure rollback regressions.
 - [x] Record the successful hosted frontend/backend pipeline, live forced-failure rollback and independently verified local recovery backup; see [deployment evidence](docs/deployment.md#release-process-and-cicd).
-- [ ] Reconcile actual cloud spend against the JPY 3,000 total; the 25-attempt CI backstop is an engineering setting, not a money meter.
+- [ ] Reconcile actual cloud spend against the JPY 3,000 total; the consumed 26-attempt CI backstop is an engineering setting, not a money meter.
 - [ ] Verify containerized Linux decoding/file/network isolation and resource bounds without disabling protection before using that deployment target.
 - [ ] Validate disk encryption, expiry/deletion, restart recovery, consistent backups and restoration without resurrecting deleted media.
 - [ ] Test bounded concurrent query/ingestion workloads, cancellation/deletion races and capacity release on the target host.

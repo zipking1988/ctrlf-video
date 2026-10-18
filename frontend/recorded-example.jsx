@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import SimpleReview from "./simple-review.jsx";
 import ClipReview from "./clip-review.jsx";
+import {loadExampleFile} from "./example-workspace.mjs";
 import {exampleView, exampleReport, findingKey, emptyFinding, completeFinding, storedFinding} from "./recorded-example-model.mjs";
 
 const initialFinding = () => {try {return storedFinding(localStorage.getItem(findingKey));} catch {return null;}};
@@ -17,11 +18,13 @@ export default function RecordedExample({icon}) {
   const [active,setActive]=useState(false),[sample,setSample]=useState(null),[loading,setLoading]=useState(false),[error,setError]=useState("");
   const [saved,setSaved]=useState(initialFinding),[draft,setDraft]=useState(()=>initialFinding() || emptyFinding());
   const [editing,setEditing]=useState(false),[status,setStatus]=useState("");
+  const [preparing,setPreparing]=useState(false),[prepareError,setPrepareError]=useState("");
   const [report,setReport]=useState(null),[exportStatus,setExportStatus]=useState(""),[exporting,setExporting]=useState(false);
 
-  const player=useRef(null),editor=useRef(null),dialog=useRef(null),request=useRef(0),abort=useRef(null),returnFocus=useRef(null),activeRef=useRef(false);
+  const player=useRef(null),editor=useRef(null),dialog=useRef(null),request=useRef(0),abort=useRef(null),returnFocus=useRef(null),activeRef=useRef(false),preparation=useRef(null);
   const dirty=!same(saved,draft);
   function leave(upload=false,workspace=false) {
+    preparation.current?.abort();preparation.current=null;setPreparing(false);
     player.current?.pause();
     abort.current?.abort();setReport(null);
     ++request.current;setLoading(false);setActive(false);activeRef.current=false;
@@ -37,6 +40,7 @@ export default function RecordedExample({icon}) {
   }
   useEffect(()=>{
     async function open() {
+      preparation.current?.abort();preparation.current=null;setPreparing(false);setPrepareError("");
       const token=++request.current,context=window.CtrlFVideoPersistence?.captureContext();
       setLoading(true);setError("");setStatus("");setActive(true);activeRef.current=true;
       document.body.classList.add("recorded-view");
@@ -69,7 +73,7 @@ export default function RecordedExample({icon}) {
     skip.addEventListener("click",skipToVideo);
     window.addEventListener("hashchange",onHash);
     if(location.hash==="#example")open();
-    return ()=>{++request.current;abort.current?.abort();skip.removeEventListener("click",skipToVideo);window.removeEventListener("hashchange",onHash);delete window.CtrlFVideoRecordedExample;};
+    return ()=>{++request.current;preparation.current?.abort();abort.current?.abort();skip.removeEventListener("click",skipToVideo);window.removeEventListener("hashchange",onHash);delete window.CtrlFVideoRecordedExample;};
   },[]);
   useEffect(()=>{if(editing)editor.current?.scrollIntoView({block:"start"});},[editing]);
   useEffect(()=>{
@@ -81,6 +85,25 @@ export default function RecordedExample({icon}) {
     const apply=()=>{video.currentTime=time;video.pause();};
     if(video.readyState>=1)apply();else video.addEventListener("loadedmetadata",apply,{once:true});
     setStatus(`Source selected at ${reports().time(time)}. Play to check the context.`);
+  };
+  const prepareWorkspace = async draft => {
+    if(preparation.current)return;
+    const persistence=window.CtrlFVideoPersistence,context=persistence?.captureContext(),token=request.current;
+    if(!context || !persistence.reviewUpload){setPrepareError("Reconnect to your workspace before preparing this clip.");return;}
+    const controller=new AbortController();preparation.current=controller;setPreparing(true);setPrepareError("");
+    const isCurrent=()=>activeRef.current && request.current===token && persistence.isCurrent(context);
+    try {
+      const flushed=await persistence.flush();
+      if(!isCurrent() || controller.signal.aborted)return;
+      if(!flushed)throw Error("Save your workspace changes first. Your question is kept here.");
+      const file=await loadExampleFile({signal:controller.signal,isCurrent});
+      if(!isCurrent() || controller.signal.aborted)return;
+      // Return to the existing owned workspace before its normal consent dialog.
+      // No source IDs or answers from the public example become private anchors.
+      leave(false,true);
+      persistence.reviewUpload(file,{initialDraft:typeof draft==='string'?draft:''});
+    } catch(error) {if(isCurrent() && error.name!=="AbortError")setPrepareError(error.message);}
+    finally {if(preparation.current===controller){preparation.current=null;setPreparing(false);}}
   };
   const editFinding = () => {
     if(!Object.values(draft).some(value=>value.trim())) {setDraft({...sample.reviewed_finding});setStatus("Prepared reviewed finding copied into your draft. Check and edit before saving.");}
@@ -124,7 +147,7 @@ export default function RecordedExample({icon}) {
         <div className="simple-source-meta"><span>Original source · 01:10.203</span><span>Play any cited moment below</span></div>
       </section>
       <section className="agent-chat" aria-label="Example video chat">
-        <ClipReview seek={seek} download={download}/>
+        <ClipReview seek={seek} download={download} prepareWorkspace={prepareWorkspace} preparing={preparing} prepareError={prepareError}/>
         {status && <p className="example-status" role="status">{status}</p>}
         <details className="example-original-result"><summary>Original Gemini test · one scoreboard question</summary><p>This separate saved test verifies one visible fact. It is not the source of the prepared clip review above.</p>
         <SimpleReview state={view} ui={()=>({seek,newQuestion:()=>leave(true)})} icon={icon} metaTarget={null} newQuestionLabel="Upload your video" playerId="example-player" onSaveFinding={editFinding}/>
