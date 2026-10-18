@@ -1,3 +1,11 @@
+# Landing follow-up · October 19, 2026
+
+Completed #start review in the separate `codex/design-review` worktree. Readable disclosures and timestamp ranges (`bb95718`), recovery/focus contrast (`91c424b`), and visible surface-aware skip navigation (`8370fb1`) are verified locally. The existing layout, source image, prepared-example disclosures and desktop-only boundary remain intact.
+
+Browser checks cover 1280px and 896px desktop, Quick guide and focus return, How it works, recorded example/Home, landing skip to heading and public-example skip to player. A deliberate local failed-service fixture confirms readable notice/retry. Actual local app warning/error log is empty. 192 frontend tests, build, lint, formatting and schema checks pass. Two new skip-navigation regressions cover surface isolation. No paid call, push or deployment.
+
+Evidence: [landing audit](/Users/zip/.gstack/projects/zipking1988-ctrlf-video/designs/design-audit-20261019/landing-audit.md), with matched before/after viewport captures and recovery/focus evidence. Qualitative design B+ → A−, generic-template score unchanged A. Mechanical detector/external cross-model coverage remains unavailable; native independent source audit completed.
+
 # Local Review design fixes · October 19, 2026
 
 final result: passed

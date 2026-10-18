@@ -104,3 +104,5 @@ Updated: 2026-10-19. This is the current acceptance backlog, consolidated from o
 - [ ] Record a verified real-flow backup demo; keep fixture/UI demonstration distinct from live quality proof.
 
 See [ARCHITECTURE](ARCHITECTURE.md), [runtime](docs/WORKSPACE_RUNTIME.md), [evaluation](docs/evaluation.md), [deployment](docs/deployment.md) and [hackathon rules](hackathon.md).
+
+- [x] Landing #start typography, recovery/focus contrast and visible skip navigation. Fixed by /design-review on codex/design-review, 2026-10-19; local browser verification and 192 frontend tests passed.
