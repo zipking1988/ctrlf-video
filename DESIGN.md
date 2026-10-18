@@ -67,6 +67,13 @@ The user rejected scoreboard-only value framing. The landing now leads with sequ
 
 Private recordings expose **Draft a whole-video breakdown** even after earlier answers exist. It preserves existing text and never submits automatically. Whole-video results open their evidence timeline and coverage/limits by default. Existing one-video-above-chat layout and desktop scope remain. The older descriptions below document the preceding design.
 
+After the live final-ball report, a local candidate replaces the static waiting
+notice with elapsed feedback every ten seconds. It reports waiting for a result,
+without inventing a model stage or percentage. Completion, failure or navigation
+ends those updates; newer draft text is retained. Choosing Draft a whole-video
+breakdown during an active request now explains the wait instead of silently
+doing nothing. This candidate is not live; all 30 authorized releases are used.
+
 ## Product experience
 
 The latest selected Review design is the third displayed simple-video concept, `exec-36afa9ec-45e7-4acb-8233-0088b3a0b71c.png`. Review uses one centered video above a compact chat, one natural page scroll, a thin header and an on-demand **Timeline** inside the answer. The rail, repeated introduction and research setup are removed from the default surface; Canvas, recording context, findings and exports remain in the menu. Timeline lists real frame citations at absolute source times, never inferred continuous chapters or exhaustive coverage. Details & save retains the full submitted question and unresolved claims, and the composer preserves drafts and unavailable-analysis feedback. The generated visual uses a shorter question/answer than the real recorded result; the implementation preserves the actual answer and exposes the full prompt in Details. This local redesign does not grant model access, publish source or deploy itself. Earlier dated layout notes below record the previous directions.

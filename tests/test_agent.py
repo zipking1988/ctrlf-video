@@ -663,6 +663,99 @@ def test_observation_bounds_use_cited_frames_instead_of_entire_review_window():
     assert single["evidence"][0]["t"] == 37.037
 
 
+@pytest.mark.anyio
+async def test_final_action_reviews_chronology_and_selects_latest_detected_evidence(
+    tmp_path, monkeypatch
+):
+    calls = []
+    base = handler(calls)
+
+    def respond(request):
+        payload = json.loads(request.content)
+        if request.url.path.endswith(":generateContent"):
+            parts = payload["contents"][0]["parts"]
+            if any("inlineData" in part for part in parts) and not parts[0]["text"].startswith(
+                "Describe"
+            ):
+                calls.append((str(request.url), payload))
+                selected = [json.loads(part["text"]) for part in parts[1:] if "text" in part]
+                assert "chronological" in parts[0]["text"]
+                return generation_response(
+                    {
+                        "observations": [
+                            {
+                                "frame_ids": [f["frame_id"] for f in selected[-2:]],
+                                "statement": "Later matching action.",
+                            },
+                            {
+                                "frame_ids": [f["frame_id"] for f in selected[:2]],
+                                "statement": "Earlier matching action.",
+                            },
+                        ],
+                        "unresolved": [],
+                    }
+                )
+        return base(request)
+
+    app, client, video, desk = await setup_real(
+        tmp_path, monkeypatch, calls, response_handler=respond
+    )
+    try:
+        before = len(calls)
+        body = {
+            "investigation_id": desk["id"],
+            "request_id": "req_final_action",
+            "generation": 0,
+            "question": "who throw the final ball ?",
+        }
+        response = await client.post("/api/chat", json=body)
+        assert response.status_code == 200, response.text
+        answer = response.json()["response"]
+        assert "Later matching action." in answer["answer"]
+        assert "Earlier matching action." not in answer["answer"]
+        assert "sampled" in answer["answer"]
+        assert any("actual final" in item for item in answer["unresolved"])
+        assert len(calls) - before == 1  # One visual review; no retrieval/plan/synthesis chain.
+        repeated = await client.post("/api/chat", json=body)
+        assert repeated.json() == response.json() and len(calls) - before == 1
+        assert len(answer["events"]) == 2  # Earlier evidence remains inspectable.
+        with app.state.workspace.db() as db:
+            row = db.execute("SELECT metadata FROM videos WHERE id=?", (video,)).fetchone()
+            metadata = json.loads(row["metadata"])
+            metadata["duration"] = 351
+            db.execute("UPDATE videos SET metadata=? WHERE id=?", (json.dumps(metadata), video))
+        too_long = await client.post("/api/chat", json={**body, "request_id": "req_final_too_long"})
+        assert too_long.json()["response"]["errors"][0]["code"] == "whole_video_review_limit"
+        assert len(calls) - before == 1  # Scope limit rejects before model dispatch.
+    finally:
+        await client.aclose()
+
+
+def test_temporal_order_ignores_prior_answer_mentions_and_keeps_single_frames_uncertain():
+    from ctrlf_video.agent import temporal_order_request, temporal_synthesis
+
+    assert temporal_order_request("who throw the final ball ?") == "last"
+    assert temporal_order_request("最后一次传球是谁？") == "last"
+    assert temporal_order_request("What was the first click?") == "first"
+    assert temporal_order_request("Compare the first and last throws") == "first_and_last"
+    assert temporal_order_request("Recheck your last answer") is None
+    assert temporal_order_request("Explain your latest summary") is None
+    assert temporal_order_request("What happens in the first 10 seconds?") is None
+    assert temporal_order_request("最后10秒发生了什么？") is None
+    value = temporal_synthesis(
+        "last", [{"statement": "A player throws the ball.", "evidence": [{"t": 7.007}]}]
+    )
+    assert "00:00:07.007" in value["answer"]
+    assert "single frame" in value["answer"]
+    assert any("actual final" in item for item in value["unresolved"])
+    chinese = temporal_synthesis(
+        "last",
+        [{"statement": "画面中有人持球。", "evidence": [{"t": 7.007}]}],
+        "最后一次传球是谁？",
+    )
+    assert "仅单帧" in chinese["answer"] and "实际最后" in chinese["answer"]
+
+
 def test_whole_video_scope_is_explicit_and_rejects_long_sources():
     from ctrlf_video.agent import whole_video_request, whole_video_windows
 

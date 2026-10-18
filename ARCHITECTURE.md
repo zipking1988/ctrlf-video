@@ -38,6 +38,20 @@ Queries bind context to an owned, current video/generation and verified prior an
 
 An explicit whole-video prompt (`Break down the whole video.`, `Break down the entire video.`, or `拆解整段视频。` at the beginning of the submitted question) instead chooses deterministic complete-range windows, bypassing embedding/relevance/planning. Scope is never inferred from retrieved content or task context. Clips over 350 seconds are rejected before any model call; the existing three visual-attempt, 120-second window, 1-FPS and single syntax-repair bounds remain unchanged. Admission reserves the conservative visual-window plus synthesis/repair bound against both existing grants. Each window reserves a share of the 100-event output cap; overflow selection is disclosed and preserves chronology including the final window. Partial checkpoints retain uncertainty, completed-window counts, sampling limits and unreviewed ranges so unknown/cancel recovery cannot look complete. No output schema or ownership contract changes. This path has mock regression coverage; fresh live quality validation remains open.
 
+Local candidate after release 30: first/last/final action questions also use the
+bounded complete-range review, based only on the submitted question. Mentions of
+the previous answer or an explicit numeric time range keep ordinary retrieval.
+Visual review requests all matching actions chronologically. The response orders
+validated evidence times directly, retains every returned observation for checking,
+and describes earliest/latest detected observations rather than asserting an actual
+first/final event. A single cited frame cannot establish movement or finality.
+This path skips retrieval/planning and prose synthesis; admission still reserves
+each visual window plus one possible text syntax repair against both scopes.
+The same 350-second/three-window limits reject before dispatch. No runtime,
+approval, persistence, evidence-schema or source-consent change is involved.
+Mock regressions and replay of the retained failed observation do not establish
+fresh live model quality. This candidate has not been deployed.
+
 An empty relevance-selection list falls back to the highest hybrid candidates up to `rerank_k`, before the existing three-window visual-review limit. Sparse descriptions cannot establish visual absence. Invalid relevance or planning indices still fail validation; the fallback does not add model retries or bypass budget admission.
 
 Planning requests use Gemini's structured output with a required `inspect` array of integers, and explicitly separate window selection from answering the user's question. Server-side validation still rejects missing fields, noninteger/out-of-range indices and more than three selections before any visual review. A valid JSON answer to the research question is not accepted as a plan or as evidence. The optional schema is included in the existing request fingerprint and bounded syntax repair; ingest requests are unchanged.

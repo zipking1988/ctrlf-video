@@ -45,7 +45,7 @@ class Element {
 }
 async function harness({ state = {}, requests = [], job = "ready", realReady = true, blockers = [], starter = false, empty = false } = {}) {
   const store = createStore(), ids = new Map(), calls = [], answers = [], timers = new Map(), entries = [], uploads = [];
-  let seq = 100, timerSeq = 0, ready = false, busy = false, context = null, override = null;
+  let seq = 100, timerSeq = 0, ready = false, busy = false, context = null, override = null, now = 0;
   const get = id => { if (!ids.has(id)) ids.set(id, new Element()); return ids.get(id); };
   const desks = new Map([
     ["desk-A", { id: "desk-A", video: "video-A", title: "A", revision: 1, state }],
@@ -99,6 +99,7 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
   };
   const window = { CtrlFVideoSessionUI: ui, CtrlFVideoWorkbench: store, addEventListener() {} };
   const sandbox = vm.createContext({ window, document: { getElementById: get, createElement: () => new Element(), addEventListener() {} }, fetch,
+    Date: class extends Date { static now() { return now; } },
     XMLHttpRequest: class {
       constructor() { this.upload = {}; this.status = 201; this.responseText = JSON.stringify({ id: "uploaded-video" }); }
       open() {}
@@ -119,7 +120,7 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
   ready = true; await window.testWorkspace.start();
   return { store, get, calls, answers, desks, videos, requestLists, ui, window, timers, entries, uploads,
     get busy() { return busy; }, setContext(value) { context = value; }, setOverride(fn) { override = fn; },
-    async timer(delay) { const entry = [...timers].find(([, timer]) => timer.delay === delay); assert.ok(entry, `Missing ${delay}ms timer`); timers.delete(entry[0]); entry[1].fn(); await tick(); },
+    async timer(delay, {latest=false}={}) { const matching = [...timers].filter(([, timer]) => timer.delay === delay); const entry=latest ? matching.at(-1) : matching[0]; assert.ok(entry, `Missing ${delay}ms timer`); timers.delete(entry[0]); now += delay; entry[1].fn(); await tick(); },
   };
 }
 
@@ -502,7 +503,9 @@ test("a pending request survives the polling limit and is available for recovery
   const h = await harness();
   h.setOverride(c => c.url === "/api/chat" ? response({ kind: "query_control", state: "pending" }) : undefined);
   const ask = h.window.CtrlFVideoPersistence.ask("long query"); await tick();
-  for (let i = 0; i < 15; i++) await h.timer(Math.min(10000, 3000 + i * 500));
+  // Polling and elapsed feedback can have the same delay; drive the network
+  // wait rather than accidentally consuming only the independent UI heartbeat.
+  for (let i = 0; i < 15; i++) await h.timer(Math.min(10000, 3000 + i * 500), {latest:true});
   await ask;
   assert.ok(h.window.testWorkspace.get().activeRequest); assert.equal(h.get("resume-query").hidden, false);
   const dispatched = h.calls.filter(c => c.url === "/api/chat").length;
@@ -691,6 +694,41 @@ test("refreshing model setup updates live access and admission without losing th
     await h.window.CtrlFVideoPersistence.ask("Which team is green?");
     assert.equal(h.calls.some(c => c.url === "/api/chat/prepare"),ready);
   }
+});
+
+test("a slow question reports elapsed time without redispatch or clearing new draft text", async () => {
+  const h=await harness(), pending=deferred();
+  h.setOverride(c=>c.url==="/api/chat" ? pending.promise : undefined);
+  h.get("question").value="Who makes the final pass?";
+  const asking=h.window.CtrlFVideoPersistence.ask(h.get("question").value);
+  await tick();
+  h.get("question").value="My next question";
+  await h.timer(10000);
+  assert.match(h.get("notice").textContent,/10s elapsed/);
+  assert.equal(h.calls.filter(c=>c.url==="/api/chat").length,1);
+  assert.equal(h.get("question").value,"My next question");
+  const call=h.calls.find(c=>c.url==="/api/chat");
+  pending.resolve(response(answer(call.body.request_id)));
+  await asking;
+  assert.equal(h.get("notice").textContent,"");
+  assert.equal(h.get("question").value,"My next question");
+  assert.equal([...h.timers.values()].some(t=>t.delay===10000),false);
+});
+
+test("a delayed question cannot keep announcing progress after another desk opens", async () => {
+  const h=await harness(), pending=deferred();
+  h.setOverride(c=>c.url==="/api/chat" ? pending.promise : c.url.endsWith("/cancel") ? response({}) : undefined);
+  const asking=h.window.CtrlFVideoPersistence.ask("Original question");
+  await tick();
+  await h.window.testWorkspace.openDesk("desk-B");
+  h.get("notice").textContent="New investigation status";
+  await h.timer(10000);
+  assert.equal(h.get("notice").textContent,"New investigation status");
+  const call=h.calls.find(c=>c.url==="/api/chat");
+  pending.resolve(response(answer(call.body.request_id)));
+  await asking;
+  assert.equal(h.answers.length,0);
+  assert.equal(h.get("notice").textContent,"New investigation status");
 });
 
 test("readiness refresh cannot replace an expired owner beneath an open investigation", async () => {

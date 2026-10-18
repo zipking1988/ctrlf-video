@@ -897,7 +897,11 @@ window.CtrlFVideoUI = {
     $("clear-context").click();
   },
   draftQuestion: (question) => {
-    if (!activeVideo || realBusy) return;
+    if (!activeVideo) return;
+    if (realBusy) {
+      notice("Please wait for the current request to finish before starting a whole-video breakdown. Your draft is kept.");
+      return;
+    }
     setWorkspaceView("review", true);
     if ($("question").value.trim()) {
       notice("Your current draft is kept. Clear it before choosing a different starting question.");

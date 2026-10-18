@@ -425,16 +425,23 @@
       generation:store().getSnapshot().epoch,question,parent_request_id:context?.mode==="real" ? context.id : null,
       task_brief:store().getSnapshot().taskBrief,study_type:store().getSnapshot().studyType};
     ui().busy(true,"Checking your question… Your draft is kept while this runs.");
-    let pending=null;
+    let pending=null, progressTimer;
+    function reportWait() {
+      if (!pending || activeRequest!==pending || pending.state!=="running" || !owns(desk.id,epoch)) return;
+      const elapsed=Math.max(0,Math.floor((Date.now()-pending.started)/1000));
+      ui().notify(elapsed ? `Waiting for video analysis · ${elapsed}s elapsed. No result received yet. Your draft is kept; this can take a few minutes.`
+        : "Analyzing the video. Your draft is kept; the result will appear here.");
+      progressTimer=setTimeout(reportWait,10000);
+    }
     try {
       await flush(); if (!owns(desk.id,epoch)) return;
       if (activeRequest) {await stopRequest();if (!owns(desk.id,epoch)) return;}
       const prepared=await api("/api/chat/prepare","POST",body);
       if(!owns(desk.id,epoch)) return;
       if (prepared.kind!=="ready") {ui().notify(prepared.message);return;}
-      pending={desk:desk.id,id:body.request_id,state:"running"};activeRequest=pending;
+      pending={desk:desk.id,id:body.request_id,state:"running",started:Date.now()};activeRequest=pending;
       status("Finding evidence…");
-      ui().notify("Finding evidence in the video… This may take a moment. Your draft is kept.");
+      reportWait();
       let data;
       for (let i=0;i<15;i++) {
         try {data=await api("/api/chat","POST",body);}catch(error){if(error.data?.kind==="query_control") {data=error.data;}else if(error.data?.response) {data=error.data;} else throw error;}
@@ -455,7 +462,7 @@
         : error.message === "real_blocked" ? "New analysis is unavailable. Open a saved answer or check Model setup."
         : "The question could not complete. Check the connection and analysis availability before trying again.";
       ui().notify(`${message} Your draft is kept.`);status("Search incomplete","error");}}
-    finally {if(owns(desk.id,epoch)) ui().busy(false);}
+    finally {clearTimeout(progressTimer);if(owns(desk.id,epoch)) ui().busy(false);}
   }
   async function stopRequest() {
     const pending=activeRequest;

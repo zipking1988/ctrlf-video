@@ -35,6 +35,12 @@ Demo snapshot saves accept current canonical answers, or an exact answer/id alre
 
 Whole-video scope is an explicit question prefix, not a new endpoint or request field. `Break down the whole video.` (also `Break down the entire video.` / `拆解整段视频。`) chooses complete-range sampling for clips up to 350 seconds. Normal readiness, ownership, idempotency and funded-session gates still apply. The final schema remains 0.1; coverage counts, unreviewed ranges and sampling limits appear in `unresolved`. The visual-vector channel is empty for this path because it does not use vector retrieval. See [architecture](../ARCHITECTURE.md).
 
+An undeployed local candidate also handles submitted first/last/final action
+questions through that bounded chronological review. It returns ordered detected
+observations and explicit sampling/finality limits, without a new field or status.
+Earlier-answer mentions and numeric time ranges retain the normal retrieval path.
+The same ownership, idempotency, source, window and budget gates apply.
+
 ## Answer contract
 
 Exports: [Answer](schema/answer-0.1.json), [QueryControl](schema/query-control-0.1.json), [synthetic fixtures](schema/fixtures-0.1.json). Run `make schema` after model changes and `make check` for drift.

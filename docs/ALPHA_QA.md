@@ -299,3 +299,34 @@ stored visual observation identifies a throw but not chronological finality.
 This is a live temporal-grounding failure and an opaque progress experience;
 it is separate from the successful release verification. JPY 109 additional
 reservations belong to that user-submitted request, not deployment checks.
+
+## Local candidate for waiting feedback and chronological questions
+
+The final-ball response is retained unchanged. Read-only inspection of its cached
+vision response shows one generic throw observation at 7.007s, with no evidence
+that it was final. Its generic waiting text covered at least 24.762s after
+embedding completion; extraction/vision accounted for 20.957s. This was a completed
+request, not an unknown dispatch or missing configuration.
+
+The local candidate adds elapsed waiting feedback every ten seconds, stops it on
+completion/navigation, preserves edits made while awaiting the response, and
+explains why the breakdown action cannot start during an active question. A
+submitted first/last/final action question instead reviews the bounded source
+chronologically, requests every matching action and orders returned actual
+citations directly. It retains other observations and explicitly distinguishes
+detected sampled order from actual finality, including single-frame motion limits.
+No fixed basketball facts, cached-answer lookup or replacement of the old answer
+is introduced. This path avoids embedding/relevance/planning/prose-synthesis calls,
+reserving the visual-window cost and one possible syntax repair through both
+existing ledgers. Limits and unknown-outcome protections remain unchanged.
+
+The new regressions fail on the earlier behavior. Mock integration verifies
+chronological evidence selection despite reversed model observation order, same-ID
+replay without another call, and over-350-second rejection before dispatch. Unit
+coverage checks prior-answer/numeric-range exclusions and single-frame limits.
+Deferred-network regressions verify elapsed feedback, draft retention, one network
+submission, timer cleanup and suppression after navigating to another investigation.
+Local checks passed 270 backend tests (one Linux-only skip), 178 frontend tests,
+targeted final-order/scope tests, lint/format/contracts, build and whitespace checks.
+These establish code behavior with mocks, not fresh live model accuracy or latency.
+The candidate remains local and undeployed because all 30 releases are consumed.

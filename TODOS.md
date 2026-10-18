@@ -22,6 +22,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [ ] Correct observed score readings/timing, contradictory findings and inadequate game-sequence analysis. The live trial failed accuracy acceptance. No deployment attempts remain authorized.
 - [x] Locally trace the correct archived image/time pairing, fix multi-frame event bounds that incorrectly used the full review window, and render actual answers as source-linked timelines. Single citations remain points; existing model claims and stored records are preserved. Visual reading/prose errors still require separate live quality work.
 - [x] Deploy the separately authorized reviewed timeline/readiness fixes as attempt 30/30 (`4ccee61`, CI 39135948648); verify exact serving assets/revision, source seeking, unchanged funding/results and a restored local backup (361 files, two SQLite checks). No model calls or cutoff changes were added.
+- [x] Diagnose the subsequent final-ball question: five completed calls, JPY 109 reserved, at least 24.762s after embedding; an earlier match was accepted without finality. Build an undeployed chronological-ordering/uncertainty safeguard and elapsed waiting feedback, with mock regressions and zero extra paid requests. Fresh live quality remains unverified.
 - [x] Preserve incorrect answers alongside a labeled human finding; verify four-question report preview, refresh and a consistent private local backup (363 file hashes, two SQLite checks). Browser JSON export initiated; its download file remains unlocated.
 
 ## Whole-video product value
@@ -33,7 +34,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Add deterministic complete-range sampling for explicit whole-video breakdowns up to 5:50, within existing resource/model limits.
 - [x] Preserve evidence and coverage gaps through later decode failures, output-cap selection and unknown/cancel recovery.
 - [x] Replace scoreboard-only framing with a prepared full-clip source review, independently attributed from the original Gemini result.
-- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. Remaining: JPY 1,249, 42 attempts and six primary calls; no new grant or deadline is implied.
+- [ ] Validate fresh five-minute analysis against a fully annotated authorized source using the remaining sole v4 grant if actual preflight fits. After the user-submitted final-ball question, remaining capacity is JPY 1,140, 37 attempts and six primary calls; no new grant or deadline is implied.
 - [ ] Run an actual first-time human study. Automated browser walkthroughs establish flow behavior, not human comprehension or researcher value.
 
 ## First-use-case validation
