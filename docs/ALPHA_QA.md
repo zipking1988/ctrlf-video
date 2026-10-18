@@ -262,3 +262,40 @@ tests passed, one Linux-only isolation test skipped; 175 frontend tests, build,
 lint/format and contract checks passed. No cloud release or paid model request ran.
 Evidence is private under `.ctrlf-video-eval/timeline-20261018/`; live accuracy,
 five-minute acceptance and another authorized deployment remain outstanding.
+
+## Reviewed release 30 production verification (October 18)
+
+The user authorized exactly one additional deployment, 30 cumulative, with the
+JPY 5,000 total and existing cutoffs unchanged. Reviewed `4ccee61` reached private
+main and deployed both components through CI 39135948648. All 176 frontend and
+269 Linux backend tests passed. The production frontend revision serves 100% of
+traffic, its five checked public assets match the reviewed commit, backend state
+is committed, and all 29 earlier release records remain intact.
+
+The approved cloud browser restored the source, four saved actual answers,
+follow-up context and human finding. The actual-result timeline displays six
+observations and twelve citation moments from the selected retained answer.
+Next selected its second observation and sought the paused source to 14.014s;
+the actual frame still shows 59 against the retained incorrect model claim 62.
+The release changes evidence presentation and bounds, not that model failure.
+The prepared-review timeline and real-result timeline remain separate components.
+
+Before/after audit equality and an isolated comparison of both consistent backup
+ledgers establish that every historical budget and attempt row is unchanged.
+This release added zero model calls. The fresh private backup restored locally
+with 361 file hashes and two SQLite integrity checks passing. Runtime/environment
+bytes, v4 usage (JPY 751, 18 calls, two primary) and cutoffs remain unchanged.
+Production screenshots and audit receipts are ignored private artifacts under
+`.ctrlf-video-eval/aiand-20261018/release30/`. Browser load-time/console telemetry
+was not captured; HTTP health, exact revision/assets, functional UI and stored-data
+checks are the verification evidence. Accuracy/client GO and real five-minute
+acceptance remain outstanding. No further deployment is authorized.
+
+The user's subsequent live question, "who throw the final ball ?", returned
+after five completed model calls rather than hanging. Cache timestamps establish
+at least 24.762 seconds after embedding completion; extraction/vision account for
+20.957 seconds. The response cited 7.007s without verifying the final throw. Its
+stored visual observation identifies a throw but not chronological finality.
+This is a live temporal-grounding failure and an opaque progress experience;
+it is separate from the successful release verification. JPY 109 additional
+reservations belong to that user-submitted request, not deployment checks.

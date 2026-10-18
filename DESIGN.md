@@ -50,8 +50,9 @@ context. All cited frames remain inspectable. Partial coverage and unresolved
 claims stay visible, and opening an old answer makes no model request.
 This is locally verified using the unchanged saved live outputs and the public
 recorded result. It does not establish improved visual-model accuracy or change
-the model allowance. The separately authorized attempt 30 will deploy these
-reviewed fixes; production verification is recorded in the deployment document.
+the model allowance. The separately authorized attempt 30 deployed these
+reviewed fixes in `4ccee61`; production verification is recorded in the deployment
+document. Existing inaccurate model responses remain unchanged.
 
 The example also offers an explicit path into the existing private workspace:
 prepare the verified public clip, confirm its normal upload disclosure, and keep

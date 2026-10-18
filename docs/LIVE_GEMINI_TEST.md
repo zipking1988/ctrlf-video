@@ -21,6 +21,26 @@ main push: 30 cumulative, retaining all 29 prior records. This release allowance
 does not add model funding or change the JPY 5,000 aggregate and existing cutoffs.
 See the [deployment record](deployment.md) for attempt 30 verification.
 
+Attempt 30 subsequently deployed `4ccee61` successfully. Read-only browser checks,
+asset checks, before/after ledger audits and restored-backup comparisons added
+zero model requests. All historical budget/attempt rows and the four real answers
+remain unchanged; v4 still reserves JPY 751 with 18/60 calls and 2/8 primary calls.
+The source timeline is live, but this is not a new accuracy or five-minute pass.
+
+After release verification, the user independently submitted "who throw the final
+ball ?" with the last breakdown as context. Request `a2859542863e4187b345812846777016`
+completed five calls (JPY 109 reserved): embedding, relevance selection, planning,
+visual review and synthesis. It returned a 7.007s throw without establishing that
+it was final. The cached visual observation itself lacked that temporal claim;
+the answer pipeline did not resolve the missing chronological qualification.
+Cached completion times show 24.762s from embedding completion through synthesis,
+including 20.957s for decoding/vision. This is a lower bound on total latency;
+the UI exposed only a generic waiting message. There was no stalled/unknown call
+or credential/budget failure in this request. Read-only diagnosis sent no model
+requests. Current v4 usage is JPY 860 / 2,000, 23/60 calls and 2/8 primary calls;
+capacity is JPY 1,140 / 37 calls / six primary calls. Earlier answers and financial
+records remain retained. This result is another failed semantic acceptance case.
+
 The fresh grant `live_jpy5000_alpha_20261018_v4` is installed for deployment and
 one current browser owner. After the old session naturally expired, the user
 explicitly confirmed binding this sole grant to `Live alpha acceptance · 2026-10-18`.

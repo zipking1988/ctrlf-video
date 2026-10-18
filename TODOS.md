@@ -21,6 +21,7 @@ Updated: 2026-10-18. This is the current acceptance backlog, consolidated from o
 - [x] Deploy the split (`0ffd59e`, release 29/29) and run actual 70.203-second source analysis plus three contextual follow-ups. All follow-ups used context; this verifies live integration only.
 - [ ] Correct observed score readings/timing, contradictory findings and inadequate game-sequence analysis. The live trial failed accuracy acceptance. No deployment attempts remain authorized.
 - [x] Locally trace the correct archived image/time pairing, fix multi-frame event bounds that incorrectly used the full review window, and render actual answers as source-linked timelines. Single citations remain points; existing model claims and stored records are preserved. Visual reading/prose errors still require separate live quality work.
+- [x] Deploy the separately authorized reviewed timeline/readiness fixes as attempt 30/30 (`4ccee61`, CI 39135948648); verify exact serving assets/revision, source seeking, unchanged funding/results and a restored local backup (361 files, two SQLite checks). No model calls or cutoff changes were added.
 - [x] Preserve incorrect answers alongside a labeled human finding; verify four-question report preview, refresh and a consistent private local backup (363 file hashes, two SQLite checks). Browser JSON export initiated; its download file remains unlocated.
 
 ## Whole-video product value

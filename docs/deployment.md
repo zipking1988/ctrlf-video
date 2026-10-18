@@ -387,7 +387,30 @@ grant, runtime, IAM, resource sizing, JPY 5,000 total or cutoff changes are incl
 The existing main-only workflow remains the deployment path; its Linux tests,
 consistent restored-backup check, owned-data verification and rollback guards
 still apply. This authorization does not grant attempt 31. The deployment result
-will be recorded after the matching CI run and production checks finish.
+is recorded below.
+
+Attempt 30 deployed reviewed `4ccee61d0cdc0cc0e82f62073853f74bb6a5957c`
+successfully through [CI 39135948648](https://github.com/zipking1988/ctrlf-video/actions/runs/39135948648).
+CI passed 176 frontend and 269 Linux backend tests, including namespace isolation
+and deployment recovery. Backend state is `committed`, 30/30, with all 29 prior
+attempt records unchanged. Frontend revision
+`ctrlfvideo-frontend-ci-4ccee61d-39135948648` serves 100% of traffic. Public HTML,
+generated bundle, workspace/app modules and timeline stylesheet match the approved
+commit byte for byte. Public health reports real mode and the owned browser
+restores the same source, four answers, follow-up context and human finding.
+The actual-result timeline's selection and 14.014-second source seek passed;
+existing incorrect claims remain visible and unchanged.
+
+Before/after audits and isolated backup comparison confirmed every historical
+budget/attempt row unchanged: JPY 751 reserved, 18/60 calls and 2/8 primary calls
+in v4. This deployment made zero model requests and added no grant. The fresh
+consistent backup was downloaded privately and restored locally: all 361 file
+hashes and both SQLite integrity checks passed, archive SHA-256
+`ecee1f92b47226ee76d498b72ecf41450d678cdb1611cdf50467de87961eb7ea`.
+Runtime/environment bytes agree with that backup. The JPY 5,000 total and all
+existing October 19 admission, model, IAM and cleanup cutoffs are unchanged.
+No attempt 31 is authorized. Live accuracy and real five-minute acceptance still
+fail/remain pending respectively; this release verifies deployment and UI behavior.
 
 Recovery entry points on the VM (trusted operator only):
 
