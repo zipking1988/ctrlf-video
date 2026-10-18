@@ -2,12 +2,15 @@ import React, {useEffect, useRef, useState} from "react";
 import {createPortal} from "react-dom";
 import {citedMoments, sourceClock} from "./review-timeline.mjs";
 import {questionLabel, isBreakdown} from "./question-shortcuts.mjs";
+import AnalysisTimeline from "./analysis-timeline.jsx";
 
 export default function SimpleReview({state, ui, icon, metaTarget, playerId = "player", onSaveFinding, newQuestionLabel = "New question"}) {
   const selected = state.records.find(record => record.id === state.selectedId) || state.records.at(-1);
   const query = selected?.query;
   const breakdown = !!query && isBreakdown(query.question);
-  const moments = citedMoments(query, state.sourceInfo?.metadata?.duration);
+  const duration = state.sourceInfo?.metadata?.duration ?? state.sourceInfo?.duration;
+  const moments = citedMoments(query, duration);
+  const analysis = query?.mode === "real";
   const [timelineFor, setTimelineFor] = useState(null);
   const timeline = useRef(null);
   const timelineTrigger = useRef(null);
@@ -52,6 +55,15 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
           </details>
   ) : null;
   const target = metaTarget === undefined ? document.getElementById("review-source-meta") : metaTarget;
+  const citedTimeline = query ? <section id={timelineId} className={`simple-cited-timeline${analysis ? " simple-analysis-timeline" : ""}`} ref={timeline} hidden={!open} aria-label="Cited timeline" onKeyDown={timelineKeyDown}>
+    <header><h2>Cited timeline <span>{moments.length} {moments.length === 1 ? "moment" : "moments"}</span></h2><button type="button" className="icon-button" aria-label="Close timeline" onClick={closeTimeline}>{icon("x")}</button></header>
+    {analysis && open ? <AnalysisTimeline key={key} query={query} duration={duration} playerId={playerId} onSeek={frame => ui()?.seek(frame.t, query)} onReplay={replay}/> : moments.length ? <ol>{moments.map(frame => <li key={`${frame.uri}:${frame.t}`}>
+      <button type="button" onClick={() => replay(frame)} aria-label={`Replay timeline ${sourceClock(frame.t)}`}>
+        <time>{sourceClock(frame.t)}</time><img src={frame.uri} alt={frame.caption || "Cited source frame"}/><span>{frame.description}</span>
+      </button>
+    </li>)}</ol> : <p>No cited moments for this question. Open a saved answer or start a new question.</p>}
+    <p className="simple-timeline-scope">{analysis ? (breakdown ? "These are cited observations from sampled windows. Check Review coverage & limits for unfinished ranges; sampling does not prove every event was detected." : "Other moments were not exhaustively reviewed. This lists citations, not a full-video breakdown.") : "Synthetic demo · preset moments, no model calls."}</p>
+  </section> : null;
   return <>
     {target && createPortal(<div className="simple-source-meta">
       <span>{state.sourceInfo?.name || "Package positions · Synthetic demo"}</span>
@@ -64,16 +76,10 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
         <p className="simple-user-message">{questionLabel(query.question)}</p>
         <article className="simple-answer" aria-label="Answer and source citations">
           <div className="simple-answer-heading">{icon("chats-circle")}<span>{query.response.status === "error" ? "Question not completed" : breakdown ? "Whole-video breakdown" : "Answer"}</span></div>
-          <p className="simple-answer-text">{query.response.answer}</p>
-          {query.mode === "real" && breakdown && !!query.response.events.length && <section className="live-findings" aria-label="Findings from this analysis">
-            <h2>Findings from this analysis</h2>
-            <p>Generated from this recording. Replay each citation to check the observation.</p>
-            <ol>{query.response.events.map((event,index)=><li key={index}>
-              <strong>{event.action}</strong>
-              {event.summary !== event.action && <p>{event.summary}</p>}
-              <div>{event.evidence.map(frame=><button type="button" className="outline-button" key={`${frame.frame_id}:${frame.t}`} onClick={()=>replay(frame)} aria-label={`Replay finding ${index+1} at ${sourceClock(frame.t)}`}>{sourceClock(frame.t)} {icon("play")}</button>)}</div>
-            </li>)}</ol>
-          </section>}
+          {analysis && breakdown && !!moments.length ? <>
+            {citedTimeline}
+            <details className="simple-generated-summary"><summary>Read generated summary · check against the source</summary><p className="simple-answer-text">{query.response.answer}</p></details>
+          </> : <p className="simple-answer-text">{query.response.answer}</p>}
           {query.mode === "real" && ["ok","partial"].includes(query.response.status) && !!query.response.events.length && <div className="live-answer-actions">
             <button type="button" className="primary-button" disabled={state.local} onClick={()=>ui()?.continueFrom(selected.id)}>Follow up on this answer {icon("arrow-right")}</button>
             <button type="button" className="outline-button" onClick={save}>Write a finding</button>
@@ -92,17 +98,10 @@ export default function SimpleReview({state, ui, icon, metaTarget, playerId = "p
           <div className="simple-citations">
             {moments.map(frame => <button type="button" key={`${frame.uri}:${frame.t}`} onClick={() => replay(frame)} aria-label={`Replay source ${sourceClock(frame.t)}`}>{sourceClock(frame.t)}{icon("play")}</button>)}
             <span>{query.mode === "real" ? "Saved model result" : "Preset demo"} · {({ok:"Cited result",partial:"Partial",error:"Not completed",no_result:"No matching evidence"})[query.response.status]}</span>
+            {!target && <button type="button" ref={timelineTrigger} aria-expanded={open} aria-controls={timelineId} onClick={() => setTimelineFor(open ? `closed:${key}` : key)}>Source timeline</button>}
             {details}
           </div>
-          <section id={timelineId} className="simple-cited-timeline" ref={timeline} hidden={!open} aria-label="Cited timeline" onKeyDown={timelineKeyDown}>
-            <header><h2>Cited timeline <span>{moments.length} {moments.length === 1 ? "moment" : "moments"}</span></h2><button type="button" className="icon-button" aria-label="Close timeline" onClick={closeTimeline}>{icon("x")}</button></header>
-            {moments.length ? <ol>{moments.map(frame => <li key={`${frame.uri}:${frame.t}`}>
-              <button type="button" onClick={() => replay(frame)} aria-label={`Replay timeline ${sourceClock(frame.t)}`}>
-                <time>{sourceClock(frame.t)}</time><img src={frame.uri} alt={frame.caption || "Cited source frame"}/><span>{frame.description}</span>
-              </button>
-            </li>)}</ol> : <p>No cited moments for this question. Open a saved answer or start a new question.</p>}
-            <p className="simple-timeline-scope">{query.mode === "real" ? (breakdown ? "These are cited observations from sampled windows. Check Review coverage & limits for unfinished ranges; sampling does not prove every event was detected." : "Other moments were not exhaustively reviewed. This lists citations, not a full-video breakdown.") : "Synthetic demo · preset moments, no model calls."}</p>
-          </section>
+          {!(analysis && breakdown && !!moments.length) && citedTimeline}
 
         </article>
       </> : <div className="simple-chat-empty">

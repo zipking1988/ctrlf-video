@@ -37,3 +37,19 @@ test("whole-video results expose coverage and chronological citations by default
  assert.ok(!/<section id="player-cited-timeline"[^>]* hidden/.test(html));
  assert.match(html,/sampling does not prove every event was detected/);
 });
+
+test("real analysis timeline distinguishes a single citation from a broad review scope",()=>{
+ const sample=require('../src/ctrlf_video/static/judge/basketball/results.json');
+ const query={...sample.query,question:'Break down the whole video.',response:{...sample.query.response,events:[{
+  video_id:sample.query.video_id,start:0,end:70.203467,action:'Model claim to check',summary:'Model claim to check',
+  evidence:[{t:36.036,frame_id:'actual-frame',uri:'/static/judge/basketball/frames/review-36.jpg'}],
+ }]}};
+ const state={records:[{id:'q',query}],selectedId:'q',sourceInfo:{id:query.video_id,metadata:{duration:70.203467}},epoch:0};
+ const html=renderToStaticMarkup(React.createElement(SimpleReview,{state,playerId:'player',metaTarget:null,ui:()=>({}),icon:()=>null}));
+ assert.match(html,/Model observations on the source timeline/);
+ assert.match(html,/Single cited instant: 00:36.036. No event duration is established./);
+ assert.match(html,/Model claims need checking/);
+ assert.ok(!html.includes('Cited frame span: 00:00'));
+ assert.ok(!html.includes('Prepared by Codex'));
+ assert.match(html,/src="\/static\/judge\/basketball\/frames\/review-36.jpg"/);
+});

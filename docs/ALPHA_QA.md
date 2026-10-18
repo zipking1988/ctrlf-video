@@ -234,3 +234,31 @@ page. The iframe wrapper and its local test server were closed after checking;
 its native click targeting was unavailable, so section activation was verified
 in the main tab. Details stack below 850px; that narrower layout was not checked.
 No model call, grant change, push to main or deployment ran for this local edit.
+
+## Local actual-result timeline and timing investigation (October 18)
+
+The real-answer renderer now opens whole-video results with their source-linked
+timeline and an evidence inspector, retaining generated prose in a disclosure.
+Nodes use sorted actual frame times, retain overlapping claims separately and
+describe a single citation as a point. They do not import the prepared review.
+Previous/Next, keyboard activation, source seeks, last-frame access, question
+switching, and Escape/trigger focus recovery passed in a read-only local replay
+of all four unchanged actual model answers with checksum-verified archived frames.
+The replay was explicitly labeled as saved output with known inaccurate claims;
+it made no model calls and did not restore/re-own a private workspace.
+
+The archived 14.014-second image shows Atlanta 59; the model's observation says
+62. Image hashes agree across the four requests, and the adapter keeps each
+frame's timestamp/image pairing. The false claim originates in visual model
+output, not a shifted source image. Generated prose also still contains malformed
+timestamps. This pass does not fix those semantic/model-quality failures.
+
+A separate deterministic bug assigned every observation the full review-window
+interval. The new regression failed on the prior implementation. Multi-frame
+events now bracket their actual citations. Single-frame legacy intervals remain
+for schema 0.1 compatibility and are explicitly rendered as points. Existing
+stored results and budget records are unchanged. Full local results: 268 backend
+tests passed, one Linux-only isolation test skipped; 175 frontend tests, build,
+lint/format and contract checks passed. No cloud release or paid model request ran.
+Evidence is private under `.ctrlf-video-eval/timeline-20261018/`; live accuracy,
+five-minute acceptance and another authorized deployment remain outstanding.

@@ -947,3 +947,42 @@ body.recorded-view .research-welcome { display: none; }
 .live-findings li { padding: 16px; background: #edf3ee; border-left: 3px solid #8eafa2; }
 .live-findings li > div, .live-answer-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .live-answer-actions small { flex-basis: 100%; }
+
+/* Actual model output uses source citations, never prepared review sections. */
+.simple-analysis-timeline { width: min(1200px, calc(100vw - 48px)); max-width: none; box-sizing: border-box; position: relative; margin-left: calc((100% - min(1200px, calc(100vw - 48px))) / 2); padding: 0; border-radius: 8px; background: #fbfcf8; }
+.simple-analysis-timeline > header { padding: 16px 20px 0; }
+.simple-analysis-timeline > .simple-timeline-scope { padding: 0 20px 16px; }
+.analysis-timeline-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 4px 20px 8px; }
+.analysis-timeline-toolbar p { display: flex; align-items: baseline; flex-wrap: wrap; gap: 14px; margin: 0; font-size: 13px; }
+.analysis-timeline-toolbar p > span { font-size: 11px; color: #526663; font-variant-numeric: tabular-nums; }
+.analysis-timeline-toolbar > div { display: flex; align-items: center; gap: 10px; font-size: 11px; }
+.analysis-timeline-toolbar button { font-size: 11px; }
+.analysis-timeline-note { font-size: 12px; color: #526663; padding: 0 20px; margin: 0 0 14px; }
+.simple-generated-summary { margin: 20px 0; font-size: 13px; }
+.simple-generated-summary > summary { color: #526663; cursor: pointer; }
+.simple-generated-summary .simple-answer-text { margin-top: 12px; }
+.analysis-timeline-scroll { max-height: 440px; overflow: auto; overscroll-behavior-x: contain; border-block: 1px solid #d6e1d8; background: #eef3ed; scrollbar-color: #91ada2 #e5ede7; }
+.analysis-timeline-board { min-width: 1180px; padding: 16px 24px 18px; box-sizing: border-box; }
+.analysis-observation-tracks { position: relative; min-height: 132px; }
+.simple-analysis-timeline .analysis-observation-tracks ol { position: absolute; inset: 0; }
+.simple-analysis-timeline .analysis-observation-tracks li { position: absolute; left: 0; width: 100%; height: 132px; border: 0; padding: 0; }
+.simple-analysis-timeline .analysis-observation-tracks li > button { position: absolute; top: 18px; width: 228px; min-height: 102px; display: flex; flex-direction: column; align-items: start; gap: 6px; padding: 10px 12px; border: 1px solid #b8ccbf; border-radius: 6px; background: #e1f2e9; color: #183e3a; text-align: left; cursor: pointer; }
+.simple-analysis-timeline .analysis-observation-tracks li > button[aria-pressed="true"] { border: 2px solid #0b625d; padding: 9px 11px; background: #f0f7f0; }
+.simple-analysis-timeline .analysis-observation-tracks li > button:hover { background: #edf7ef; }
+.simple-analysis-timeline .analysis-observation-node time { font-size: 10px; font-weight: 500; }
+.analysis-observation-node strong { font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+.analysis-observation-node small { font-size: 10px; color: #526663; }
+.simple-analysis-timeline li > .analysis-time-anchor { position: absolute; top: 3px; height: 15px; width: 1px; background: #7ca093; }
+.analysis-time-anchor::before { content: ''; position: absolute; left: -3px; top: 0; width: 7px; height: 7px; border-radius: 50%; background: #527d6e; }
+.analysis-observation-detail { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 28px; padding: 22px; }
+.analysis-observation-detail > div { min-width: 0; }
+.analysis-observation-detail h3 { font-size: 19px; line-height: 1.4; margin: 10px 0; }
+.analysis-observation-detail p { font-size: 13px; line-height: 1.7; }
+.analysis-observation-detail .analysis-evidence-scope { color: #526663; font-size: 12px; }
+.analysis-evidence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; max-height: 320px; overflow-y: auto; }
+.analysis-evidence-grid figure { min-width: 0; margin: 0; }
+.analysis-evidence-grid figure button { width: 100%; padding: 0; border: 1px solid #b7c9bc; border-radius: 4px; overflow: hidden; background: #f5f8f2; cursor: pointer; text-align: left; }
+.analysis-evidence-grid figure img { width: 100%; height: auto; display: block; }
+.analysis-evidence-grid figure time { display: block; padding: 7px; }
+.analysis-timeline button:focus-visible, .analysis-timeline [tabindex="0"]:focus-visible { outline: 2px solid #0b625d; outline-offset: 3px; }
+@media (max-width: 850px) { .analysis-observation-detail { grid-template-columns: 1fr; } .analysis-timeline-toolbar { flex-wrap: wrap; } }

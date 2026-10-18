@@ -38,6 +38,19 @@ playback updates, finding save/refresh and preserved drafts were checked locally
 This remains a labeled prepared review, not new model analysis. The change is
 local only: all 29 authorized cloud deployments are already consumed.
 
+The next local pass carries the canvas into actual model results. Whole-video
+answers open with their own source timeline and selected evidence; generated
+prose stays available under Read generated summary. The timeline derives positions
+and frame spans from actual citations, not review-window bounds or prepared notes.
+Overlapping observations occupy separate rows; one-frame observations remain
+points with an explicit duration limit. Previous/Next, keyboard selection, a
+playback marker and direct source replay keep navigation separate from question
+context. All cited frames remain inspectable. Partial coverage and unresolved
+claims stay visible, and opening an old answer makes no model request.
+This is locally verified using the unchanged saved live outputs and the public
+recorded result. It does not establish improved visual-model accuracy or change
+the exhausted cloud release allowance.
+
 The example also offers an explicit path into the existing private workspace:
 prepare the verified public clip, confirm its normal upload disclosure, and keep
 the visitor's question as a draft. This copies only the fixed, size-bounded,
