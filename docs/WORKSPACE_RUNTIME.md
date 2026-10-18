@@ -6,6 +6,8 @@ Updated: 2026-10-17. Gemini-default implementation; optional ai& Gemma preparati
 
 Use `make setup`, `make preflight`, `make run` and open http://127.0.0.1:8765. The source library uploads and renames/deletes videos, performs bounded FFmpeg/ffprobe preflight, and supports private source playback. Analysis stays blocked until real prerequisites and budgets are met.
 
+The default local preview disables live analysis. Its upload-complete notice and Model setup identify that mode explicitly; an otherwise configured session is instead directed to Start analysis in Sources. Configuration and owner approvals on a cloud deployment do not configure or fund a localhost session. Check Model setup in the original approved browser session on that deployment.
+
 Investigation storage includes the latest 12 questions, up to eight findings, notes, layout, groups, paths, viewport, drafts and player position in local SQLite. Default retention is 24 hours. Ownership follows the `ctrlf_session` cookie; clearing it does not transfer an old investigation. There is no account-based cross-device sync.
 
 The synthetic library uses a public 18-second static-scene demo. It demonstrates the UI and contracts; it cannot answer uploaded-source questions or establish model quality. New visitors see the recorded real example and upload actions on the landing. The preset demo is available through Quick guide and the workspace menu. Returning work restores directly. Upload shows access, retention and size limits before transmission, uses the same owned upload/preflight path and does not start model analysis. A demo starter desk is initialized for ownership/saving, without dispatching a model request. See the [alpha handoff](../ALPHA.md).

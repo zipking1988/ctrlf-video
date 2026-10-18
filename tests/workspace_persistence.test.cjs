@@ -43,7 +43,7 @@ class Element {
   scrollIntoView() {}
   querySelector() { return new Element(); }
 }
-async function harness({ state = {}, requests = [], job = "ready", realReady = true, starter = false, empty = false } = {}) {
+async function harness({ state = {}, requests = [], job = "ready", realReady = true, blockers = [], starter = false, empty = false } = {}) {
   const store = createStore(), ids = new Map(), calls = [], answers = [], timers = new Map(), entries = [], uploads = [];
   let seq = 100, timerSeq = 0, ready = false, busy = false, context = null, override = null;
   const get = id => { if (!ids.has(id)) ids.set(id, new Element()); return ids.get(id); };
@@ -76,7 +76,7 @@ async function harness({ state = {}, requests = [], job = "ready", realReady = t
     calls.push(call);
     const special = override?.(call);
     if (special !== undefined) return special;
-    if (url === "/api/session") return response({ csrf: "csrf", owner_id: "owner-A", ttl_hours: 24, real_ready: realReady });
+    if (url === "/api/session") return response({ csrf: "csrf", owner_id: "owner-A", ttl_hours: 24, real_ready: realReady, blockers });
     if (url === "/api/investigations" && call.method === "GET") return response({ items: [...desks.values()] });
     if (url === "/api/investigations" && call.method === "POST") {
       const desk = { id: "new-demo", video: call.body.video_id, title: call.body.title, revision: 1, state: {} };
@@ -131,6 +131,22 @@ test("successful upload saves the previous draft and opens the new investigation
   assert.equal(h.window.testWorkspace.get().current.video, "uploaded-video");
   assert.equal(h.desks.get("desk-A").state.ui.draft, "Keep the original draft");
   assert.match(h.get("notice").textContent, /Upload complete/);
+});
+
+test("preflight distinguishes preview mode, blocked sessions and explicitly started analysis", async () => {
+  for (const scenario of [
+    {realReady:false, blockers:["fixture_mode_no_model_requests"], notice:/Live analysis is disabled.*preview mode/},
+    {realReady:false, blockers:["budget_not_approved_or_insufficient"], notice:/blocked for this browser session.*Model setup/},
+    {realReady:true, blockers:[], notice:/Ready to start analysis.*Sources.*Start analysis/},
+  ]) {
+    const h=await harness({...scenario,job:"queued"});
+    h.get("question").value="Keep my question";
+    h.videos.get("video-A").job={state:"awaiting_configuration"};
+    await h.timer(2000);
+    assert.match(h.get("notice").textContent,scenario.notice);
+    assert.equal(h.get("question").value,"Keep my question");
+    assert.equal(h.calls.some(c=>/\/analyze|\/chat/.test(c.url)),false);
+  }
 });
 
 test("prepared example question transfers only as a draft into the new owned investigation", async () => {

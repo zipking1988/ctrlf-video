@@ -114,6 +114,14 @@
     button.onclick=()=>Promise.resolve(action()).catch(error=>libraryNotice(error.message));row.append(button);return row;
   }
   function libraryNotice(message) { $("library-notice").textContent=message; }
+  function analysisNotice(prefix="") {
+    const detail=session?.blockers?.includes("fixture_mode_no_model_requests")
+      ? "Live analysis is disabled on this server (preview mode). Playback and drafts are available. Open Workspace menu → Model setup for details."
+      : session?.real_ready
+        ? "Ready to start analysis. Open Sources and choose Start analysis; uploading does not send model requests."
+        : "Analysis is blocked for this browser session. Open Workspace menu → Model setup to check credentials, calibration and its approved budget. Playback and drafts are available.";
+    return prefix+detail;
+  }
   async function refreshAccess() {
     const next=await api("/api/session");
     if (session?.owner_id && next.owner_id!==session.owner_id) throw new Error("session_expired_reload");
@@ -128,7 +136,9 @@
       await refreshAccess();
       const data=await api("/api/runtime/status");
       const provider=data.provider === "aiand" ? "Gemma via ai& · Google text embeddings" : data.provider === "gemini_aiand" ? "Gemini vision · Gemma text via ai&" : "Gemini · AI Builder Cup";
-      $("agent-setup-summary").textContent=data.dispatch_prerequisites_met
+      $("agent-setup-summary").textContent=data.mode === "fixture"
+        ? "Live analysis is disabled on this server (preview mode). Upload, playback, drafts and saved results remain available. A configured deployment and its approved browser session are separate from this preview."
+        : data.dispatch_prerequisites_met
         ? `${provider}: Local prerequisites are ready. Start analysis in Sources; live model connectivity and quality remain unverified.`
         : `${provider}: Analysis is not ready. Demos, upload preflight, playback and local saving remain available.`;
       const list=$("agent-readiness-checks");list.replaceChildren();
@@ -198,7 +208,7 @@
         remove.setAttribute("aria-label",`Delete source: ${video.name}`);
         remove.onclick=()=>confirmDelete(video,"videos");row.append(remove);body.append(row);
       }
-      if (!session.real_ready) libraryNotice("Analysis awaits model and budget configuration. Upload, preflight, playback and saving are available.");
+      if (!session.real_ready) libraryNotice(analysisNotice());
     } else {
       const data=await api("/api/investigations");
       if (!active()) return;
@@ -358,7 +368,7 @@
           try {ui().restore(saved,video);} finally {suspended=false;}
           changed();
           if (video.job?.state === "failed") ui().notify(`Preflight or analysis failed: ${video.job.error}.Source retained; retry processing or delete it.`);
-          if (video.job?.state === "awaiting_configuration") ui().notify("Preflight complete. Awaiting model and budget configuration; no model requests will be sent.");
+          if (video.job?.state === "awaiting_configuration") ui().notify(analysisNotice("Preflight complete. "));
           return;
         }
       }catch(error){if (owns(deskId,epoch)) ui().notify(error.message);return;}

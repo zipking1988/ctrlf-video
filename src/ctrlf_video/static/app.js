@@ -281,7 +281,7 @@ function updateSend() {
 }
 function updateComposerFeedback() {
   const message = composerMessage || (activeVideo && liveAccess === false
-    ? "New analysis is unavailable in this workspace. You can play the video and open saved answers."
+    ? "New analysis is unavailable for this session. Open Workspace menu → Model setup to check why. Playback, drafts and saved answers remain available."
     : "");
   $("composer-feedback").textContent = message;
   $("composer-feedback").hidden = !message;
