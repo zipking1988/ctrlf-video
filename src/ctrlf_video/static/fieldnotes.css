@@ -708,7 +708,9 @@
 .compact-welcome .welcome-actions .welcome-primary img { filter: brightness(0) invert(1); }
 .compact-welcome .welcome-actions .welcome-secondary { background: transparent; color: #193d3c; border: 1px solid #bdccc1; }
 .compact-welcome .welcome-intro > .welcome-access { font-size: 13px; line-height: 1.7; margin-top: 0; }
-.compact-welcome #welcome-notice { font-size: 12px; }
+.compact-welcome #welcome-notice { font-size: 13px; color: #88401f; }
+.compact-welcome .welcome-intro > .text-button { color: #0b625d; }
+.compact-welcome button:focus-visible, .compact-welcome a:focus-visible { outline-color: #0b625d; }
 .compact-welcome .welcome-product { align-self: center; width: 100%; }
 .compact-welcome .welcome-product a { border: 1px solid #d5ded5; border-radius: 14px; background: #fffefa; box-shadow: 0 14px 44px #193d3c0a; text-decoration: none; color: #192b30; }
 .compact-welcome .welcome-product img { width: 100%; height: auto; aspect-ratio: 16/9; object-fit: contain; }
